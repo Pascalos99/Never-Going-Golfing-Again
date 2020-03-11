@@ -3,14 +3,20 @@ package golf_map_generator;
 import main.Function2d;
 import main.Vector2d;
 
+import static golf_map_generator.Variables.*;
+
 public class PuttingCourse {
 	
 	double[][] height_map;
 	double[][] friction_map;
 	int[][] material_map;
 	
+	Function2d height_function;
+	
 	public PuttingCourse(Function2d height, Vector2d flag, Vector2d start) {
-		//TODO implement this
+		height_function = height;
+		friction_map = MapGenUtils.fill(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_FRICTION);
+		height_map = MapGenUtils.fill(DEFAULT_WIDTH, DEFAULT_HEIGHT, height);
 	}
 	
 	public Function2d get_height() {
