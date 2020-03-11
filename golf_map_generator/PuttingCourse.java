@@ -12,11 +12,18 @@ public class PuttingCourse {
 	int[][] material_map;
 	
 	Function2d height_function;
+	Vector2d flag_position;
+	Vector2d start_position;
+	double hole_tolerance;
 	
 	public PuttingCourse(Function2d height, Vector2d flag, Vector2d start) {
 		height_function = height;
 		friction_map = MapGenUtils.fill(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_FRICTION);
 		height_map = MapGenUtils.fill(DEFAULT_WIDTH, DEFAULT_HEIGHT, height);
+		flag_position = flag;
+		start_position = start;
+		hole_tolerance = DEFAULT_HOLE_TOLERANCE;
+		material_map = PuttingCourseGenerator.generate_materials(height_map, friction_map, flag, start, hole_tolerance);
 	}
 	
 	public Function2d get_height() {

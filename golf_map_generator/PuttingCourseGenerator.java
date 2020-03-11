@@ -18,16 +18,20 @@ public class PuttingCourseGenerator {
 	/** This method will generate a material heat-map given a height and friction map.<br>
 	 * It will therefor not be able to account for obstacles, as they cannot be gathered from this data.<br>
 	 * Flag and start positions will also be inserted, given the hole_tolerance is > 0
-	 * @return {@code null} if the heat-map sizes do not match up. */
+	 * @return {@code null} if the heat-map sizes do not match up.
+	 * @throws RuntimeException if the flag or start positions are not within the bounds of the height and friction maps. */
 	public static int[][] generate_materials(double[][] height, double[][] friction, Vector2d flag, Vector2d start, double hole_tolerance) {
 		if (height.length != friction.length || height[0].length != friction[0].length) return null;
 		int[][] result = new int[height.length][height[0].length];
+		boolean start_chosen = false, flag_chosen = false;
 		for (int i=0; i < height.length; i++) {
 			for (int j=0; j < height[i].length; j++) {
 				double z_value = height[i][j];
 				double f_value = friction[i][j];
-				if (flag.is_contained_in(i, j, hole_tolerance)) result[i][j] = FLAG.index;
-				else if (start.is_contained_in(i, j, 0.01)) result[i][j] = STARTING_POINT.index; // TODO perfect when the is_contained_in method functions properly
+				if (flag.is_contained_in(i, j, hole_tolerance)) { result[i][j] = FLAG.index; flag_chosen = true; }
+				else if (start.is_contained_in(i, j, 0.01) && !start_chosen) {
+					result[i][j] = STARTING_POINT.index;
+					start_chosen = true; }
 				else if (z_value < 0) result[i][j] = WATER.index;
 				else if (f_value <= 0) result[i][j] = ICE.index;
 				else if (f_value >= SAND_FRICTION) result[i][j] = SAND.index;
@@ -36,6 +40,10 @@ public class PuttingCourseGenerator {
 				else result[i][j] = GRASS.index;
 			}
 		}
+		
+		if (!start_chosen) throw new RuntimeException("Start is not contained within the map.");
+		if (!flag_chosen) throw new RuntimeException("Flag is not contained within the map.");
+		
 		return result;
 	}
 	
