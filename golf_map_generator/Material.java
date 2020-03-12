@@ -17,6 +17,7 @@ public enum Material {			// index
 	TNT				(EXPLOSIVE, 	9,		new Color(0xf74343));
 	
 	public final MaterialType type;
+	/** This index should always be perfectly alligned with the {@link #values()} index of the corresponding Material. */
 	public final int index;
 	/** Were we to use a mini-map, this would be the color this material would display on the map (for now just used for visualization of map-generation) */
 	public final Color map_color;
