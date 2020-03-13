@@ -2,6 +2,7 @@ package golf_map_generator;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 
@@ -11,6 +12,8 @@ import javax.swing.JFrame;
 import main.Function2d;
 
 public class MapGenUtils {
+	
+	public static final double m = 100d;
 	
 	/** Approaches the scaling of the matrix m by the given factor (a 2x2 * 2 gives a 3x3, a 100x100 * 2 gives a 199x199) */
 	public static double[][] enlargeMatrix(double[][] m, int factor) {
@@ -53,9 +56,9 @@ public class MapGenUtils {
 	}
 	
 	/** designed for matrices that only contain numbers between 0 and 1*/
-	public static void applyRangeToMatrix(double[][] m, double min, double max) {
+	public static void applyRangeToMatrix(double[][] m, Range range) {
 		for (int i=0; i < m.length; i++)
-			for (int j=0; j < m[i].length; j++) m[i][j] = min + m[i][j]*(max - min);
+			for (int j=0; j < m[i].length; j++) m[i][j] = range.min + m[i][j]*(range.max - range.min);
 	}
 	
 	public static int floor(double x) {
@@ -85,6 +88,8 @@ public class MapGenUtils {
 							paintmatrix[y * scale_up + i][x * scale_up + j] = course.getMaterialAt(x, y).map_color;
 				}
 		}
+		final int scaleup = scale_up;
+		final int scaledown = scale_down;
 		JFrame frame = new JFrame("Display Course Map");
 		frame.setSize(paintmatrix[0].length, paintmatrix.length);
 		frame.setVisible(true);
@@ -97,6 +102,15 @@ public class MapGenUtils {
 						g.setColor(paintmatrix[i][j]);
 						g.fillRect(i, j, 1, 1);
 					}
+				float measure = 1f;
+				while (measure * 100 * scaleup / scaledown < 50) measure *= 10;
+				while (measure * 100 * scaleup / scaledown > 150) measure /= 10;
+				g.setColor(Color.BLACK);
+				g.fillRect(10, 10, (int)(measure * 100 * scaleup / scaledown), 5);
+				g.fillRect(10, 5, 5, 15);
+				g.fillRect((int)(10 + measure * 100 * scaleup / scaledown), 5, 5, 15);
+				g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
+				g.drawString(measure+" meter", (int)(15 + measure * 30 * scaleup/ scaledown), 30);
 			}
 		});
 		frame.repaint();
@@ -104,8 +118,9 @@ public class MapGenUtils {
 	
 	public static void main(String[] args) {
 		long seed = System.currentTimeMillis();
-		PuttingCourseGenerator gen = new PuttingCourseGenerator(seed);
-		PuttingCourse test = gen.fractalGeneratedCourse(200, 20, 0.8, 0.3, 0, 0.5, 50);
+		PuttingCourseGenerator gen = new PuttingCourseGenerator(seed, new Range(-10*m, 30*m), new Range(-1, 6));
+		PuttingCourse test = gen.fractalGeneratedCourse(2000, 50, 0.4, 0.7, 10, 50);
+		//PuttingCourse test = gen.functionGeneratedCourse(height, friction, course_width_cm, course_height_cm, hole_tolerance, maximum_velocity);
 		System.out.println("course is "+test.courseWidth()+"x"+test.courseHeight()+", generated with seed "+seed);
 		displayCourse(test);
 	}
