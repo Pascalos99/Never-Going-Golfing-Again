@@ -1,0 +1,6 @@
+/.classpath
+/.project
+/README.md
+/bin/
+bin/basic/Main.class
+*.class
