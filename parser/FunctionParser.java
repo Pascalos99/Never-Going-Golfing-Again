@@ -2,9 +2,7 @@ package parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -13,6 +11,7 @@ import java.util.Scanner;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.sun.corba.se.impl.orbutil.closure.Constant;
 import javafx.util.Pair;
 
 class FunctionParser {
@@ -584,28 +583,32 @@ class SumAtom extends Atom {
 
 }
 
-abstract class TranscendentalAtom extends Atom {
+abstract class FunctionAtom extends Atom {
     protected Atom atom;
 
-    TranscendentalAtom(Atom atom) {
+    FunctionAtom(Atom atom) {
         this.atom = atom;
     }
 
-    abstract public Atom derivate(String variable);
+    abstract protected Atom partialDerivate(String variable);
+
+    public Atom derivate(String variable){
+        return new ProductAtom(partialDerivate(variable), atom.derivate(variable));
+    }
 
     abstract public double apply(Map<String, Double> variables);
 
 }
 
-class CosAtom extends TranscendentalAtom {
+class CosAtom extends FunctionAtom {
 
     CosAtom(Atom atom) {
         super(atom);
     }
 
     @Override
-    public Atom derivate(String variable) {
-        return new ProductAtom(new ConstantAtom(-1), new SinAtom(atom));
+    protected Atom partialDerivate(String variable) {
+        return new SinAtom(atom);
     }
 
     @Override
@@ -626,15 +629,15 @@ class CosAtom extends TranscendentalAtom {
 
 }
 
-class SinAtom extends TranscendentalAtom {
+class SinAtom extends FunctionAtom {
 
     SinAtom(Atom atom) {
         super(atom);
     }
 
     @Override
-    public Atom derivate(String variable) {
-        return new CosAtom(atom);
+    protected Atom partialDerivate(String variable) {
+        return new ProductAtom(new ConstantAtom(-1), new SinAtom(atom));
     }
 
     @Override
@@ -655,7 +658,7 @@ class SinAtom extends TranscendentalAtom {
 
 }
 
-class MaxAtom extends TranscendentalAtom {
+class MaxAtom extends FunctionAtom {
     protected Atom left, right;
 
     MaxAtom(Atom atom1, Atom atom2) {
@@ -665,7 +668,7 @@ class MaxAtom extends TranscendentalAtom {
     }
 
     @Override
-    public Atom derivate(String variable) {
+    public Atom partialDerivate(String variable) {
         throw new ArithmeticException("Derivative of max() is not defined yet.");
     }
 
