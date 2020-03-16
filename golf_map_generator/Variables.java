@@ -27,7 +27,7 @@ public final class Variables {
 	public static final double 	START_PLATFORM_RADIUS = 200;
 	public static final double 	FLAG_PLATFORM_RADIUS = 200;
 	public static final double 	PATH_RADIUS = 100;
-	public static final double 	MIN_FLAG_DISTANCE = 0.5; // percentage of diagonal length of map
+	public static final double 	MIN_FLAG_DISTANCE = 0.7; // percentage of diagonal length of map
 	public static final double	PATH_BUMPINESS = 0.2; // a value of 0 is completely smooth, anything above 1 is incredibly noisy (affects height)
 	public static final double	PATH_ROUGHNESS = 1.2; // a value of 0 is completely smooth, anything above 1 is incredibly noisy (affects friction)
 	

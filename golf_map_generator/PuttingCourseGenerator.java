@@ -42,35 +42,6 @@ public class PuttingCourseGenerator {
 		return GRASS.index;
 	}
 	
-	/** This method will generate a material heat-map given a height and friction map.<br>
-	 * It will therefor not be able to account for obstacles, as they cannot be gathered from this data.<br>
-	 * Flag and start positions will also be inserted, given the hole_tolerance is > 0
-	 * @return {@code null} if the heat-map sizes do not match up.
-	 * @throws RuntimeException if the flag or start positions are not within the bounds of the height and friction maps. */
-	public static int[][] generate_materials(double[][] height, double[][] friction, Vector2d flag, Vector2d start, double hole_tolerance) {
-		if (height.length != friction.length || height[0].length != friction[0].length) return null;
-		int[][] result = new int[height.length][height[0].length];
-		boolean flag_placed = false;
-		if (start.get_x() >= result.length || start.get_y() >= result[0].length || start.get_x() < 0) throw new RuntimeException("Start is not contained within the map.");
-		if (flag.get_x() >= result.length || flag.get_y() >= result[0].length || flag.get_x() < 0) throw new RuntimeException("Flag is not contained within the map.");
-		for (int i=0; i < height.length; i++) {
-			for (int j=0; j < height[i].length; j++) {
-				double z_value = height[i][j];
-				double f_value = friction[i][j];
-				if (flag.is_contained_in(i, j, hole_tolerance)) { result[i][j] = FLAG.index; flag_placed = true; }
-				else if (z_value < 0) result[i][j] = WATER.index;
-				else if (f_value <= 0) result[i][j] = ICE.index;
-				else if (f_value >= SAND_FRICTION) result[i][j] = SAND.index;
-				else if (z_value >= MOUNTAIN_HEIGHT) result[i][j] = MOUNTAIN.index;
-				else if (z_value >= HILL_HEIGHT) result[i][j] = HILL.index;
-				else result[i][j] = GRASS.index;
-			}
-		}
-		result[(int)start.get_x()][(int)start.get_y()] = STARTING_POINT.index;
-		if (!flag_placed) result[(int)flag.get_x()][(int)flag.get_y()] = FLAG.index;
-		return result;
-	}
-	
 	/**
 	 * @param desired_size The algorithm will aim to create a course that is a square of this number as its sides (no guarantees sorry)<p>
 	 * @param smoothing_factor a factor that determines how much the resulting fractalmap is enlarged to create the final coursemap (this will make the terrain smoother)
@@ -95,9 +66,9 @@ public class PuttingCourseGenerator {
 		applyRangeToMatrix(fractal_f, friction_range);
 		double[][] heightmap = enlargeMatrix(fractal_h, smoothing_factor);
 		double[][] frictionmap = enlargeMatrix(fractal_f, smoothing_factor);
-		Function2d height = functionFromArray(heightmap, OUT_OF_BOUNDS_HEIGHT);
-		Function2d friction = functionFromArray(frictionmap, OUT_OF_BOUNDS_FRICTION);
 		Vector2d[] pos = determineFlagAndStartPositions(heightmap, frictionmap);
+		Function2d height = functionFromArray(heightmap, Function2d.getConstant(OUT_OF_BOUNDS_HEIGHT));
+		Function2d friction = functionFromArray(frictionmap, Function2d.getConstant(OUT_OF_BOUNDS_FRICTION));
 		return new PuttingCourse(height, friction, heightmap.length, heightmap[0].length, pos[0], pos[1], hole_tolerance, maximum_velocity);
 	}
 	
@@ -115,6 +86,8 @@ public class PuttingCourseGenerator {
 		Vector2d[] pos = determineFlagAndStartPositions(maps[0], maps[1]);
 		result.flag_position = pos[0];
 		result.start_position = pos[1];
+		result.height_function = functionFromArray(maps[0], height);
+		result.friction_function = functionFromArray(maps[1], friction);
 		return result;
 	}
 	
@@ -238,10 +211,10 @@ public class PuttingCourseGenerator {
 		path_preference = always_lay_paths;
 	}
 	
-	public static Function2d functionFromArray(double[][] m, double out_of_bounds_value) {
+	public static Function2d functionFromArray(double[][] m, Function2d out_of_bounds_value) {
 		return new Function2d() {
 			double[][] array = m;
-			double value = out_of_bounds_value;
+			Function2d function = out_of_bounds_value;
 			@Override
 			public Vector2d gradient(Vector2d p) {
 				// TODO improve and test this gradient				
@@ -256,7 +229,7 @@ public class PuttingCourseGenerator {
 			}
 			@Override
 			public double evaluate(double x, double y) {
-				if (x > array.length - 1 || y > array.length - 1 || x < 0 || y < 0) return value;
+				if (x > array.length - 1 || y > array.length - 1 || x < 0 || y < 0) return function.evaluate(x, y);
 				if ((float)x == (int)x && (float)y == (int)y) return array[(int)(float)x][(int)(float)y];
 				double diff_x = x - floor(x);
 				double diff_y = y - floor(y);
