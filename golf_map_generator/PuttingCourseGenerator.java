@@ -4,6 +4,8 @@ import static golf_map_generator.Material.*;
 import static golf_map_generator.Variables.*;
 import static golf_map_generator.MapGenUtils.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import main.Function2d;
@@ -14,11 +16,17 @@ public class PuttingCourseGenerator {
 	Random random;
 	Range height_range;
 	Range friction_range;
+	boolean path_preference;
 	
-	public PuttingCourseGenerator(long seed, Range height, Range friction) {
+	public PuttingCourseGenerator(long seed, Range height, Range friction, boolean always_lay_paths) {
 		random = new Random(seed);
 		height_range = height;
 		friction_range = friction;
+		path_preference = always_lay_paths;
+	}
+	
+	public PuttingCourseGenerator(long seed) {
+		this(seed, new Range(MINIMUM_HEIGHT, MAXIMUM_HEIGHT), new Range(MINIMUM_FRICTION, MAXIMUM_FRICTION), true);
 	}
 
 	/** This method will generate a material heat-map given a height and friction map.<br>
@@ -29,15 +37,14 @@ public class PuttingCourseGenerator {
 	public static int[][] generate_materials(double[][] height, double[][] friction, Vector2d flag, Vector2d start, double hole_tolerance) {
 		if (height.length != friction.length || height[0].length != friction[0].length) return null;
 		int[][] result = new int[height.length][height[0].length];
-		boolean start_chosen = false, flag_chosen = false;
+		boolean flag_placed = false;
+		if (start.get_x() >= result.length || start.get_y() >= result[0].length || start.get_x() < 0) throw new RuntimeException("Start is not contained within the map.");
+		if (flag.get_x() >= result.length || flag.get_y() >= result[0].length || flag.get_x() < 0) throw new RuntimeException("Flag is not contained within the map.");
 		for (int i=0; i < height.length; i++) {
 			for (int j=0; j < height[i].length; j++) {
 				double z_value = height[i][j];
 				double f_value = friction[i][j];
-				if (flag.is_contained_in(i, j, hole_tolerance)) { result[i][j] = FLAG.index; flag_chosen = true; }
-				else if (start.is_contained_in(i, j, 0.01) && !start_chosen) {
-					result[i][j] = STARTING_POINT.index;
-					start_chosen = true; }
+				if (flag.is_contained_in(i, j, hole_tolerance)) { result[i][j] = FLAG.index; flag_placed = true; }
 				else if (z_value < 0) result[i][j] = WATER.index;
 				else if (f_value <= 0) result[i][j] = ICE.index;
 				else if (f_value >= SAND_FRICTION) result[i][j] = SAND.index;
@@ -46,10 +53,8 @@ public class PuttingCourseGenerator {
 				else result[i][j] = GRASS.index;
 			}
 		}
-		
-		if (!start_chosen) throw new RuntimeException("Start is not contained within the map.");
-		if (!flag_chosen) throw new RuntimeException("Flag is not contained within the map.");
-		
+		result[(int)start.get_x()][(int)start.get_y()] = STARTING_POINT.index;
+		if (!flag_placed) result[(int)flag.get_x()][(int)flag.get_y()] = FLAG.index;
 		return result;
 	}
 	
@@ -73,8 +78,8 @@ public class PuttingCourseGenerator {
 		int detail = approximate_required_detail(small_size_desired);
 		double[][] fractal_h = fractalMap(detail, roughness_height);
 		double[][] fractal_f = fractalMap(detail, roughness_friction);
-		applyRangeToMatrix(fractal_h, height_range); // TODO finallize a better range or make it parametric
-		applyRangeToMatrix(fractal_f, friction_range); // TODO finallize a better range or make it parametric
+		applyRangeToMatrix(fractal_h, height_range);
+		applyRangeToMatrix(fractal_f, friction_range);
 		double[][] heightmap = enlargeMatrix(fractal_h, smoothing_factor);
 		double[][] frictionmap = enlargeMatrix(fractal_f, smoothing_factor);
 		Function2d height = functionFromArray(heightmap, OUT_OF_BOUNDS_HEIGHT);
@@ -83,18 +88,129 @@ public class PuttingCourseGenerator {
 		return new PuttingCourse(height, friction, heightmap.length, heightmap[0].length, pos[0], pos[1], hole_tolerance, maximum_velocity);
 	}
 	
+	public PuttingCourse fractalGeneratedCourse(FractalGenerationSettings settings) {
+		return fractalGeneratedCourse(settings.desired_size, settings.smoothing_factor, settings.roughness_height, settings.roughness_friction, settings.hole_tolerance, settings.maximum_velocity);
+	}
+	public PuttingCourse randomCourse(int desired_size, double hole_tolerance, double maximum_velocity) {
+		return fractalGeneratedCourse(desired_size, 50, 0.4, 0.6, hole_tolerance, maximum_velocity);
+	}
+	
+	/** Generates a course from a function.<br>This method also adjusts the course to be more playable. */
 	public PuttingCourse functionGeneratedCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, double hole_tolerance, double maximum_velocity) {
 		PuttingCourse result = new PuttingCourse(height, friction, course_width_cm, course_height_cm, new Vector2d(0, 0), new Vector2d(0, 0), hole_tolerance, maximum_velocity);
 		Vector2d[] pos = determineFlagAndStartPositions(result.height_map, result.friction_map);
 		result.flag_position = pos[0];
 		result.start_position = pos[1];
+		result.generateMaterialMap();
 		return result;
 	}
 	
+	/** Generates a course from a function as per the {@link PuttingCourse#PuttingCourse(Function2d, Function2d, int, int, Vector2d, Vector2d, double, double)} method, but with random
+	 * inputs for the start and flag positions. */
+	public PuttingCourse pureFunctionGeneratedCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, double hole_tolerance, double maximum_velocity) {
+		return new PuttingCourse(height, friction, course_width_cm, course_height_cm,
+				new Vector2d(random.nextDouble() * course_width_cm, random.nextDouble() * course_height_cm),
+				new Vector2d(random.nextDouble() * course_width_cm, random.nextDouble() * course_height_cm),
+			hole_tolerance, maximum_velocity);
+	}
+	
 	private Vector2d[] determineFlagAndStartPositions(double[][] heightmap, double[][] frictionmap) {
-		Vector2d flag = new Vector2d(random.nextInt(heightmap.length/2) + heightmap.length/3 + 0.5, random.nextInt(heightmap.length/2) + heightmap.length/3 + 0.5);
-		Vector2d start = new Vector2d(heightmap.length/2,0);
+		int flag_x = 0, flag_y = 0, start_x = 0, start_y = 0, width = heightmap.length, height = heightmap[0].length;
+		double max_distance = distance(0, 0, width-1, height-1);
+		ArrayList<Integer> flag_try_xy = new ArrayList<Integer>((width / 2) * (height / 2));
+		ArrayList<Integer> start_try_xy = new ArrayList<Integer>((width / 2) * (height / 2));
+		for (int x=width/10; x < width/2; x++)
+			for (int y=height/10; y < height/2; y++) flag_try_xy.add(x*height + y);
+		for (int x=width/2; x < (width*9)/10; x++)
+			for (int y=height/2; y < (height*9)/10; y++) start_try_xy.add(x*height + y);
+		Collections.shuffle(flag_try_xy, random);
+		Collections.shuffle(start_try_xy, random);
+		
+		int okay_flag_pos = flag_try_xy.get(0);
+		int okay_start_pos = start_try_xy.get(0);
+		
+		boolean pos_found = false;
+		finding_pos: {
+			int tries = 0;
+			boolean start_left_upper = true;
+			int nums = random.nextInt(2);
+			if (nums==1) start_left_upper = false;
+			while (nums == 0 || nums == 1) {
+				for (int fli = 0; fli < flag_try_xy.size(); fli++) {
+					for (int sti = 0; sti < start_try_xy.size(); sti++) {
+						if (++tries >= NUM_FLAG_POS_TRIES) break finding_pos;
+						int flag = flag_try_xy.get(fli);
+						int start = start_try_xy.get(sti);
+						flag_x = flag/height;
+						flag_y = flag - flag_x * height;
+						start_x = start/height;
+						start_y = start - start_x * height;
+						if (nums==1) { // this is so I can still try every quadrant if the first two quadrants fail
+							flag_x = width - flag_x;
+							start_x = width - start_x;
+						}
+						if (distance(flag_x, flag_y, start_x, start_y) < MIN_FLAG_DISTANCE * max_distance) continue;
+						double flag_z = heightmap[flag_x][flag_y];
+						double flag_f = frictionmap[flag_x][flag_y];
+						double start_z = heightmap[start_x][start_y];
+						double start_f = frictionmap[start_x][start_y];
+						if (flag_z < MINIMUM_FLAG_HEIGHT || flag_z >= MAXIMUM_FLAG_HEIGHT ||
+							flag_f < MINIMUM_FLAG_FRICTION || flag_f >= MAXIMUM_FLAG_FRICTION) { fli++; sti--; continue;}
+						if (start_z < MINIMUM_START_HEIGHT || start_z >= MAXIMUM_START_HEIGHT ||
+							start_f < MINIMUM_START_FRICTION || start_f >= MAXIMUM_START_FRICTION) { continue; }
+						okay_flag_pos = flag;
+						okay_start_pos = start;
+						break finding_pos;
+					}
+				} if (start_left_upper) nums++; else nums--;
+			}}
+		if (!pos_found) {
+			flag_x = okay_flag_pos / height;
+			flag_y = okay_flag_pos - flag_x * height;
+			start_x = okay_start_pos / height;
+			start_y = okay_start_pos - start_x * height;
+			createPath(start_x, start_y, flag_x, flag_y, heightmap, frictionmap);
+		} else if (path_preference) {
+			createPath(start_x, start_y, flag_x, flag_y, heightmap, frictionmap);
+		}
+		Vector2d flag = new Vector2d(flag_x + random.nextDouble(), flag_y + random.nextDouble());
+		Vector2d start = new Vector2d(start_x + random.nextDouble(), start_y + random.nextDouble());
 		return new Vector2d[] {flag, start};
+	}
+	
+	private void createPath(int start_x, int start_y, int flag_x, int flag_y, double[][] heightmap, double[][] frictionmap) {
+		double height = MINIMUM_FLAG_HEIGHT + (MAXIMUM_FLAG_HEIGHT - MINIMUM_FLAG_HEIGHT)/2;
+		double friction = MINIMUM_FLAG_FRICTION + (MAXIMUM_FLAG_FRICTION - MINIMUM_FLAG_FRICTION)/2;
+		double h_angle = 0;
+		double f_angle = 0;
+		MapGenUtils.brushPaint(flag_x, flag_y, height, FLAG_PLATFORM_RADIUS, heightmap);
+		MapGenUtils.brushPaint(flag_x, flag_y, friction, FLAG_PLATFORM_RADIUS, frictionmap);
+		MapGenUtils.brushPaint(start_x, start_y, height, START_PLATFORM_RADIUS, heightmap);
+		MapGenUtils.brushPaint(start_x, start_y, friction, START_PLATFORM_RADIUS, frictionmap);
+		double x_distance = flag_x - start_x;
+		double y_distance = flag_y - start_y;
+		double current_x = start_x;
+		double current_y = start_y;
+		while (modulus(x_distance) > FLAG_PLATFORM_RADIUS/4 || modulus(y_distance) > FLAG_PLATFORM_RADIUS/4) {
+			double leftover_distance = distance(current_x, current_y, flag_x, flag_y);
+			x_distance = flag_x - current_x;
+			y_distance = flag_y - current_y;
+			h_angle += modulus(random.nextDouble() * PATH_BUMPINESS); double adj_h = 1 + PATH_BUMPINESS * Math.sin(h_angle);
+			f_angle += modulus(random.nextDouble() * PATH_ROUGHNESS); double adj_f = 1 + PATH_ROUGHNESS * Math.cos(f_angle);
+			MapGenUtils.brushPaint((int)current_x, (int)current_y, height * adj_h, PATH_RADIUS, heightmap);
+			MapGenUtils.brushPaint((int)current_x, (int)current_y, friction * adj_f, PATH_RADIUS, frictionmap);
+			double ran_y = random.nextDouble(), ran_x = random.nextDouble();
+			if (current_x < PATH_RADIUS) ran_x = modulus(ran_x);
+			if (current_y < PATH_RADIUS) ran_y = modulus(ran_y);
+			if (current_x > heightmap.length - PATH_RADIUS) ran_x = -modulus(ran_x);
+			if (current_y > heightmap[0].length - PATH_RADIUS) ran_y = -modulus(ran_y);
+			current_x += (x_distance / leftover_distance) * (PATH_RADIUS/2) + ran_x * PATH_RADIUS / 2;
+			current_y += (y_distance / leftover_distance) * (PATH_RADIUS/2) + ran_y * PATH_RADIUS / 2;
+		}
+	}
+	
+	public void setPathPreference(boolean always_lay_paths) {
+		path_preference = always_lay_paths;
 	}
 	
 	public static Function2d functionFromArray(double[][] m, double out_of_bounds_value) {
@@ -197,4 +313,17 @@ public class PuttingCourseGenerator {
 	private double rnd () {
 		return 2. * random.nextDouble () - 1.0;
   	}
+	
+	static class FractalGenerationSettings {
+		public final int desired_size, smoothing_factor;
+		public final double roughness_height, roughness_friction, hole_tolerance, maximum_velocity;
+		public FractalGenerationSettings(int desired_size, int smoothing_factor, double roughness_height, double roughness_friction, double hole_tolerance, double maximum_velocity) {
+			this.desired_size = desired_size;
+			this.smoothing_factor = smoothing_factor;
+			this.roughness_height = roughness_height;
+			this.roughness_friction = roughness_friction;
+			this.hole_tolerance = hole_tolerance;
+			this.maximum_velocity = maximum_velocity;
+		}
+	}
 }
