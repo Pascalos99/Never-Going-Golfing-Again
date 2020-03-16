@@ -13,7 +13,7 @@ public enum Material {			// index
 	ICE				(SURFACE, 		5,		new Color(0xccf2ff)),
 	TREE			(OBSTACLE, 		6,		new Color(0x1b422a)),
 	STARTING_POINT	(START, 		7,		new Color(0xfc9d62)),
-	FLAG			(GOAL, 			8,		new Color(0xff8103)),
+	FLAG			(GOAL, 			8,		new Color(0xe0e000)),
 	TNT				(EXPLOSIVE, 	9,		new Color(0xf74343));
 	
 	public final MaterialType type;

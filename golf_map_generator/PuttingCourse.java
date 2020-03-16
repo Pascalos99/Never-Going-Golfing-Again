@@ -39,7 +39,7 @@ public class PuttingCourse {
 		start_position = start;
 		this.hole_tolerance = hole_tolerance;
 		this.maximum_velocity = maximum_velocity;
-		material_map = PuttingCourseGenerator.generate_materials(height_map, friction_map, flag_position, start_position, this.hole_tolerance);
+		generateMaterialMap();
 	}
 	
 	public PuttingCourse(Function2d height, Vector2d flag, Vector2d start) {
@@ -56,6 +56,10 @@ public class PuttingCourse {
 	/** A more efficient way of retrieving the friction value at a given point.<br>Will work for integer points of 1x1 cm*/
 	public double getFrictionAt(int x, int y) {
 		return friction_map[x][y];
+	}
+	
+	public void generateMaterialMap() {
+		material_map = PuttingCourseGenerator.generate_materials(height_map, friction_map, flag_position, start_position, this.hole_tolerance);
 	}
 	
 	public int courseWidth() {
