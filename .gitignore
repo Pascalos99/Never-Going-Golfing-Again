@@ -2,5 +2,6 @@
 /.project
 /README.md
 /bin/
-bin/basic/Main.class
 *.class
+bin/.classpath
+bin/basic/Main.class
