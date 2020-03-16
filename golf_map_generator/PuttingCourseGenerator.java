@@ -216,10 +216,11 @@ public class PuttingCourseGenerator {
 			double[][] array = m;
 			Function2d function = out_of_bounds_value;
 			@Override
-			public Vector2d gradient(Vector2d p) {
-				// TODO improve and test this gradient				
+			public Vector2d gradient(Vector2d p) {		
 				double x = p.get_x();
 				double y = p.get_y();
+				
+				if (x < 0 || x > m.length || y < 0 || y > m[0].length) return function.gradient(p);
 				
 				double A = array[floor(x)][floor(y)];
 				double C = array[floor(x+1)][floor(y)];
