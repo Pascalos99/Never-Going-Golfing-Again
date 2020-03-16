@@ -76,7 +76,7 @@ public class PuttingCourseGenerator {
 		return fractalGeneratedCourse(settings.desired_size, settings.smoothing_factor, settings.roughness_height, settings.roughness_friction, settings.hole_tolerance, settings.maximum_velocity);
 	}
 	public PuttingCourse randomCourse(int desired_size, double hole_tolerance, double maximum_velocity) {
-		return fractalGeneratedCourse(desired_size, 50, 0.4, 0.6, hole_tolerance, maximum_velocity);
+		return fractalGeneratedCourse(desired_size, 1, 0.4, 0.6, hole_tolerance, maximum_velocity);
 	}
 	
 	/** Generates a course from a function.<br>This method also adjusts the course to be more playable. */
@@ -219,12 +219,13 @@ public class PuttingCourseGenerator {
 			public Vector2d gradient(Vector2d p) {		
 				double x = p.get_x();
 				double y = p.get_y();
-				
-				if (x < 0 || x > m.length || y < 0 || y > m[0].length) return function.gradient(p);
-				
+				if (x < 0 || x >= m.length - 1 || y < 0 || y >= m[0].length - 1) return function.gradient(p);
 				double A = array[floor(x)][floor(y)];
-				double C = array[floor(x+1)][floor(y)];
-				double D = array[floor(x)][floor(y+1)];
+				double C, D;
+				if (floor(x+1) >= m.length) C = function.evaluate(floor(x+1), floor(y));
+				else C = array[floor(x+1)][floor(y)];
+				if (floor(y+1) >= m.length) D = function.evaluate(floor(x), floor(y+1));
+				else D = array[floor(x)][floor(y+1)];
 				
 				return new Vector2d(C - A, D - A);
 			}
