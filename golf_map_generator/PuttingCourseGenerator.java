@@ -29,6 +29,19 @@ public class PuttingCourseGenerator {
 		this(seed, new Range(MINIMUM_HEIGHT, MAXIMUM_HEIGHT), new Range(MINIMUM_FRICTION, MAXIMUM_FRICTION), true);
 	}
 
+	public static int evaluateMaterial(double x, double y, Function2d height, Function2d friction, Vector2d flag, Vector2d start, double hole_tolerance) {
+		double z_value = height.evaluate(x, y);
+		double f_value = friction.evaluate(x, y);
+		if (distance(flag.get_x(), flag.get_y(), x, y) <= hole_tolerance) return FLAG.index;
+		if (distance(start.get_x(), start.get_y(), x, y) <= 1) return STARTING_POINT.index;
+		if (z_value < 0) return WATER.index;
+		if (f_value <= 0) return ICE.index;
+		if (f_value >= SAND_FRICTION) return SAND.index;
+		if (z_value >= MOUNTAIN_HEIGHT) return MOUNTAIN.index;
+		if (z_value >= HILL_HEIGHT) return HILL.index;
+		return GRASS.index;
+	}
+	
 	/** This method will generate a material heat-map given a height and friction map.<br>
 	 * It will therefor not be able to account for obstacles, as they cannot be gathered from this data.<br>
 	 * Flag and start positions will also be inserted, given the hole_tolerance is > 0
@@ -98,10 +111,10 @@ public class PuttingCourseGenerator {
 	/** Generates a course from a function.<br>This method also adjusts the course to be more playable. */
 	public PuttingCourse functionGeneratedCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, double hole_tolerance, double maximum_velocity) {
 		PuttingCourse result = new PuttingCourse(height, friction, course_width_cm, course_height_cm, new Vector2d(0, 0), new Vector2d(0, 0), hole_tolerance, maximum_velocity);
-		Vector2d[] pos = determineFlagAndStartPositions(result.height_map, result.friction_map);
+		double[][][] maps = generate_height_and_friction_maps(result);
+		Vector2d[] pos = determineFlagAndStartPositions(maps[0], maps[1]);
 		result.flag_position = pos[0];
 		result.start_position = pos[1];
-		result.generateMaterialMap();
 		return result;
 	}
 	
@@ -112,6 +125,18 @@ public class PuttingCourseGenerator {
 				new Vector2d(random.nextDouble() * course_width_cm, random.nextDouble() * course_height_cm),
 				new Vector2d(random.nextDouble() * course_width_cm, random.nextDouble() * course_height_cm),
 			hole_tolerance, maximum_velocity);
+	}
+	
+	private double[][][] generate_height_and_friction_maps(PuttingCourse course) {
+		double[][][] result = new double[2][course.course_width][course.course_height];
+		Function2d height = course.get_height();
+		Function2d friction = course.get_friction();
+		for (int x=0; x < result[0].length; x++)
+			for (int y=0; y < result[0][x].length; y++) {
+				result[0][x][y] = height.evaluate(x, y);
+				result[1][x][y] = friction.evaluate(x, y);
+			}
+		return result;
 	}
 	
 	private Vector2d[] determineFlagAndStartPositions(double[][] heightmap, double[][] frictionmap) {

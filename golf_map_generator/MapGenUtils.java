@@ -102,10 +102,10 @@ public class MapGenUtils {
 	public static JFrame displayCourse(PuttingCourse course) {
 		double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
 		if (gradient_display) {
-			for (int i=0; i < course.height_map.length; i++)
-				for (int j=0; j < course.height_map[i].length; j++) {
-					if (course.height_map[i][j] > max) max = course.height_map[i][j];
-					if (course.height_map[i][j] < min) min = course.height_map[i][j];
+			for (int i=0; i < course.course_width; i++)
+				for (int j=0; j < course.course_height; j++) {
+					if (course.getHeightAt(i, j) > max) max = course.getHeightAt(i, j);
+					if (course.getHeightAt(i, j) < min) min = course.getHeightAt(i, j);
 				}
 		}
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -120,7 +120,7 @@ public class MapGenUtils {
 			for (int x=0; x < paintmatrix.length; x++)
 				for (int y=0; y < paintmatrix[x].length; y++) {
 					if (gradient_display) {
-						double value = (course.height_map[x * scale_down][y * scale_down] - min)/(max-min);
+						double value = (course.getHeightAt(x * scale_down, y * scale_down) - min)/(max-min);
 						paintmatrix[x][y] = new Color((int)(50 * value),(int)(255 * value),(int)(200 * (1-value)));
 					} else paintmatrix[x][y] = course.getMaterialAt(x * scale_down, y * scale_down).map_color;
 				}
@@ -130,7 +130,7 @@ public class MapGenUtils {
 					for (int i=0; i < scale_up; i++)
 						for (int j=0; j < scale_up; j++)
 							if (gradient_display) {
-								double value = (course.height_map[x][y] - min)/(max - min);
+								double value = (course.getHeightAt(x, y) - min)/(max - min);
 								paintmatrix[x * scale_up + i][y * scale_up + j] = new Color((int)(50 * value),(int)(255 * value),(int)(200 * (1-value)));
 							} else paintmatrix[x * scale_up + i][y * scale_up + j] = course.getMaterialAt(x, y).map_color;
 				}
