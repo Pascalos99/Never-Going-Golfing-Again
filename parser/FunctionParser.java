@@ -10,8 +10,6 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import com.sun.corba.se.impl.orbutil.closure.Constant;
 import javafx.util.Pair;
 
 class FunctionParser {
@@ -608,7 +606,7 @@ class CosAtom extends FunctionAtom {
 
     @Override
     protected Atom partialDerivate(String variable) {
-        return new SinAtom(atom);
+        return new ProductAtom(new ConstantAtom(-1), new SinAtom(atom));
     }
 
     @Override
@@ -637,7 +635,7 @@ class SinAtom extends FunctionAtom {
 
     @Override
     protected Atom partialDerivate(String variable) {
-        return new ProductAtom(new ConstantAtom(-1), new SinAtom(atom));
+        return new CosAtom(atom);
     }
 
     @Override

@@ -7,7 +7,6 @@ import main.Function2d;
 import main.Vector2d;
 
 public class AtomFunction2d implements Function2d {
-
 	Atom function;
 	Atom derivative_x;
 	Atom derivative_y;
