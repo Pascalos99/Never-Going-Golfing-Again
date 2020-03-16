@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import golf_map_generator.PuttingCourseGenerator.FractalGenerationSettings;
 import main.Function2d;
 import main.FunctionalFunction2d;
+import main.Vector2d;
 
 import static golf_map_generator.Variables.FLAG_TEXTURE;
 import static golf_map_generator.Variables.START_TEXTURE;
@@ -166,8 +167,8 @@ public class MapGenUtils {
 				    start = ImageIO.read(new File(START_TEXTURE));
 				} catch (IOException e) {
 				}
-				g.drawImage(flag, flag_x - (flag.getWidth()*1)/5, flag_y - (flag.getHeight()*5)/6, null);
-				g.drawImage(start, strt_x - start.getWidth()/2, strt_y - start.getHeight()/2, null);
+				g.drawImage(flag, flag_x - 2*(flag.getWidth()*1)/5, flag_y - 2*(flag.getHeight()*5)/6, 32, 32, null);
+				g.drawImage(start, strt_x - 2*start.getWidth()/2, strt_y - 2*start.getHeight()/2, 34, 34, null);
 			}
 		});
 		frame.setVisible(true);
@@ -202,10 +203,10 @@ public class MapGenUtils {
 		PuttingCourseGenerator gen = new PuttingCourseGenerator(seed);
 		gen.setPathPreference(true);
 		PuttingCourse test;
-		if (!use_function) test = gen.fractalGeneratedCourse(2000, 50, 0.4, 0.6, 10, 50);
+		if (!use_function) test = gen.fractalGeneratedCourse(50, 1, 0.4, 0.6, 10, 50);
 		else test = gen.functionGeneratedCourse(function, Function2d.getConstant(0.134), 2000, 2000, 10, 50);
 		System.out.println("course is "+test.courseWidth()+"x"+test.courseHeight()+", generated with seed "+seed);
-		if (tester_frame) generationTesterFrame(gen, 2000, 50, 0.4, 0.6, 10, 50);
+		if (tester_frame) generationTesterFrame(gen, 50, 1, 0.4, 0.6, 1, 50);
 		else displayCourse(test);
 	}
 	
