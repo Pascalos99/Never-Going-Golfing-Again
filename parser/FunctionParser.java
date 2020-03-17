@@ -226,11 +226,6 @@ class FunctionParser {
                     a = new CosAtom(a);
                 }
 
-                else if (token.equals("max")) {
-                    Atom b = atoms.pop();
-                    a = new MaxAtom(a, b);
-                }
-
                 else {
                     throw new ArithmeticException("Unknown function ( " + token + " ).");
                 }
@@ -331,10 +326,6 @@ abstract class Atom {
     abstract public Atom derivate(String variable);
 
     abstract public double apply(Map<String, Double> variables);
-
-    public static PowerAtom wrap(Atom a) {
-        return new PowerAtom(a, 1);
-    }
 
     abstract public Atom simplify();
 
@@ -444,7 +435,7 @@ class PowerAtom extends Atom {
     public String toString() {
         String base = atom.toString();
 
-        if (!(atom instanceof ConstantAtom) && !(atom instanceof VariableAtom))
+        if (!(atom instanceof ConstantAtom) && !(atom instanceof VariableAtom) && !(atom instanceof FunctionAtom))
             base = "(" + base + ")";
 
         return base + "^" + power;
@@ -454,17 +445,26 @@ class PowerAtom extends Atom {
     public Atom simplify() {
         atom = atom.simplify();
 
-        if (power == 0.0) {
+        if(power == 1.0){
+            return atom;
+        }
 
-            if ((atom instanceof ConstantAtom && ((ConstantAtom) atom).getConstant() != 0.0)
-                    || (!(atom instanceof ConstantAtom))) {
-                return new ConstantAtom(1);
+        if(power == 0.0){
+
+            if(atom instanceof ConstantAtom){
+                double value = ((ConstantAtom)atom).getConstant();
+
+                if(value == 0.0)
+                    return new IndefiniteAtom(this);
+
             }
 
         }
 
-        if (atom instanceof ConstantAtom && ((ConstantAtom) atom).getConstant() == 0.0) {
-            return new ConstantAtom(0);
+        if(atom instanceof  ConstantAtom){
+            double value = ((ConstantAtom)atom).getConstant();
+            double result = Math.pow(value, power);
+            return new ConstantAtom(result);
         }
 
         return this;
@@ -504,13 +504,13 @@ class ProductAtom extends Atom {
         String l = left.toString();
         String r = right.toString();
 
-        if (!(left instanceof ConstantAtom) && !(left instanceof VariableAtom) && !(left instanceof PowerAtom))
+        if (!(left instanceof ConstantAtom) && !(left instanceof VariableAtom) && !(left instanceof PowerAtom) && !(left instanceof FunctionAtom))
             l = "(" + l + ")";
 
-        if (!(right instanceof ConstantAtom) && !(right instanceof VariableAtom) && !(right instanceof PowerAtom))
+        if (!(right instanceof ConstantAtom) && !(right instanceof VariableAtom) && !(right instanceof PowerAtom) && !(right instanceof FunctionAtom))
             r = "(" + r + ")";
 
-        return "(" + l + " * " + r + ")";
+        return l + " * " + r;
     }
 
     @Override
@@ -526,6 +526,12 @@ class ProductAtom extends Atom {
 
         if (right instanceof ConstantAtom && ((ConstantAtom) right).getConstant() == 0.0)
             return new ConstantAtom(0);
+
+        if (left instanceof ConstantAtom && ((ConstantAtom) left).getConstant() == 1.0)
+            return right;
+
+        if (right instanceof ConstantAtom && ((ConstantAtom) right).getConstant() == 1.0)
+            return left;
 
         return this;
     }
@@ -568,7 +574,7 @@ class SumAtom extends Atom {
         right = right.simplify();
 
         if (left instanceof ConstantAtom && right instanceof ConstantAtom)
-            return new ConstantAtom(((ConstantAtom) left).getConstant() * ((ConstantAtom) right).getConstant());
+            return new ConstantAtom(((ConstantAtom) left).getConstant() + ((ConstantAtom) right).getConstant());
 
         if (left instanceof ConstantAtom && ((ConstantAtom) left).getConstant() == 0.0)
             return right;
@@ -590,11 +596,27 @@ abstract class FunctionAtom extends Atom {
 
     abstract protected Atom partialDerivate(String variable);
 
+    abstract protected double solve(double n);
+
     public Atom derivate(String variable){
         return new ProductAtom(partialDerivate(variable), atom.derivate(variable));
     }
 
-    abstract public double apply(Map<String, Double> variables);
+    public double apply(Map<String, Double> variables){
+        return solve(atom.apply(variables));
+    }
+
+    @Override
+    public Atom simplify() {
+        atom = atom.simplify();
+
+        if(atom instanceof ConstantAtom){
+            double value = ((ConstantAtom)atom).getConstant();
+            return new ConstantAtom(solve(value));
+        }
+
+        return this;
+    }
 
 }
 
@@ -610,19 +632,13 @@ class CosAtom extends FunctionAtom {
     }
 
     @Override
-    public double apply(Map<String, Double> variables) {
-        return Math.cos(atom.apply(variables));
+    public double solve(double n){
+        return Math.cos(n);
     }
 
     @Override
     public String toString() {
         return "cos(" + atom.toString() + ")";
-    }
-
-    @Override
-    public Atom simplify() {
-        atom = atom.simplify();
-        return this;
     }
 
 }
@@ -639,8 +655,8 @@ class SinAtom extends FunctionAtom {
     }
 
     @Override
-    public double apply(Map<String, Double> variables) {
-        return Math.sin(atom.apply(variables));
+    public double solve(double n){
+        return Math.sin(n);
     }
 
     @Override
@@ -648,43 +664,33 @@ class SinAtom extends FunctionAtom {
         return "sin(" + atom.toString() + ")";
     }
 
-    @Override
-    public Atom simplify() {
-        atom = atom.simplify();
-        return this;
-    }
-
 }
 
-class MaxAtom extends FunctionAtom {
-    protected Atom left, right;
+class IndefiniteAtom extends Atom {
+    protected Atom atom;
 
-    MaxAtom(Atom atom1, Atom atom2) {
-        super(null);
-        this.left = atom1;
-        this.right = atom2;
+    IndefiniteAtom(Atom atom) {
+        this.atom = atom;
     }
 
     @Override
-    public Atom partialDerivate(String variable) {
-        throw new ArithmeticException("Derivative of max() is not defined yet.");
+    public Atom derivate(String variable) {
+        throw new ArithmeticException("Indefinite expression (" + atom.toString() + ") cannot be derivated.");
     }
 
     @Override
     public double apply(Map<String, Double> variables) {
-        return Math.max(left.apply(variables), right.apply(variables));
+        throw new ArithmeticException("Indefinite expression (" + atom.toString() + ") cannot be resolved.");
     }
 
     @Override
     public String toString() {
-        return "max(" + left.toString() + ", " + right.toString() + ")";
+        return "indef(" + atom.toString() + ")";
     }
 
     @Override
     public Atom simplify() {
-        left = left.simplify();
-        right = right.simplify();
-        return this;
+        throw new ArithmeticException("Indefinite expression (" + atom.toString() + ") cannot be simplified.");
     }
 
 }
