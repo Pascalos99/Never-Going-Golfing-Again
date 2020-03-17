@@ -29,33 +29,17 @@ public class PuttingCourseGenerator {
 		this(seed, new Range(MINIMUM_HEIGHT, MAXIMUM_HEIGHT), new Range(MINIMUM_FRICTION, MAXIMUM_FRICTION), true);
 	}
 
-	/** This method will generate a material heat-map given a height and friction map.<br>
-	 * It will therefor not be able to account for obstacles, as they cannot be gathered from this data.<br>
-	 * Flag and start positions will also be inserted, given the hole_tolerance is > 0
-	 * @return {@code null} if the heat-map sizes do not match up.
-	 * @throws RuntimeException if the flag or start positions are not within the bounds of the height and friction maps. */
-	public static int[][] generate_materials(double[][] height, double[][] friction, Vector2d flag, Vector2d start, double hole_tolerance) {
-		if (height.length != friction.length || height[0].length != friction[0].length) return null;
-		int[][] result = new int[height.length][height[0].length];
-		boolean flag_placed = false;
-		if (start.get_x() >= result.length || start.get_y() >= result[0].length || start.get_x() < 0) throw new RuntimeException("Start is not contained within the map.");
-		if (flag.get_x() >= result.length || flag.get_y() >= result[0].length || flag.get_x() < 0) throw new RuntimeException("Flag is not contained within the map.");
-		for (int i=0; i < height.length; i++) {
-			for (int j=0; j < height[i].length; j++) {
-				double z_value = height[i][j];
-				double f_value = friction[i][j];
-				if (flag.is_contained_in(i, j, hole_tolerance)) { result[i][j] = FLAG.index; flag_placed = true; }
-				else if (z_value < 0) result[i][j] = WATER.index;
-				else if (f_value <= 0) result[i][j] = ICE.index;
-				else if (f_value >= SAND_FRICTION) result[i][j] = SAND.index;
-				else if (z_value >= MOUNTAIN_HEIGHT) result[i][j] = MOUNTAIN.index;
-				else if (z_value >= HILL_HEIGHT) result[i][j] = HILL.index;
-				else result[i][j] = GRASS.index;
-			}
-		}
-		result[(int)start.get_x()][(int)start.get_y()] = STARTING_POINT.index;
-		if (!flag_placed) result[(int)flag.get_x()][(int)flag.get_y()] = FLAG.index;
-		return result;
+	public static int evaluateMaterial(double x, double y, Function2d height, Function2d friction, Vector2d flag, Vector2d start, double hole_tolerance) {
+		double z_value = height.evaluate(x, y);
+		double f_value = friction.evaluate(x, y);
+		if (distance(flag.get_x(), flag.get_y(), x, y) <= hole_tolerance) return FLAG.index;
+		if (distance(start.get_x(), start.get_y(), x, y) <= 1) return STARTING_POINT.index;
+		if (z_value < 0) return WATER.index;
+		if (f_value <= 0) return ICE.index;
+		if (f_value >= SAND_FRICTION) return SAND.index;
+		if (z_value >= MOUNTAIN_HEIGHT) return MOUNTAIN.index;
+		if (z_value >= HILL_HEIGHT) return HILL.index;
+		return GRASS.index;
 	}
 	
 	/**
@@ -82,9 +66,9 @@ public class PuttingCourseGenerator {
 		applyRangeToMatrix(fractal_f, friction_range);
 		double[][] heightmap = enlargeMatrix(fractal_h, smoothing_factor);
 		double[][] frictionmap = enlargeMatrix(fractal_f, smoothing_factor);
-		Function2d height = functionFromArray(heightmap, OUT_OF_BOUNDS_HEIGHT);
-		Function2d friction = functionFromArray(frictionmap, OUT_OF_BOUNDS_FRICTION);
 		Vector2d[] pos = determineFlagAndStartPositions(heightmap, frictionmap);
+		Function2d height = functionFromArray(heightmap, Function2d.getConstant(OUT_OF_BOUNDS_HEIGHT));
+		Function2d friction = functionFromArray(frictionmap, Function2d.getConstant(OUT_OF_BOUNDS_FRICTION));
 		return new PuttingCourse(height, friction, heightmap.length, heightmap[0].length, pos[0], pos[1], hole_tolerance, maximum_velocity);
 	}
 	
@@ -92,16 +76,18 @@ public class PuttingCourseGenerator {
 		return fractalGeneratedCourse(settings.desired_size, settings.smoothing_factor, settings.roughness_height, settings.roughness_friction, settings.hole_tolerance, settings.maximum_velocity);
 	}
 	public PuttingCourse randomCourse(int desired_size, double hole_tolerance, double maximum_velocity) {
-		return fractalGeneratedCourse(desired_size, 50, 0.4, 0.6, hole_tolerance, maximum_velocity);
+		return fractalGeneratedCourse(desired_size, 1, 0.4, 0.6, hole_tolerance, maximum_velocity);
 	}
 	
 	/** Generates a course from a function.<br>This method also adjusts the course to be more playable. */
 	public PuttingCourse functionGeneratedCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, double hole_tolerance, double maximum_velocity) {
 		PuttingCourse result = new PuttingCourse(height, friction, course_width_cm, course_height_cm, new Vector2d(0, 0), new Vector2d(0, 0), hole_tolerance, maximum_velocity);
-		Vector2d[] pos = determineFlagAndStartPositions(result.height_map, result.friction_map);
+		double[][][] maps = generate_height_and_friction_maps(result);
+		Vector2d[] pos = determineFlagAndStartPositions(maps[0], maps[1]);
 		result.flag_position = pos[0];
 		result.start_position = pos[1];
-		result.generateMaterialMap();
+		result.height_function = functionFromArray(maps[0], height);
+		result.friction_function = functionFromArray(maps[1], friction);
 		return result;
 	}
 	
@@ -112,6 +98,18 @@ public class PuttingCourseGenerator {
 				new Vector2d(random.nextDouble() * course_width_cm, random.nextDouble() * course_height_cm),
 				new Vector2d(random.nextDouble() * course_width_cm, random.nextDouble() * course_height_cm),
 			hole_tolerance, maximum_velocity);
+	}
+	
+	private double[][][] generate_height_and_friction_maps(PuttingCourse course) {
+		double[][][] result = new double[2][course.course_width][course.course_height];
+		Function2d height = course.get_height();
+		Function2d friction = course.get_friction();
+		for (int x=0; x < result[0].length; x++)
+			for (int y=0; y < result[0][x].length; y++) {
+				result[0][x][y] = height.evaluate(x, y);
+				result[1][x][y] = friction.evaluate(x, y);
+			}
+		return result;
 	}
 	
 	private Vector2d[] determineFlagAndStartPositions(double[][] heightmap, double[][] frictionmap) {
@@ -213,25 +211,27 @@ public class PuttingCourseGenerator {
 		path_preference = always_lay_paths;
 	}
 	
-	public static Function2d functionFromArray(double[][] m, double out_of_bounds_value) {
+	public static Function2d functionFromArray(double[][] m, Function2d out_of_bounds_value) {
 		return new Function2d() {
 			double[][] array = m;
-			double value = out_of_bounds_value;
+			Function2d function = out_of_bounds_value;
 			@Override
-			public Vector2d gradient(Vector2d p) {
-				// TODO improve and test this gradient				
+			public Vector2d gradient(Vector2d p) {		
 				double x = p.get_x();
 				double y = p.get_y();
-				
+				if (x < 0 || x >= m.length - 1 || y < 0 || y >= m[0].length - 1) return function.gradient(p);
 				double A = array[floor(x)][floor(y)];
-				double C = array[floor(x+1)][floor(y)];
-				double D = array[floor(x)][floor(y+1)];
+				double C, D;
+				if (floor(x+1) >= m.length) C = function.evaluate(floor(x+1), floor(y));
+				else C = array[floor(x+1)][floor(y)];
+				if (floor(y+1) >= m.length) D = function.evaluate(floor(x), floor(y+1));
+				else D = array[floor(x)][floor(y+1)];
 				
 				return new Vector2d(C - A, D - A);
 			}
 			@Override
 			public double evaluate(double x, double y) {
-				if (x > array.length - 1 || y > array.length - 1 || x < 0 || y < 0) return value;
+				if (x > array.length - 1 || y > array.length - 1 || x < 0 || y < 0) return function.evaluate(x, y);
 				if ((float)x == (int)x && (float)y == (int)y) return array[(int)(float)x][(int)(float)y];
 				double diff_x = x - floor(x);
 				double diff_y = y - floor(y);

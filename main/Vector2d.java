@@ -23,4 +23,8 @@ public class Vector2d {
 		Rectangle square = new Rectangle(_x, _y, 1, 1);
 		return circle.intersects(square);
 	}
+	
+	public String toString() {
+		return String.format("(% f, % f)", x, y);
+	}
 }

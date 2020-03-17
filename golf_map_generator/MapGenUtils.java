@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import golf_map_generator.PuttingCourseGenerator.FractalGenerationSettings;
 import main.Function2d;
 import main.FunctionalFunction2d;
+import main.Vector2d;
 
 import static golf_map_generator.Variables.FLAG_TEXTURE;
 import static golf_map_generator.Variables.START_TEXTURE;
@@ -102,10 +103,10 @@ public class MapGenUtils {
 	public static JFrame displayCourse(PuttingCourse course) {
 		double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
 		if (gradient_display) {
-			for (int i=0; i < course.height_map.length; i++)
-				for (int j=0; j < course.height_map[i].length; j++) {
-					if (course.height_map[i][j] > max) max = course.height_map[i][j];
-					if (course.height_map[i][j] < min) min = course.height_map[i][j];
+			for (int i=0; i < course.course_width; i++)
+				for (int j=0; j < course.course_height; j++) {
+					if (course.getHeightAt(i, j) > max) max = course.getHeightAt(i, j);
+					if (course.getHeightAt(i, j) < min) min = course.getHeightAt(i, j);
 				}
 		}
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -120,7 +121,7 @@ public class MapGenUtils {
 			for (int x=0; x < paintmatrix.length; x++)
 				for (int y=0; y < paintmatrix[x].length; y++) {
 					if (gradient_display) {
-						double value = (course.height_map[x * scale_down][y * scale_down] - min)/(max-min);
+						double value = (course.getHeightAt(x * scale_down, y * scale_down) - min)/(max-min);
 						paintmatrix[x][y] = new Color((int)(50 * value),(int)(255 * value),(int)(200 * (1-value)));
 					} else paintmatrix[x][y] = course.getMaterialAt(x * scale_down, y * scale_down).map_color;
 				}
@@ -130,7 +131,7 @@ public class MapGenUtils {
 					for (int i=0; i < scale_up; i++)
 						for (int j=0; j < scale_up; j++)
 							if (gradient_display) {
-								double value = (course.height_map[x][y] - min)/(max - min);
+								double value = (course.getHeightAt(x, y) - min)/(max - min);
 								paintmatrix[x * scale_up + i][y * scale_up + j] = new Color((int)(50 * value),(int)(255 * value),(int)(200 * (1-value)));
 							} else paintmatrix[x * scale_up + i][y * scale_up + j] = course.getMaterialAt(x, y).map_color;
 				}
@@ -166,8 +167,8 @@ public class MapGenUtils {
 				    start = ImageIO.read(new File(START_TEXTURE));
 				} catch (IOException e) {
 				}
-				g.drawImage(flag, flag_x - (flag.getWidth()*1)/5, flag_y - (flag.getHeight()*5)/6, null);
-				g.drawImage(start, strt_x - start.getWidth()/2, strt_y - start.getHeight()/2, null);
+				g.drawImage(flag, flag_x - 2*(flag.getWidth()*1)/5, flag_y - 2*(flag.getHeight()*5)/6, 32, 32, null);
+				g.drawImage(start, strt_x - 2*start.getWidth()/2, strt_y - 2*start.getHeight()/2, 34, 34, null);
 			}
 		});
 		frame.setVisible(true);
@@ -202,10 +203,10 @@ public class MapGenUtils {
 		PuttingCourseGenerator gen = new PuttingCourseGenerator(seed);
 		gen.setPathPreference(true);
 		PuttingCourse test;
-		if (!use_function) test = gen.fractalGeneratedCourse(2000, 50, 0.4, 0.6, 10, 50);
+		if (!use_function) test = gen.fractalGeneratedCourse(50, 1, 0.4, 0.6, 10, 50);
 		else test = gen.functionGeneratedCourse(function, Function2d.getConstant(0.134), 2000, 2000, 10, 50);
 		System.out.println("course is "+test.courseWidth()+"x"+test.courseHeight()+", generated with seed "+seed);
-		if (tester_frame) generationTesterFrame(gen, 2000, 50, 0.4, 0.6, 10, 50);
+		if (tester_frame) generationTesterFrame(gen, 50, 1, 0.4, 0.6, 1, 50);
 		else displayCourse(test);
 	}
 	
