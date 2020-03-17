@@ -196,15 +196,15 @@ public class MapGenUtils {
 	
 	public static void main(String[] args) {
 		boolean use_function = false;
-		boolean tester_frame = true;
+		boolean tester_frame = !use_function;
 		gradient_display	 = false;
 		long seed = System.currentTimeMillis();
-		FunctionalFunction2d function = (x, y) -> {return 1000*Math.sin(x) + 1000*Math.sin(y);};
+		FunctionalFunction2d function = (x, y) -> {return Math.sin(x) + Math.sin(y);};
 		PuttingCourseGenerator gen = new PuttingCourseGenerator(seed);
-		gen.setPathPreference(true);
+		gen.setPathPreference(false);
 		PuttingCourse test;
 		if (!use_function) test = gen.fractalGeneratedCourse(50, 1, 0.4, 0.6, 10, 50);
-		else test = gen.functionGeneratedCourse(function, Function2d.getConstant(0.134), 2000, 2000, 10, 50);
+		else test = gen.functionGeneratedCourse(function, Function2d.getConstant(0.134), 50, 50, 1, 50);
 		System.out.println("course is "+test.courseWidth()+"x"+test.courseHeight()+", generated with seed "+seed);
 		if (tester_frame) generationTesterFrame(gen, 50, 1, 0.4, 0.6, 1, 50);
 		else displayCourse(test);

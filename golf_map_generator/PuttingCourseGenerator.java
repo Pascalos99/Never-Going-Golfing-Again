@@ -124,8 +124,8 @@ public class PuttingCourseGenerator {
 		Collections.shuffle(flag_try_xy, random);
 		Collections.shuffle(start_try_xy, random);
 		
-		int okay_flag_pos = flag_try_xy.get(0);
-		int okay_start_pos = start_try_xy.get(0);
+		Integer okay_flag_pos = null;
+		Integer okay_start_pos = null;
 		
 		boolean pos_found = false;
 		finding_pos: {
@@ -147,32 +147,42 @@ public class PuttingCourseGenerator {
 							flag_x = width - flag_x;
 							start_x = width - start_x;
 						}
-						if (distance(flag_x, flag_y, start_x, start_y) < MIN_FLAG_DISTANCE * max_distance) continue;
 						double flag_z = heightmap[flag_x][flag_y];
 						double flag_f = frictionmap[flag_x][flag_y];
 						double start_z = heightmap[start_x][start_y];
 						double start_f = frictionmap[start_x][start_y];
-						if (flag_z < MINIMUM_FLAG_HEIGHT || flag_z >= MAXIMUM_FLAG_HEIGHT ||
-							flag_f < MINIMUM_FLAG_FRICTION || flag_f >= MAXIMUM_FLAG_FRICTION) { fli++; sti--; continue;}
-						if (start_z < MINIMUM_START_HEIGHT || start_z >= MAXIMUM_START_HEIGHT ||
-							start_f < MINIMUM_START_FRICTION || start_f >= MAXIMUM_START_FRICTION) { continue; }
+						if (flag_z < 0) continue;
+						if (start_z < 0) continue;
+						System.out.println("Check 1");
 						okay_flag_pos = flag;
 						okay_start_pos = start;
+						if (distance(flag_x, flag_y, start_x, start_y) < MIN_FLAG_DISTANCE * max_distance) continue;
+						if (flag_z >= MAXIMUM_FLAG_HEIGHT || flag_f < MINIMUM_FLAG_FRICTION || flag_f >= MAXIMUM_FLAG_FRICTION) continue;
+						if (start_z >= MAXIMUM_START_HEIGHT || start_f < MINIMUM_START_FRICTION || start_f >= MAXIMUM_START_FRICTION) continue;
+						pos_found = true;
 						break finding_pos;
 					}
 				} if (start_left_upper) nums++; else nums--;
 			}}
 		if (!pos_found) {
+			boolean make_path = path_preference;
+			if (okay_flag_pos == null || okay_start_pos == null) {
+				make_path = true;
+				okay_flag_pos = flag_try_xy.get(0);
+				okay_start_pos = start_try_xy.get(0);
+				System.out.println("nothing found");
+			}
 			flag_x = okay_flag_pos / height;
 			flag_y = okay_flag_pos - flag_x * height;
 			start_x = okay_start_pos / height;
 			start_y = okay_start_pos - start_x * height;
-			createPath(start_x, start_y, flag_x, flag_y, heightmap, frictionmap);
+			if (make_path) createPath(start_x, start_y, flag_x, flag_y, heightmap, frictionmap);
 		} else if (path_preference) {
 			createPath(start_x, start_y, flag_x, flag_y, heightmap, frictionmap);
 		}
 		Vector2d flag = new Vector2d(flag_x + random.nextDouble(), flag_y + random.nextDouble());
 		Vector2d start = new Vector2d(start_x + random.nextDouble(), start_y + random.nextDouble());
+		System.out.println("---");
 		return new Vector2d[] {flag, start};
 	}
 	
