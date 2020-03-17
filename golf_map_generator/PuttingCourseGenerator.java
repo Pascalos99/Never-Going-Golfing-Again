@@ -153,7 +153,6 @@ public class PuttingCourseGenerator {
 						double start_f = frictionmap[start_x][start_y];
 						if (flag_z < 0) continue;
 						if (start_z < 0) continue;
-						System.out.println("Check 1");
 						okay_flag_pos = flag;
 						okay_start_pos = start;
 						if (distance(flag_x, flag_y, start_x, start_y) < MIN_FLAG_DISTANCE * max_distance) continue;
@@ -170,7 +169,6 @@ public class PuttingCourseGenerator {
 				make_path = true;
 				okay_flag_pos = flag_try_xy.get(0);
 				okay_start_pos = start_try_xy.get(0);
-				System.out.println("nothing found");
 			}
 			flag_x = okay_flag_pos / height;
 			flag_y = okay_flag_pos - flag_x * height;
@@ -182,7 +180,6 @@ public class PuttingCourseGenerator {
 		}
 		Vector2d flag = new Vector2d(flag_x + random.nextDouble(), flag_y + random.nextDouble());
 		Vector2d start = new Vector2d(start_x + random.nextDouble(), start_y + random.nextDouble());
-		System.out.println("---");
 		return new Vector2d[] {flag, start};
 	}
 	
