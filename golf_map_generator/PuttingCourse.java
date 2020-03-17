@@ -43,15 +43,15 @@ public class PuttingCourse {
 		this(height, Function2d.getConstant(DEFAULT_FRICTION), DEFAULT_WIDTH, DEFAULT_HEIGHT, flag, start, DEFAULT_HOLE_TOLERANCE, DEFAULT_MAXIMUM_VELOCITY);
 	}
 	
-	public Material getMaterialAt(int x, int y) {
+	public Material getMaterialAt(double x, double y) {
 		return Material.values()[PuttingCourseGenerator.evaluateMaterial(x, y, height_function, friction_function, flag_position, start_position, hole_tolerance)];
 	}
 	/** A more efficient way of retrieving the height value at a given point.<br>Will work for integer points of 1x1 cm*/
-	public double getHeightAt(int x, int y) {
+	public double getHeightAt(double x, double y) {
 		return height_function.evaluate(x, y);
 	}
 	/** A more efficient way of retrieving the friction value at a given point.<br>Will work for integer points of 1x1 cm*/
-	public double getFrictionAt(int x, int y) {
+	public double getFrictionAt(double x, double y) {
 		return friction_function.evaluate(x, y);
 	}
 	
