@@ -1,4 +1,4 @@
-package main;
+package parser;
 
 import java.awt.Rectangle;
 import java.awt.geom.Ellipse2D;

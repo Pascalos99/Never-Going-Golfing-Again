@@ -1,16 +1,17 @@
-package main;
+package parser;
 
 public interface Function2d {
 	
-	/** input is in cm's and output is in cm's */
 	public default double evaluate(Vector2d p) {
 		return evaluate(p.get_x(), p.get_y());
 	}
 	
-	/** input is in cm's and output is in cm's */
-	public Vector2d gradient(Vector2d p);
+	public default Vector2d gradient(Vector2d p) {
+		return gradient(p.get_x(), p.get_y());
+	}
 	
-	/**	input is in cm's and output is in cm's */
+	public Vector2d gradient(double x, double y);
+	
 	public double evaluate(double x, double y);
 	
 	public static Function2d getConstant(double value) {
@@ -18,7 +19,7 @@ public interface Function2d {
 			public double evaluate(double x, double y) {
 				return value;
 			}
-			public Vector2d gradient(Vector2d p) {
+			public Vector2d gradient(double x, double y) {
 				return new Vector2d(0, 0);
 			}
 		};

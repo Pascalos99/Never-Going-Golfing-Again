@@ -1,6 +1,5 @@
 package golf_map_generator;
 
-import static golf_map_generator.Material.*;
 import static golf_map_generator.Variables.*;
 import static golf_map_generator.MapGenUtils.*;
 
@@ -8,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-import main.Function2d;
-import main.Vector2d;
+import parser.Function2d;
+import parser.Vector2d;
 
 public class PuttingCourseGenerator {
 	

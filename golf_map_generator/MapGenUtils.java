@@ -15,10 +15,10 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import golf_map_generator.MapGenUtils.FractalGenerationSettings;
-import main.Function2d;
-import main.FunctionalFunction2d;
-import main.Vector2d;
+import parser.ArrayFunction2d;
+import parser.Function2d;
+import parser.FunctionalFunction2d;
+import parser.Vector2d;
 
 import static golf_map_generator.Material.FLAG;
 import static golf_map_generator.Material.GRASS;
@@ -251,21 +251,20 @@ public class MapGenUtils {
 		return r;
 	}
 
-	public static Function2d functionFromArray(double[][] m, Function2d out_of_bounds_value) {
+	public static ArrayFunction2d functionFromArray(double[][] m, Function2d out_of_bounds_value) {
 		double[][] m2 = new double[m.length + 2][m[0].length + 2];
 		for (int i=0; i < m2.length; i++)
 			for (int j=0; j < m2[i].length; j++)
 				if (i==0 || j==0 || i == m2.length-1 || j == m2.length-1) m2[i][j] = out_of_bounds_value.evaluate(i-1, j-1);
 				else m2[i][j] = m[i-1][j-1];
 		
-		return new Function2d() {
+		return new ArrayFunction2d() {
+			double[][] original = m;
 			double[][] array = m2;
 			Function2d function = out_of_bounds_value;
 			@Override
-			public Vector2d gradient(Vector2d v) {
-				double x = v.get_x();
-				double y = v.get_y();
-				if (x >= array.length - 2|| y >= array.length - 2 || x < -1 || y < -1) return function.gradient(v);
+			public Vector2d gradient(double x, double y) {
+				if (x >= array.length - 2|| y >= array.length - 2 || x < -1 || y < -1) return function.gradient(x, y);
 				x++; y++;
 				double p = floor(x), q= floor(x+1);
 				double r = floor(y), s = floor(y+1);
@@ -293,6 +292,10 @@ public class MapGenUtils {
 				double fx1 = (x2 - x) * Q11 + (x - x1) * Q21;
 				double fx2 = (x2 - x) * Q12 + (x - x1) * Q22;
 				return (y2 - y) * fx1 + (y - y1) * fx2;
+			}
+			@Override
+			public double[][] getArray() {
+				return original;
 			}
 		};
 	}

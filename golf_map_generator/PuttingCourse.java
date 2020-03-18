@@ -1,9 +1,9 @@
 package golf_map_generator;
 
-import main.Function2d;
-import main.Vector2d;
-
 import static golf_map_generator.Variables.*;
+
+import parser.Function2d;
+import parser.Vector2d;
 
 public class PuttingCourse {
 	
