@@ -15,15 +15,40 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import golf_map_generator.PuttingCourseGenerator.FractalGenerationSettings;
+import golf_map_generator.MapGenUtils.FractalGenerationSettings;
 import main.Function2d;
 import main.FunctionalFunction2d;
+import main.Vector2d;
 
+import static golf_map_generator.Material.FLAG;
+import static golf_map_generator.Material.GRASS;
+import static golf_map_generator.Material.HILL;
+import static golf_map_generator.Material.ICE;
+import static golf_map_generator.Material.MOUNTAIN;
+import static golf_map_generator.Material.SAND;
+import static golf_map_generator.Material.STARTING_POINT;
+import static golf_map_generator.Material.WATER;
 import static golf_map_generator.Variables.FLAG_TEXTURE;
+import static golf_map_generator.Variables.HILL_HEIGHT;
+import static golf_map_generator.Variables.MOUNTAIN_HEIGHT;
+import static golf_map_generator.Variables.SAND_FRICTION;
 import static golf_map_generator.Variables.START_TEXTURE;
 
 public class MapGenUtils {
 	
+	static class FractalGenerationSettings {
+		public final int desired_size, smoothing_factor;
+		public final double roughness_height, roughness_friction, hole_tolerance, maximum_velocity;
+		public FractalGenerationSettings(int desired_size, int smoothing_factor, double roughness_height, double roughness_friction, double hole_tolerance, double maximum_velocity) {
+			this.desired_size = desired_size;
+			this.smoothing_factor = smoothing_factor;
+			this.roughness_height = roughness_height;
+			this.roughness_friction = roughness_friction;
+			this.hole_tolerance = hole_tolerance;
+			this.maximum_velocity = maximum_velocity;
+		}
+	}
+
 	public static final double m = 100d;
 	
 	public static boolean gradient_display = false;
@@ -210,10 +235,81 @@ public class MapGenUtils {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) pressed = false; }
 		});
 	}
-	public void generationTesterFrame(PuttingCourseGenerator gen, FractalGenerationSettings settings) {
+	public void generationTesterFrame(PuttingCourseGenerator gen, MapGenUtils.FractalGenerationSettings settings) {
 		generationTesterFrame(gen, settings.desired_size, settings.smoothing_factor, settings.roughness_height, settings.roughness_friction, settings.hole_tolerance, settings.maximum_velocity);
 	}
 	
+	static int approximate_required_detail(int size) {
+		int r = 0, t = size;
+		while (t > 0) {
+			r++;
+			t >>= 1; }
+		if (r==0) return 1;
+		int lower = 1 << (r - 1);
+		int higher = 1 << r;
+		if (size - lower <= higher - size) return r - 1;
+		return r;
+	}
+
+	public static Function2d functionFromArray(double[][] m, Function2d out_of_bounds_value) {
+		double[][] m2 = new double[m.length + 2][m[0].length + 2];
+		for (int i=0; i < m2.length; i++)
+			for (int j=0; j < m2[i].length; j++)
+				if (i==0 || j==0 || i == m2.length-1 || j == m2.length-1) m2[i][j] = out_of_bounds_value.evaluate(i-1, j-1);
+				else m2[i][j] = m[i-1][j-1];
+		
+		return new Function2d() {
+			double[][] array = m2;
+			Function2d function = out_of_bounds_value;
+			@Override
+			public Vector2d gradient(Vector2d v) {
+				double x = v.get_x();
+				double y = v.get_y();
+				if (x >= array.length - 2|| y >= array.length - 2 || x < -1 || y < -1) return function.gradient(v);
+				x++; y++;
+				double p = floor(x), q= floor(x+1);
+				double r = floor(y), s = floor(y+1);
+				double T = array[floor(x)][floor(y)];
+				double U = array[floor(x)][floor(y+1)]; 
+				double V = array[floor(x+1)][floor(y)];
+				double W = array[floor(x+1)][floor(y+1)];
+				return new Vector2d(
+						(r - y) * (U - W) + (s - y) * (V - T),
+						p * (V - W) + q * (U - T) + x * (T - U - V + W)
+					); // I trust WolframAlpha on this one...
+			}
+			@Override
+			public double evaluate(double x, double y) {
+				if (x >= array.length - 2|| y >= array.length - 2 || x < -1 || y < -1) return function.evaluate(x, y);
+				x++; y++;
+				double x1 = floor(x), x2 = floor(x+1);
+				double y1 = floor(y), y2 = floor(y+1);
+				
+				double Q11 = array[floor(x)][floor(y)];
+				double Q12 = array[floor(x)][floor(y+1)]; 
+				double Q21 = array[floor(x+1)][floor(y)];
+				double Q22 = array[floor(x+1)][floor(y+1)];
+				
+				double fx1 = (x2 - x) * Q11 + (x - x1) * Q21;
+				double fx2 = (x2 - x) * Q12 + (x - x1) * Q22;
+				return (y2 - y) * fx1 + (y - y1) * fx2;
+			}
+		};
+	}
+
+	public static int evaluateMaterial(double x, double y, Function2d height, Function2d friction, Vector2d flag, Vector2d start, double hole_tolerance) {
+		double z_value = height.evaluate(x, y);
+		double f_value = friction.evaluate(x, y);
+		if (distance(flag.get_x(), flag.get_y(), x, y) <= hole_tolerance) return FLAG.index;
+		if (distance(start.get_x(), start.get_y(), x, y) <= 1) return STARTING_POINT.index;
+		if (z_value < 0) return WATER.index;
+		if (f_value <= 0) return ICE.index;
+		if (f_value >= SAND_FRICTION) return SAND.index;
+		if (z_value >= MOUNTAIN_HEIGHT) return MOUNTAIN.index;
+		if (z_value >= HILL_HEIGHT) return HILL.index;
+		return GRASS.index;
+	}
+
 	public static void main(String[] args) {
 		boolean use_function = false;
 		boolean tester_frame = !use_function;
@@ -229,5 +325,4 @@ public class MapGenUtils {
 		if (tester_frame) generationTesterFrame(gen, 50, 1, 0.4, 0.6, 1, 50);
 		else displayCourse(test);
 	}
-	
 }

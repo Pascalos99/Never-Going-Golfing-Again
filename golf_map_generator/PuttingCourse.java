@@ -44,7 +44,7 @@ public class PuttingCourse {
 	}
 	
 	public Material getMaterialAt(double x, double y) {
-		return Material.values()[PuttingCourseGenerator.evaluateMaterial(x, y, height_function, friction_function, flag_position, start_position, hole_tolerance)];
+		return Material.values()[MapGenUtils.evaluateMaterial(x, y, height_function, friction_function, flag_position, start_position, hole_tolerance)];
 	}
 	/** A more efficient way of retrieving the height value at a given point.<br>Will work for integer points of 1x1 cm*/
 	public double getHeightAt(double x, double y) {
