@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import main.Function2d;
+import main.FunctionalFunction2d;
 import main.Vector2d;
 
 public class PuttingCourseGenerator {
@@ -219,32 +220,47 @@ public class PuttingCourseGenerator {
 	}
 	
 	public static Function2d functionFromArray(double[][] m, Function2d out_of_bounds_value) {
+		double[][] m2 = new double[m.length + 2][m[0].length + 2];
+		for (int i=0; i < m2.length; i++)
+			for (int j=0; j < m2[i].length; j++)
+				if (i==0 || j==0 || i == m2.length-1 || j == m2.length-1) m2[i][j] = out_of_bounds_value.evaluate(i-1, j-1);
+				else m2[i][j] = m[i-1][j-1];
+		
 		return new Function2d() {
-			double[][] array = m;
+			double[][] array = m2;
 			Function2d function = out_of_bounds_value;
 			@Override
-			public Vector2d gradient(Vector2d p) {		
-				double x = p.get_x();
-				double y = p.get_y();
-				if (x < 0 || x >= m.length - 1 || y < 0 || y >= m[0].length - 1) return function.gradient(p);
-				double A = array[floor(x)][floor(y)];
-				double C, D;
-				if (floor(x+1) >= m.length) C = function.evaluate(floor(x+1), floor(y));
-				else C = array[floor(x+1)][floor(y)];
-				if (floor(y+1) >= m.length) D = function.evaluate(floor(x), floor(y+1));
-				else D = array[floor(x)][floor(y+1)];
-				
-				return new Vector2d(C - A, D - A);
+			public Vector2d gradient(Vector2d v) {
+				double x = v.get_x();
+				double y = v.get_y();
+				if (x >= array.length - 2|| y >= array.length - 2 || x < -1 || y < -1) return function.gradient(v);
+				x++; y++;
+				double p = floor(x), q= floor(x+1);
+				double r = floor(y), s = floor(y+1);
+				double T = array[floor(x)][floor(y)];
+				double U = array[floor(x)][floor(y+1)]; 
+				double V = array[floor(x+1)][floor(y)];
+				double W = array[floor(x+1)][floor(y+1)];
+				return new Vector2d(
+						(r - y) * (U - W) + (s - y) * (V - T),
+						p * (V - W) + q * (U - T) + x * (T - U - V + W)
+					); // I trust WolframAlpha on this one...
 			}
 			@Override
 			public double evaluate(double x, double y) {
-				if (x > array.length - 1 || y > array.length - 1 || x < 0 || y < 0) return function.evaluate(x, y);
-				if ((float)x == (int)x && (float)y == (int)y) return array[(int)(float)x][(int)(float)y];
-				double diff_x = x - floor(x);
-				double diff_y = y - floor(y);
-				double A = array[floor(x)][floor(y)];
-				double B = array[floor(x+1)][floor(y+1)];
-				return ((diff_x + diff_y)/2) * (B - A) + A;
+				if (x >= array.length - 2|| y >= array.length - 2 || x < -1 || y < -1) return function.evaluate(x, y);
+				x++; y++;
+				double x1 = floor(x), x2 = floor(x+1);
+				double y1 = floor(y), y2 = floor(y+1);
+				
+				double Q11 = array[floor(x)][floor(y)];
+				double Q12 = array[floor(x)][floor(y+1)]; 
+				double Q21 = array[floor(x+1)][floor(y)];
+				double Q22 = array[floor(x+1)][floor(y+1)];
+				
+				double fx1 = (x2 - x) * Q11 + (x - x1) * Q21;
+				double fx2 = (x2 - x) * Q12 + (x - x1) * Q22;
+				return (y2 - y) * fx1 + (y - y1) * fx2;
 			}
 		};
 	}

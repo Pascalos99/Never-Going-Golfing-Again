@@ -18,7 +18,6 @@ import javax.swing.JFrame;
 import golf_map_generator.PuttingCourseGenerator.FractalGenerationSettings;
 import main.Function2d;
 import main.FunctionalFunction2d;
-import main.Vector2d;
 
 import static golf_map_generator.Variables.FLAG_TEXTURE;
 import static golf_map_generator.Variables.START_TEXTURE;
@@ -73,6 +72,27 @@ public class MapGenUtils {
 	public static void applyRangeToMatrix(double[][] m, Range range) {
 		for (int i=0; i < m.length; i++)
 			for (int j=0; j < m[i].length; j++) m[i][j] = range.min + m[i][j]*(range.max - range.min);
+	}
+	
+	public static void testFunction(Function2d f, double x1, double y1, double x2, double y2, double interval_x, double interval_y) {
+		double y = y1, x = x1;
+		for (;y <= y2; y += interval_y) {
+			if (y==y1) {
+				String str = " y  x / ";
+				for (; x <= x2; x += interval_x) {
+					str += String.format("% .2f",x);
+					if (x <= x2-interval_x) str += " .";
+				} System.out.println(str);
+				String line = "";
+				while (line.length() < str.length() + 2) line += "-";
+				System.out.println(line);
+			} x = x1;
+			for (;x <= x2; x += interval_x) {
+				if (x==x1) System.out.format("% .2f [ ", y);
+				System.out.format("% .2f",f.evaluate(x, y));
+				if (x <= x2-interval_x) System.out.print(" |");
+			} System.out.println(" ]");
+		}
 	}
 	
 	public static int floor(double x) {
