@@ -38,14 +38,15 @@ public class MapGenUtils {
 	
 	static class FractalGenerationSettings {
 		public final int desired_size, smoothing_factor;
-		public final double roughness_height, roughness_friction, hole_tolerance, maximum_velocity;
-		public FractalGenerationSettings(int desired_size, int smoothing_factor, double roughness_height, double roughness_friction, double hole_tolerance, double maximum_velocity) {
+		public final double roughness_height, roughness_friction, hole_tolerance, maximum_velocity, gravity;
+		public FractalGenerationSettings(int desired_size, int smoothing_factor, double roughness_height, double roughness_friction, double hole_tolerance, double maximum_velocity, double gravity) {
 			this.desired_size = desired_size;
 			this.smoothing_factor = smoothing_factor;
 			this.roughness_height = roughness_height;
 			this.roughness_friction = roughness_friction;
 			this.hole_tolerance = hole_tolerance;
 			this.maximum_velocity = maximum_velocity;
+			this.gravity = gravity;
 		}
 	}
 
@@ -222,21 +223,21 @@ public class MapGenUtils {
 		return frame;
 	}
 	
-	public static void generationTesterFrame(PuttingCourseGenerator gen, int desired_size, int smoothing_factor, double roughness_height, double roughness_friction, double hole_tolerance, double maximum_velocity) {
-		JFrame frame = displayCourse(gen.fractalGeneratedCourse(desired_size, smoothing_factor, roughness_height, roughness_friction, hole_tolerance, maximum_velocity));
+	public static void generationTesterFrame(PuttingCourseGenerator gen, int desired_size, int smoothing_factor, double roughness_height, double roughness_friction, double hole_tolerance, double maximum_velocity, double gravity) {
+		JFrame frame = displayCourse(gen.fractalGeneratedCourse(desired_size, smoothing_factor, roughness_height, roughness_friction, hole_tolerance, maximum_velocity, gravity));
 		frame.addKeyListener(new KeyAdapter() {
 			boolean pressed = false;
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER && !pressed) {
 					frame.setVisible(false);
-					generationTesterFrame(gen, desired_size, smoothing_factor, roughness_height, roughness_friction, hole_tolerance, maximum_velocity);
+					generationTesterFrame(gen, desired_size, smoothing_factor, roughness_height, roughness_friction, hole_tolerance, maximum_velocity, gravity);
 					pressed = true; }}
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) pressed = false; }
 		});
 	}
 	public void generationTesterFrame(PuttingCourseGenerator gen, MapGenUtils.FractalGenerationSettings settings) {
-		generationTesterFrame(gen, settings.desired_size, settings.smoothing_factor, settings.roughness_height, settings.roughness_friction, settings.hole_tolerance, settings.maximum_velocity);
+		generationTesterFrame(gen, settings.desired_size, settings.smoothing_factor, settings.roughness_height, settings.roughness_friction, settings.hole_tolerance, settings.maximum_velocity, settings.gravity);
 	}
 	
 	static int approximate_required_detail(int size) {
@@ -322,10 +323,10 @@ public class MapGenUtils {
 		PuttingCourseGenerator gen = new PuttingCourseGenerator(seed);
 		gen.setPathPreference(false);
 		PuttingCourse test;
-		if (!use_function) test = gen.fractalGeneratedCourse(50, 1, 0.4, 0.6, 10, 50);
-		else test = gen.functionGeneratedCourse(function, Function2d.getConstant(0.134), 50, 50, 1, 50);
+		if (!use_function) test = gen.fractalGeneratedCourse(50, 1, 0.4, 0.6, 10, 50, 9.812);
+		else test = gen.functionGeneratedCourse(function, Function2d.getConstant(0.134), 50, 50, 1, 50, 9.812);
 		System.out.println("course is "+test.courseWidth()+"x"+test.courseHeight()+", generated with seed "+seed);
-		if (tester_frame) generationTesterFrame(gen, 50, 1, 0.4, 0.6, 1, 50);
+		if (tester_frame) generationTesterFrame(gen, 50, 1, 0.4, 0.6, 1, 50, 9.812);
 		else displayCourse(test);
 	}
 }

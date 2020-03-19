@@ -42,7 +42,7 @@ public class PuttingCourseGenerator {
 	 * @param maximum_velocity
 	 * @return
 	 */
-	public PuttingCourse fractalGeneratedCourse(int desired_size, int smoothing_factor, double roughness_height, double roughness_friction, double hole_tolerance, double maximum_velocity) {
+	public PuttingCourse fractalGeneratedCourse(int desired_size, int smoothing_factor, double roughness_height, double roughness_friction, double hole_tolerance, double maximum_velocity, double gravity) {
 		if (smoothing_factor < 1) smoothing_factor = 1;
 		int small_size_desired = (desired_size / smoothing_factor);
 		int detail = MapGenUtils.approximate_required_detail(small_size_desired);
@@ -55,19 +55,19 @@ public class PuttingCourseGenerator {
 		Vector2d[] pos = determineFlagAndStartPositions(heightmap, frictionmap);
 		Function2d height = MapGenUtils.functionFromArray(heightmap, OUT_OF_BOUNDS_HEIGHT);
 		Function2d friction = MapGenUtils.functionFromArray(frictionmap, OUT_OF_BOUNDS_FRICTION);
-		return new PuttingCourse(height, friction, heightmap.length, heightmap[0].length, pos[0], pos[1], hole_tolerance, maximum_velocity);
+		return new PuttingCourse(height, friction, heightmap.length, heightmap[0].length, pos[0], pos[1], hole_tolerance, maximum_velocity, gravity);
 	}
 	
 	public PuttingCourse fractalGeneratedCourse(MapGenUtils.FractalGenerationSettings settings) {
-		return fractalGeneratedCourse(settings.desired_size, settings.smoothing_factor, settings.roughness_height, settings.roughness_friction, settings.hole_tolerance, settings.maximum_velocity);
+		return fractalGeneratedCourse(settings.desired_size, settings.smoothing_factor, settings.roughness_height, settings.roughness_friction, settings.hole_tolerance, settings.maximum_velocity, settings.gravity);
 	}
-	public PuttingCourse randomCourse(int desired_size, double hole_tolerance, double maximum_velocity) {
-		return fractalGeneratedCourse(desired_size, 1, 0.4, 0.6, hole_tolerance, maximum_velocity);
+	public PuttingCourse randomCourse(int desired_size, double hole_tolerance, double maximum_velocity, double gravity) {
+		return fractalGeneratedCourse(desired_size, 1, 0.4, 0.6, hole_tolerance, maximum_velocity, gravity);
 	}
 	
 	/** Generates a course from a function.<br>This method also adjusts the course to be more playable. */
-	public PuttingCourse functionGeneratedCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, double hole_tolerance, double maximum_velocity) {
-		PuttingCourse result = new PuttingCourse(height, friction, course_width_cm, course_height_cm, new Vector2d(0, 0), new Vector2d(0, 0), hole_tolerance, maximum_velocity);
+	public PuttingCourse functionGeneratedCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, double hole_tolerance, double maximum_velocity, double gravity) {
+		PuttingCourse result = new PuttingCourse(height, friction, course_width_cm, course_height_cm, new Vector2d(0, 0), new Vector2d(0, 0), hole_tolerance, maximum_velocity, gravity);
 		double[][][] maps = generate_height_and_friction_maps(result);
 		Vector2d[] pos = determineFlagAndStartPositions(maps[0], maps[1]);
 		result.flag_position = pos[0];
@@ -79,11 +79,11 @@ public class PuttingCourseGenerator {
 	
 	/** Generates a course from a function as per the {@link PuttingCourse#PuttingCourse(Function2d, Function2d, int, int, Vector2d, Vector2d, double, double)} method, but with random
 	 * inputs for the start and flag positions. */
-	public PuttingCourse pureFunctionGeneratedCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, double hole_tolerance, double maximum_velocity) {
+	public PuttingCourse pureFunctionGeneratedCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, double hole_tolerance, double maximum_velocity, double gravity) {
 		return new PuttingCourse(height, friction, course_width_cm, course_height_cm,
 				new Vector2d(random.nextDouble() * course_width_cm, random.nextDouble() * course_height_cm),
 				new Vector2d(random.nextDouble() * course_width_cm, random.nextDouble() * course_height_cm),
-			hole_tolerance, maximum_velocity);
+			hole_tolerance, maximum_velocity, gravity);
 	}
 	
 	private double[][][] generate_height_and_friction_maps(PuttingCourse course) {

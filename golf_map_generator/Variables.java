@@ -15,6 +15,7 @@ public final class Variables {
 	public static final int 	DEFAULT_HEIGHT = 20 * 100; //cm
 	public static final double	DEFAULT_HOLE_TOLERANCE = 0.02; //cm
 	public static final double 	DEFAULT_MAXIMUM_VELOCITY = 20; // cm/s ? <- physics people have to decide this
+	public static final double	DEFAULT_GRAVITY = 9.812; // m/s^2
 	
 	public static final String	FLAG_TEXTURE = ".\\textures\\Flag.png";
 	public static final String	START_TEXTURE = ".\\textures\\Start.png";

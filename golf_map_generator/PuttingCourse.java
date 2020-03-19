@@ -15,6 +15,7 @@ public class PuttingCourse {
 	
 	double hole_tolerance;
 	double maximum_velocity;
+	double gravity;
 	
 	int course_width, course_height;
 	
@@ -28,7 +29,7 @@ public class PuttingCourse {
 	 * @param hole_tolerance
 	 * @param maximum_velocity
 	 */
-	public PuttingCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, Vector2d flag, Vector2d start, double hole_tolerance, double maximum_velocity) {
+	public PuttingCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, Vector2d flag, Vector2d start, double hole_tolerance, double maximum_velocity, double gravity) {
 		height_function = height;
 		friction_function = friction;
 		flag_position = flag;
@@ -37,10 +38,11 @@ public class PuttingCourse {
 		this.maximum_velocity = maximum_velocity;
 		this.course_width = course_width_cm;
 		this.course_height = course_height_cm;
+		this.gravity = gravity;
 	}
 	
 	public PuttingCourse(Function2d height, Vector2d flag, Vector2d start) {
-		this(height, Function2d.getConstant(DEFAULT_FRICTION), DEFAULT_WIDTH, DEFAULT_HEIGHT, flag, start, DEFAULT_HOLE_TOLERANCE, DEFAULT_MAXIMUM_VELOCITY);
+		this(height, Function2d.getConstant(DEFAULT_FRICTION), DEFAULT_WIDTH, DEFAULT_HEIGHT, flag, start, DEFAULT_HOLE_TOLERANCE, DEFAULT_MAXIMUM_VELOCITY, DEFAULT_GRAVITY);
 	}
 	
 	public Material getMaterialAt(double x, double y) {
@@ -88,6 +90,10 @@ public class PuttingCourse {
 	
 	public double get_hole_tolerance() {
 		return hole_tolerance;
+	}
+	
+	public double get_gravity() {
+		return gravity;
 	}
 	
 }
