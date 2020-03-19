@@ -53,8 +53,8 @@ public class PuttingCourseGenerator {
 		double[][] heightmap = enlargeMatrix(fractal_h, smoothing_factor);
 		double[][] frictionmap = enlargeMatrix(fractal_f, smoothing_factor);
 		Vector2d[] pos = determineFlagAndStartPositions(heightmap, frictionmap);
-		Function2d height = MapGenUtils.functionFromArray(heightmap, Function2d.getConstant(OUT_OF_BOUNDS_HEIGHT));
-		Function2d friction = MapGenUtils.functionFromArray(frictionmap, Function2d.getConstant(OUT_OF_BOUNDS_FRICTION));
+		Function2d height = MapGenUtils.functionFromArray(heightmap, OUT_OF_BOUNDS_HEIGHT);
+		Function2d friction = MapGenUtils.functionFromArray(frictionmap, OUT_OF_BOUNDS_FRICTION);
 		return new PuttingCourse(height, friction, heightmap.length, heightmap[0].length, pos[0], pos[1], hole_tolerance, maximum_velocity);
 	}
 	

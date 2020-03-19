@@ -1,5 +1,8 @@
 package golf_map_generator;
 
+import parser.Function2d;
+import parser.AtomFunction2d;
+
 public final class Variables {
 	// MATERIAL SETTINGS
 	public static final double 	SAND_FRICTION = 5; // ? TODO decide unit of friction
@@ -16,11 +19,10 @@ public final class Variables {
 	public static final String	FLAG_TEXTURE = ".\\textures\\Flag.png";
 	public static final String	START_TEXTURE = ".\\textures\\Start.png";
 	
-	
 	// MAP GENERATION SETTINGS
 		// World-border settings
-	public static final double 	OUT_OF_BOUNDS_FRICTION = 100000;
-	public static final double 	OUT_OF_BOUNDS_HEIGHT = -1; // water surrounds the course
+	public static final Function2d	OUT_OF_BOUNDS_FRICTION = Function2d.getConstant(100000);
+	public static final	Function2d 	OUT_OF_BOUNDS_HEIGHT = new AtomFunction2d("-sin(y/8 - x/8)/8 - cos(x/8 + y/4)/8 - 2");
 	
 		// Settings for path generation
 	public static final int 	NUM_FLAG_POS_TRIES = 2000;
