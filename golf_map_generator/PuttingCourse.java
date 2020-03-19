@@ -57,6 +57,14 @@ public class PuttingCourse {
 		return friction_function.evaluate(x, y);
 	}
 	
+	public Vector2d getHeightGradientAt(double x, double y) {
+		return height_function.gradient(x, y);
+	}
+	
+	public Vector2d getFrictionGradientAt(double x, double y) {
+		return friction_function.gradient(x, y);
+	}
+	
 	public int courseWidth() {
 		return course_width;
 	}

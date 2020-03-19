@@ -20,19 +20,8 @@ import parser.Function2d;
 import parser.FunctionalFunction2d;
 import parser.Vector2d;
 
-import static golf_map_generator.Material.FLAG;
-import static golf_map_generator.Material.GRASS;
-import static golf_map_generator.Material.HILL;
-import static golf_map_generator.Material.ICE;
-import static golf_map_generator.Material.MOUNTAIN;
-import static golf_map_generator.Material.SAND;
-import static golf_map_generator.Material.STARTING_POINT;
-import static golf_map_generator.Material.WATER;
-import static golf_map_generator.Variables.FLAG_TEXTURE;
-import static golf_map_generator.Variables.HILL_HEIGHT;
-import static golf_map_generator.Variables.MOUNTAIN_HEIGHT;
-import static golf_map_generator.Variables.SAND_FRICTION;
-import static golf_map_generator.Variables.START_TEXTURE;
+import static golf_map_generator.Material.*;
+import static golf_map_generator.Variables.*;
 
 public class MapGenUtils {
 	
@@ -307,7 +296,7 @@ public class MapGenUtils {
 		if (distance(flag.get_x(), flag.get_y(), x, y) <= hole_tolerance) return FLAG.index;
 		if (distance(start.get_x(), start.get_y(), x, y) <= 1) return STARTING_POINT.index;
 		if (z_value < 0) return WATER.index;
-		if (f_value <= 0) return ICE.index;
+		if (f_value <= ICE_FRICTION) return ICE.index;
 		if (f_value >= SAND_FRICTION) return SAND.index;
 		if (z_value >= MOUNTAIN_HEIGHT) return MOUNTAIN.index;
 		if (z_value >= HILL_HEIGHT) return HILL.index;
@@ -321,7 +310,7 @@ public class MapGenUtils {
 		long seed = System.currentTimeMillis();
 		FunctionalFunction2d function = (x, y) -> {return Math.sin(x) + Math.sin(y);};
 		PuttingCourseGenerator gen = new PuttingCourseGenerator(seed);
-		gen.setPathPreference(false);
+		gen.setPathPreference(true);
 		PuttingCourse test;
 		if (!use_function) test = gen.fractalGeneratedCourse(50, 1, 0.4, 0.6, 10, 50, 9.812);
 		else test = gen.functionGeneratedCourse(function, Function2d.getConstant(0.134), 50, 50, 1, 50, 9.812);
