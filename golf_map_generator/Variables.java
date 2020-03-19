@@ -7,8 +7,8 @@ public final class Variables {
 	// MATERIAL SETTINGS
 	public static final double 	SAND_FRICTION = 0.178;
 	public static final double	ICE_FRICTION = 0.0839;
-	public static final double	MOUNTAIN_HEIGHT = 20;
-	public static final double 	HILL_HEIGHT = 10;
+	public static final double	MOUNTAIN_HEIGHT = 2;
+	public static final double 	HILL_HEIGHT = 1;
 	
 	// DEFAULT CONSTRUCTOR OF PUTTINGCOURSE SETTINGS
 	public static final double 	DEFAULT_FRICTION = 0.131; // ? TODO decide unit of friction
@@ -36,16 +36,16 @@ public final class Variables {
 	public static final double	PATH_ROUGHNESS = 0.4; // a value of 0 is completely smooth, anything above 1 is incredibly noisy (affects friction)
 	
 		// Value ranges for fractal generation
-	public static final double 	MINIMUM_HEIGHT = -10;
-	public static final double 	MAXIMUM_HEIGHT = 30;
+	public static final double 	MINIMUM_HEIGHT = -1;
+	public static final double 	MAXIMUM_HEIGHT = 3;
 	public static final double 	MINIMUM_FRICTION = 0.065;
 	public static final double 	MAXIMUM_FRICTION = 0.196;
 	
 		// Settings for valid flag and start positions
-	public static final double	MINIMUM_START_HEIGHT = 5; // inclusive
-	public static final double	MAXIMUM_START_HEIGHT = 15; // exclusive
-	public static final double	MINIMUM_FLAG_HEIGHT = 5; // inclusive
-	public static final double	MAXIMUM_FLAG_HEIGHT = 15; // exclusive
+	public static final double	MINIMUM_START_HEIGHT = 0.5; // inclusive
+	public static final double	MAXIMUM_START_HEIGHT = 1.5; // exclusive
+	public static final double	MINIMUM_FLAG_HEIGHT = 0.5; // inclusive
+	public static final double	MAXIMUM_FLAG_HEIGHT = 1.5; // exclusive
 	
 	public static final double	MINIMUM_START_FRICTION = 0.0933; // inclusive
 	public static final double	MAXIMUM_START_FRICTION = 0.169; // exclusive
