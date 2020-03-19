@@ -5,3 +5,11 @@
 *.class
 bin/.classpath
 bin/basic/Main.class
+.idea/compiler.xml
+.idea/gradle.xml
+.idea/jarRepositories.xml
+.idea/misc.xml
+.idea/modules/Never-Going-Golfing-Again.iml
+.idea/modules/Never-Going-Golfing-Again.main.iml
+.idea/modules/Never-Going-Golfing-Again.test.iml
+.idea/workspace.xml
