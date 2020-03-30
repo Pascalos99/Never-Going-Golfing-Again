@@ -1,3 +1,4 @@
+
 .gradle/5.4.1/executionHistory/executionHistory.bin
 *.bin
 .gradle/5.4.1/executionHistory/executionHistory.lock
@@ -11,19 +12,14 @@
 .idea/modules/Never-Going-Golfing-Again.test.iml
 .idea/vcs.xml
 .idea/jarRepositories.xml
-.gradle/buildOutputCleanup/outputFiles.bin
-.gradle/buildOutputCleanup/buildOutputCleanup.lock
-.gradle/5.4.1/fileHashes/fileHashes.lock
-.gradle/5.4.1/fileHashes/fileHashes.bin
-.gradle/5.4.1/executionHistory/executionHistory.lock
-.gradle/5.4.1/executionHistory/executionHistory.bin
+core/.gradle/
+desktop/.gradle/
 *.class
-*.bin
 *.lock
-.idea/misc.xml
 .idea/modules.xml
 .idea/modules/Never-Going-Golfing-Again.iml
 core/build/libs/core-1.0.jar
+core/src/com/mygdx/game/PlayerScreen.java
 .gradle/5.4.1/gc.properties
 .gradle/buildOutputCleanup/cache.properties
 .gradle/vcs-1/gc.properties
@@ -61,6 +57,7 @@ core/build/libs/core-1.0.jar
 .idea/modules/desktop/golfing.desktop.main.iml
 .idea/modules/desktop/golfing.desktop.test.iml
 .idea/modules/golfing.iml
+build.gradle
 core/build/tmp/jar/MANIFEST.MF
 desktop/build/resources/main/badlogic.jpg
 desktop/build/resources/main/font-big-export.fnt
@@ -70,5 +67,10 @@ desktop/build/resources/main/glassy-ui.json
 desktop/build/resources/main/glassy-ui.png
 desktop/build/resources/main/txt.png
 gradle.properties
+gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
+gradlew
+gradlew.bat
+settings.gradle
 .idea/
 bin/
