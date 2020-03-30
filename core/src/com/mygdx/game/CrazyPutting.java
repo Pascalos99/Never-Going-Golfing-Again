@@ -163,7 +163,7 @@ public class CrazyPutting implements ApplicationListener {
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
 //        MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_LINES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(Color.BROWN)));
-        MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(IntAttribute.createCullFace(GL20.GL_NONE),ColorAttribute.createDiffuse(Color.BROWN)));
+        MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(IntAttribute.createCullFace(GL20.GL_NONE),ColorAttribute.createDiffuse(Color.BLUE)));
         VertexInfo v1, v2, v3, v4;
         Vector3 nor1=new Vector3(-1,0,0);
         for(int i=0;i<borderPoints1.size()-1;i++){
