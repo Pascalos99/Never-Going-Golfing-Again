@@ -82,8 +82,8 @@ public class CrazyPutting implements ApplicationListener {
         camera.lookAt(0f, 0f, 0f);
 
         // Near and Far (plane) repesent the minimum and maximum ranges of the camera in, um, units
-        camera.near = 0.1f;
-        camera.far = 1000.0f;
+        camera.near = 1f;
+        camera.far = 200.0f;
 
         // A ModelBatch is like a SpriteBatch, just for models.  Use it to batch up geometry for OpenGL
         modelBatch = new ModelBatch();
@@ -100,7 +100,7 @@ public class CrazyPutting implements ApplicationListener {
         );
 
         ball = modelBuilder.createSphere(ballRadius * 2, ballRadius * 2, ballRadius * 2, 30, 30,
-                new Material(ColorAttribute.createDiffuse(Color.RED)),
+                new Material(ColorAttribute.createDiffuse(Color.YELLOW)),
                 Usage.Position | Usage.Normal
         );
 
