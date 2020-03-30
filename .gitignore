@@ -64,13 +64,6 @@ core/src/com/mygdx/game/PlayerScreen.java
 .idea/modules/desktop/golfing.desktop.test.iml
 .idea/modules/golfing.iml
 build.gradle
-core/assets/badlogic.jpg
-core/assets/font-big-export.fnt
-core/assets/font-export.fnt
-core/assets/glassy-ui.atlas
-core/assets/glassy-ui.json
-core/assets/glassy-ui.png
-core/assets/txt.png
 core/build/tmp/jar/MANIFEST.MF
 desktop/build/resources/main/badlogic.jpg
 desktop/build/resources/main/font-big-export.fnt
