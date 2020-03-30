@@ -46,11 +46,6 @@ public class Ball implements TopDownPhysicsObject {
 
         x += velocity_x*delta;
         y += velocity_y*delta;
-
-        System.out.println(this.toString() + "-->" + new Vector2d(x, y).toString() + " (position)");
-        System.out.println(this.toString() + "-->  " + velocity.toString() + " (velocity)");
-        System.out.println(this.toString() + "-->  " + acceleration.toString() + " (acceleration)");
-        System.out.println("Delta: " + delta);
     }
 
 
