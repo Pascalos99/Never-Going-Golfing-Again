@@ -19,7 +19,6 @@ desktop/.gradle/
 .idea/modules.xml
 .idea/modules/Never-Going-Golfing-Again.iml
 core/build/libs/core-1.0.jar
-core/src/com/mygdx/game/PlayerScreen.java
 .gradle/5.4.1/gc.properties
 .gradle/buildOutputCleanup/cache.properties
 .gradle/vcs-1/gc.properties
