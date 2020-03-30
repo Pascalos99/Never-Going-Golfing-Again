@@ -160,8 +160,6 @@ public class CrazyPutting implements ApplicationListener {
     }
 
     public static ModelInstance buildWalls(){
-
-        Test.test();
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
 //        MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_LINES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(Color.BROWN)));
