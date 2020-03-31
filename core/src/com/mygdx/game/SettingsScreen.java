@@ -54,19 +54,19 @@ public class SettingsScreen implements Screen {
         table.add(tabler).expandY().expandX();
         table.add(tablel).expandY().expandX();
         TextButton play=new TextButton("PLAY",MainMenuScreen.skin);
-        TextButton file = new TextButton("Create through file path:", MainMenuScreen.skin);
+        TextButton input = new TextButton("Create through file path:", MainMenuScreen.skin);
         TextButton output = new TextButton("Path for output", MainMenuScreen.skin);
         table.add(play);
-        TextField path= new TextField("", MainMenuScreen.skin);
+        TextField inputPath= new TextField("", MainMenuScreen.skin);
         TextField outputPath =new TextField("",MainMenuScreen.skin);
 
-        file.addListener(new ChangeListener() {
+        input.addListener(new ChangeListener() {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                File f = new File(path.getText());
+                File f = new File(inputPath.getText());
                 if(f.exists()) {
-                    io = new IO_course_module(path.getText());
+                    io = new IO_course_module(inputPath.getText());
                     gravity.setText("" + io.getGravity());
                     ballMass.setText("" + io.getMassofBall());
                     coefff.setText(("" + io.getFrictionc()));
@@ -77,7 +77,6 @@ public class SettingsScreen implements Screen {
                     goalX.setText(""+io.getGoalX());
                     goalY.setText(""+io.getGoalY());
                     height.setText(""+io.getHeightFunction());
-
                 }
 
             }
@@ -88,7 +87,7 @@ public class SettingsScreen implements Screen {
             public void changed(ChangeEvent event, Actor actor) {
 
                 try{
-                    File f = new File(path.getText());
+                    File f = new File(outputPath.getText());
                     if (!f.createNewFile()) {
                         f.delete();
                         f.createNewFile();
@@ -97,7 +96,7 @@ public class SettingsScreen implements Screen {
                             new Vector2d( getStartX(),getStartY()),new Vector2d(getGoalX(),getGoalY()), getHeightFunction());
 
                 }catch(Exception e){
-
+                    e.printStackTrace();
                 }
 
             }
@@ -153,8 +152,8 @@ public class SettingsScreen implements Screen {
 
 
         table.row().pad(0, 0, 10, 0);
-        table.add(file);
-        table.add(path);
+        table.add(input);
+        table.add(inputPath);
         table.row().pad(0, 0, 10, 0);
         table.add(output);
         table.add(outputPath);
