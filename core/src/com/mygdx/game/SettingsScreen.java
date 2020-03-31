@@ -2,12 +2,14 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.io.File;
@@ -20,6 +22,7 @@ public class SettingsScreen implements Screen {
     private TextField gravity;
     private TextField ballMass;
     private TextField coefff;
+    private SelectBox<String> color_select;
 
     private TextField vMax;
     private TextField tolerance;
@@ -105,34 +108,44 @@ public class SettingsScreen implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+
+                setBallColor();
+
                 parent.changeScreen(Menu.PLAY);
             }
         });
 
         gravity = new TextField("9.81",MainMenuScreen.skin);
-        Label g =new Label("Gravity in m/s^2:",MainMenuScreen.skin);
+        Label g =new Label("Gravity in m/s^2: ",MainMenuScreen.skin);
         ballMass = new TextField("45.93", MainMenuScreen.skin);
-        Label bm =new Label("Mass of Ball (grams):",MainMenuScreen.skin);
+        Label bm =new Label("Mass of Ball (grams): ",MainMenuScreen.skin);
         coefff = new TextField("0.131", MainMenuScreen.skin);
-        Label cf =new Label("Coefficient of friction:",MainMenuScreen.skin);
+        Label cf =new Label("Coefficient of friction: ",MainMenuScreen.skin);
 
         vMax = new TextField("3", MainMenuScreen.skin);
-        Label vm =new Label("Maximum Velocity (m/s):",MainMenuScreen.skin);
+        Label vm =new Label("Maximum Velocity (m/s): ",MainMenuScreen.skin);
         tolerance = new TextField("0.02", MainMenuScreen.skin);
-        Label t =new Label("Hole tolerance",MainMenuScreen.skin);
+        Label t =new Label("Hole tolerance: ",MainMenuScreen.skin);
+
+        color_select=new SelectBox<String>(MainMenuScreen.skin);
+        Array<String> items = new Array<String>();
+        for (int i=0; i < Variables.BALL_COLORS.length; i++)
+            items.add(Variables.BALL_COLORS[i].name);
+        color_select.setItems(items);
+        Label cs = new Label("Ball Color: ",MainMenuScreen.skin);
 
         startX = new TextField("1", MainMenuScreen.skin);
-        Label sX =new Label("Start X :",MainMenuScreen.skin);
+        Label sX =new Label("Start X: ",MainMenuScreen.skin);
         startY = new TextField("1", MainMenuScreen.skin);
-        Label sY =new Label("Start Y:",MainMenuScreen.skin);
+        Label sY =new Label("Start Y: ",MainMenuScreen.skin);
 
         goalX = new TextField("0", MainMenuScreen.skin);
-        Label gX =new Label("Goal X:",MainMenuScreen.skin);
+        Label gX =new Label("Goal X: ",MainMenuScreen.skin);
         goalY = new TextField("10", MainMenuScreen.skin);
-        Label gY =new Label("Goal Y",MainMenuScreen.skin);
+        Label gY =new Label("Goal Y: ",MainMenuScreen.skin);
 
         height = new TextField("sin(x)+cos(y)", MainMenuScreen.skin);
-        Label h =new Label("Height function",MainMenuScreen.skin);
+        Label h =new Label("Height function: ",MainMenuScreen.skin);
 
 
         int margine =10;
@@ -144,6 +157,7 @@ public class SettingsScreen implements Screen {
         addToTable(tabler,cf,coefff,0,0,margine,0);
         addToTable(tabler,vm,vMax,0,0,margine,0);
         addToTable(tabler,t,tolerance,margine,0,margine,0);
+        addToTable(tabler,cs,color_select, margine, 0, margine, 0);
         addToTable(tablel,sX,startX,margine,0,margine,0);
         addToTable(tablel,sY,startY,0,0,margine,0);
         addToTable(tablel,gX,goalX,0,0,margine,0);
@@ -168,10 +182,16 @@ public class SettingsScreen implements Screen {
 
     }
 
-    private void addToTable(Table table,Label label, TextField field, int top,int left,int bottom,int right) {
+    private void addToTable(Table table,Label label, Widget field, int top,int left,int bottom,int right) {
         table.add(label).expand();
         table.add(field).expand();
         table.row().pad(top, left, bottom, right);
+    }
+
+    private void setBallColor() {
+        String selected = color_select.getSelected();
+        for (int i=0; i < Variables.BALL_COLORS.length; i++)
+            if (selected.equals(Variables.BALL_COLORS[i].name)) Variables.BALL_COLOR = Variables.BALL_COLORS[i].color;
     }
 
     @Override
@@ -250,8 +270,13 @@ public class SettingsScreen implements Screen {
         return height.getText();
     }
 
-
-
-
+    static class ColorSelection {
+        String name;
+        Color color;
+        public ColorSelection(String name, Color color) {
+            this.name = name;
+            this.color = color;
+        }
+    }
 
 }

@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.graphics.Color;
+
 public final class Variables {
 	// MATERIAL SETTINGS
 	public static final double 	SAND_FRICTION = 0.178;
@@ -49,4 +51,15 @@ public final class Variables {
 	public static final double	MAXIMUM_START_FRICTION = 0.169; // exclusive
 	public static final double	MINIMUM_FLAG_FRICTION = 0.0933; // inclusive
 	public static final double	MAXIMUM_FLAG_FRICTION = 0.169; // exclusive
+
+		// Ball color
+	public static Color 		BALL_COLOR = Color.RED;
+	public static SettingsScreen.ColorSelection[] BALL_COLORS = {
+			new SettingsScreen.ColorSelection("Red", Color.RED),
+			new SettingsScreen.ColorSelection("Yellow", Color.YELLOW),
+			new SettingsScreen.ColorSelection("Pink", Color.PINK),
+			new SettingsScreen.ColorSelection("Blue", Color.BLUE),
+			new SettingsScreen.ColorSelection("Purple", Color.PURPLE),
+			new SettingsScreen.ColorSelection("White", Color.WHITE)
+	};
 }

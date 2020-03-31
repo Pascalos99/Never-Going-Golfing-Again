@@ -100,7 +100,7 @@ public class CrazyPutting implements ApplicationListener {
         );
 
         ball = modelBuilder.createSphere(ballRadius * 2, ballRadius * 2, ballRadius * 2, 30, 30,
-                new Material(ColorAttribute.createDiffuse(Color.YELLOW)),
+                new Material(ColorAttribute.createDiffuse(Variables.BALL_COLOR)),
                 Usage.Position | Usage.Normal
         );
 
