@@ -26,7 +26,7 @@ import java.util.List;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class CrazyPutting implements ApplicationListener {
-    private PerspectiveCamera camera;
+    public static PerspectiveCamera camera;
     private ModelBatch modelBatch;
     private Model box;
     private Model shadow;
@@ -72,10 +72,9 @@ public class CrazyPutting implements ApplicationListener {
     @Override
     public void create() {
         // Create camera sized to screens width/height with Field of View of 75 degrees
-        camera = new PerspectiveCamera(
-                75,
-                Gdx.graphics.getWidth(),
-                Gdx.graphics.getHeight());
+        camera = new PerspectiveCamera(75,
+                                        Gdx.graphics.getWidth(),
+                                        Gdx.graphics.getHeight());
 
         // Move the camera 3 units back along the z-axis and look at the origin
         camera.position.set(-10f, 10f, -10f);
@@ -236,7 +235,7 @@ public class CrazyPutting implements ApplicationListener {
         ModelInstance[] rectInstance = new ModelInstance[25];
         ModelBuilder modelBuilder = new ModelBuilder();
         MeshPartBuilder builder;
-        AtomFunction2d func = new AtomFunction2d(FunctionParser.parse("sin(x)+sin(y)"));
+        AtomFunction2d func = new AtomFunction2d(FunctionParser.parse("sin(x)+cos(y)"));
         try{
             func = new AtomFunction2d(FunctionParser.parse(game_aspects.getHeightFunction()));
         } catch(Error e) {
@@ -316,7 +315,6 @@ public class CrazyPutting implements ApplicationListener {
 
     @Override
     public void dispose() {
-        modelBatch.dispose();
         box.dispose();
     }
 
@@ -329,15 +327,24 @@ public class CrazyPutting implements ApplicationListener {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
         previous_time = world_physics.frameStep(previous_time);
+        camera.lookAt(game_aspects.players.get(0).getBall().realX,game_aspects.players.get(0).getBall().realY,game_aspects.players.get(0).getBall().realZ);
 
-        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-            float x = Gdx.input.getDeltaX();
-            float y = Gdx.input.getDeltaY();
-            camera.rotate(new Vector3(0,1,0),-x/3f);
-            camera.rotate(new Vector3(-camera.direction.z,0,camera.direction.x),-y/3f);
+//        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+//            float x = Gdx.input.getDeltaX();
+//            float y = Gdx.input.getDeltaY();
+//            camera.rotateAround(new Vector3(game_aspects.players.get(0).getBall().realX,game_aspects.players.get(0).getBall().realY,game_aspects.players.get(0).getBall().realZ),Vector3.Y,Gdx.graphics.getDeltaTime()*10*x);
+//            //camera.rotate(new Vector3(-camera.direction.z,0,camera.direction.x),-y/3f);
+//        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            camera.rotateAround(new Vector3(game_aspects.players.get(0).getBall().realX,game_aspects.players.get(0).getBall().realY,game_aspects.players.get(0).getBall().realZ),Vector3.Y,-Gdx.graphics.getDeltaTime()*100);
         }
 
-        if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)){
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            camera.rotateAround(new Vector3(game_aspects.players.get(0).getBall().realX,game_aspects.players.get(0).getBall().realY,game_aspects.players.get(0).getBall().realZ),Vector3.Y,Gdx.graphics.getDeltaTime()*100);
+        }
+
+        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
             for(Player p : game_aspects.players)
                 p.getBall().velocity.add(new Vector2d(camera.direction.x,camera.direction.z));
         }
@@ -375,25 +382,19 @@ public class CrazyPutting implements ApplicationListener {
             }
         }
 
-        /*x2+=Gdx.graphics.getDeltaTime()*5f;
-        y2+=Gdx.graphics.getDeltaTime()*2f;
-        if(x2>50)x2=0;
-        if(y2>50)y2=0;
-        flagBoxInstance.transform.set(new Vector3(x2,(float) course.getHeightAt(x2/8,y2/8),y2),new Quaternion(0,0,0,0));*/
+//        flagBoxInstance.transform.set(new Vector3(x2,(float) course.getHeightAt(x2/8,y2/8),y2),new Quaternion(0,0,0,0));
 
         //shadowInstance.transform.setTranslation(new Vector3(-ballInstance.transform.getTranslation(new Vector3()).y, 0, ballInstance.transform.getTranslation(new Vector3()).y));
 
         // When you change the camera details, you need to call update();
         // Also note, you need to call update() at least once.
         camera.update();
-        // Like spriteBatch, just with models!  pass in the box Instance and the environment
 
         modelBatch.begin(camera);
-        //modelBatch.render(boxInstance, environment);
 
         for(Player p : game_aspects.players)
             modelBatch.render(p.getBall().getModel(course), environment);
-        //modelBatch.render(shadowInstance, environment);
+
         for (int i = 0; i < 25; i++)
             modelBatch.render(rectInstance[i], environment);
         modelBatch.render(waterInstance, environment);
