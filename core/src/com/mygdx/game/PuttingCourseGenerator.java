@@ -137,8 +137,8 @@ public class PuttingCourseGenerator {
 						okay_flag_pos = flag;
 						okay_start_pos = start;
 						if (distance(flag_x, flag_y, start_x, start_y) < MIN_FLAG_DISTANCE * max_distance) continue;
-						if (flag_z >= MAXIMUM_FLAG_HEIGHT || flag_f < MINIMUM_FLAG_FRICTION || flag_f >= MAXIMUM_FLAG_FRICTION) continue;
-						if (start_z >= MAXIMUM_START_HEIGHT || start_f < MINIMUM_START_FRICTION || start_f >= MAXIMUM_START_FRICTION) continue;
+						if (flag_z < MINIMUM_FLAG_HEIGHT || flag_z >= MAXIMUM_FLAG_HEIGHT || flag_f < MINIMUM_FLAG_FRICTION || flag_f >= MAXIMUM_FLAG_FRICTION) continue;
+						if (start_z < MINIMUM_START_HEIGHT || start_z >= MAXIMUM_START_HEIGHT || start_f < MINIMUM_START_FRICTION || start_f >= MAXIMUM_START_FRICTION) continue;
 						pos_found = true;
 						break finding_pos;
 					}

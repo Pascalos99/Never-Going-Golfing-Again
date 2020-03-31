@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import java.io.*;
+import static com.mygdx.game.Variables.*;
 
 public class IO_course_module {
 
@@ -48,14 +49,14 @@ public class IO_course_module {
         return new Vector2d(Double.parseDouble(numbers[0]), Double.parseDouble(numbers[1]));
     }
 
-    private double g;
-    private double m;
-    private double mu;
-    private double vmax;
-    private double tol;
-    private Vector2d start;
-    private Vector2d goal;
-    private String height;
+    private double g = DEFAULT_GRAVITY;
+    private double m = DEFAULT_MASS;
+    private double mu = DEFAULT_FRICTION;
+    private double vmax = DEFAULT_MAXIMUM_VELOCITY;
+    private double tol = DEFAULT_HOLE_TOLERANCE;
+    private Vector2d start = new Vector2d(0, 0);
+    private Vector2d goal = new Vector2d(5, 5);
+    private String height = "sin(x) + cos(y)";
 
     public String toString() {
         return String.format("g = %s\nm = %s\nmu = %s\nvmax = %s\ntol = %s\nstart = %s\ngoal = %s\nheight = %s", g, m, mu, vmax, tol, start, goal, height);
@@ -112,6 +113,7 @@ public class IO_course_module {
             writer = new PrintWriter(new FileWriter(file));
             writer.format(" g = %s; m = %s; mu = %s; vmax = %s; tol = %s;\nstart = %s; goal = %s;\nheight = %s ",
                     g, m, mu, vmax, tol, start_str, goal_str, height);
+            writer.close();
         } catch (IOException e) {
             System.err.println("Given file is invalid");
             e.printStackTrace();
