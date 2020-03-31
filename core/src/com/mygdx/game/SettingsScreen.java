@@ -54,8 +54,8 @@ public class SettingsScreen implements Screen {
         table.add(tabler).expandY().expandX();
         table.add(tablel).expandY().expandX();
         TextButton play=new TextButton("PLAY",MainMenuScreen.skin);
-        TextButton input = new TextButton("Create through file path:", MainMenuScreen.skin);
-        TextButton output = new TextButton("Path for output", MainMenuScreen.skin);
+        TextButton input = new TextButton("Save course to file", MainMenuScreen.skin);
+        TextButton output = new TextButton("Load course from file", MainMenuScreen.skin);
         table.add(play);
         TextField inputPath= new TextField("", MainMenuScreen.skin);
         TextField outputPath =new TextField("",MainMenuScreen.skin);
