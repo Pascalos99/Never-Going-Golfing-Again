@@ -73,7 +73,7 @@ public class SettingsScreen implements Screen {
                     vMax.setText(""+io.getMaxV());
                     tolerance.setText(""+io.getTolerance());
                     startX.setText(""+io.getStartX());
-                    startY.setText(""+io.getGoalY());
+                    startY.setText(""+io.getStartY());
                     goalX.setText(""+io.getGoalX());
                     goalY.setText(""+io.getGoalY());
                     height.setText(""+io.getHeightFunction());
