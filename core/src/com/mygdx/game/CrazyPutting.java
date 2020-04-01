@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -88,7 +89,7 @@ public class CrazyPutting implements ApplicationListener {
         camera.lookAt(0f, 0f, 0f);
 
         // Near and Far (plane) repesent the minimum and maximum ranges of the camera in, um, units
-        camera.near = 1f;
+        camera.near = 0.1f;
         camera.far = 200.0f;
 
         // A ModelBatch is like a SpriteBatch, just for models.  Use it to batch up geometry for OpenGL
@@ -104,10 +105,10 @@ public class CrazyPutting implements ApplicationListener {
                 new Material(ColorAttribute.createDiffuse(Variables.BALL_COLOR)),
                 Usage.Position | Usage.Normal
         );
-//        shadow = modelBuilder.createBox(ballRadius * 2, 0.01f, ballRadius * 2,
-//                new Material(ColorAttribute.createDiffuse(Color.BLACK)),
-//                Usage.Position | Usage.Normal
-//        );
+        shadow = modelBuilder.createBox(1, 0.05f, 0.05f,
+                new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
+                Usage.Position | Usage.Normal
+        );
 
         rectInstance = buildTerrain();
         waterInstance = buildWater();
@@ -131,7 +132,7 @@ public class CrazyPutting implements ApplicationListener {
             world_physics.addBody(ball_obj);
         }
 
-//        shadowInstance = new ModelInstance(shadow, 0, 0.5f, 0);
+        shadowInstance = new ModelInstance(shadow, 0, 0, 0);
 
         // Finally we want some light, or we wont see our color.  The environment gets passed in during
         // the rendering process.  Create one, then create an Ambient ( non-positioned, non-directional ) light.
@@ -326,6 +327,10 @@ public class CrazyPutting implements ApplicationListener {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
         previous_time = world_physics.frameStep(previous_time);
+        Player currentPlayer=game_aspects.players.get(0);
+        float ballX=currentPlayer.getBall().realX;
+        float ballY=currentPlayer.getBall().realY;
+        float ballZ=currentPlayer.getBall().realZ;
 
 
 //        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
@@ -336,11 +341,11 @@ public class CrazyPutting implements ApplicationListener {
 //        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            camera.rotateAround(new Vector3(game_aspects.players.get(0).getBall().realX,game_aspects.players.get(0).getBall().realY,game_aspects.players.get(0).getBall().realZ),Vector3.Y,-Gdx.graphics.getDeltaTime()*cameraRotationSpeed);
+            camera.rotateAround(new Vector3(ballX,ballY,ballZ),Vector3.Y,-Gdx.graphics.getDeltaTime()*cameraRotationSpeed);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            camera.rotateAround(new Vector3(game_aspects.players.get(0).getBall().realX,game_aspects.players.get(0).getBall().realY,game_aspects.players.get(0).getBall().realZ),Vector3.Y,Gdx.graphics.getDeltaTime()*cameraRotationSpeed);
+            camera.rotateAround(new Vector3(ballX,ballY,ballZ),Vector3.Y,Gdx.graphics.getDeltaTime()*cameraRotationSpeed);
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
@@ -380,14 +385,12 @@ public class CrazyPutting implements ApplicationListener {
                 p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
             }
         }
-
+        camera.update();
 //        flagBoxInstance.transform.set(new Vector3(x2,(float) course.getHeightAt(x2/8,y2/8),y2),new Quaternion(0,0,0,0));
-
-        //shadowInstance.transform.setTranslation(new Vector3(-ballInstance.transform.getTranslation(new Vector3()).y, 0, ballInstance.transform.getTranslation(new Vector3()).y));
 
         // When you change the camera details, you need to call update();
         // Also note, you need to call update() at least once.
-        camera.update();
+
 
         modelBatch.begin(camera);
 
@@ -400,6 +403,19 @@ public class CrazyPutting implements ApplicationListener {
         modelBatch.render(wallInstance, environment);
         //modelBatch.render(flagBoxInstance,environment);
         modelBatch.end();
+
+        if(currentPlayer.getBall().velocity.get_x()==0&&currentPlayer.getBall().velocity.get_y()==0){
+            System.out.println((float)Math.toDegrees((Math.asin(new Vector3(camera.direction.x, 0, camera.direction.z).nor().x))));
+            if(new Vector3(camera.direction.x, 0, camera.direction.z).nor().z>0)
+                shadowInstance.transform.setToRotation(Vector3.Y, 90+(float)Math.toDegrees((Math.asin(new Vector3(camera.direction.x, 0, camera.direction.z).nor().x))));
+            else
+                shadowInstance.transform.setToRotation(Vector3.Y, 90-(float)Math.toDegrees((Math.asin(new Vector3(camera.direction.x, 0, camera.direction.z).nor().x))));
+            shadowInstance.transform.setTranslation(new Vector3(ballX, ballY, ballZ).add(new Vector3(camera.position.x, 0, camera.position.z).sub(new Vector3(ballX, 0, ballZ)).nor().scl(-0.7f)));
+            modelBatch.begin(camera);
+            Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
+            modelBatch.render(shadowInstance, environment);
+            modelBatch.end();
+        }
     }
 
     @Override
