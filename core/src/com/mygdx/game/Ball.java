@@ -43,8 +43,11 @@ public class Ball implements TopDownPhysicsObject {
 
         double velocity_x = velocity.get_x() + acceleration.get_x() * delta;
         double velocity_y = velocity.get_y() + acceleration.get_y() * delta;
+        if(Math.abs(velocity_x)<0.05) velocity_x=0.0;
+        if(Math.abs(velocity_y)<0.05) velocity_y=0.0;
 
         velocity = new Vector2d(velocity_x, velocity_y);
+
 
         x += velocity_x * delta;
         y += velocity_y * delta;
@@ -75,7 +78,7 @@ public class Ball implements TopDownPhysicsObject {
             return pos;
         }
 
-        return new Vector3d(x, y, (world.get_height().evaluate(new Vector2d(x, y)) + r));
+        return new Vector3d(x, y, (world.get_height().evaluate(new Vector2d(x, y)) + CrazyPutting.getBallRadius()*2.0));
     }
 
     @Override
@@ -88,7 +91,11 @@ public class Ball implements TopDownPhysicsObject {
         realY = (float) pos.get_z();
         realZ = (float) pos.get_y() * worldScaling;
         model.transform.setTranslation(realX, realY, realZ);
+
         CrazyPutting.camera.translate(new Vector3(realX-oldX,realY-oldY,realZ-oldZ));
+        CrazyPutting.camera.lookAt(realX,realY,realZ);
+        CrazyPutting.camera.update();
+
         return model;
     }
 
