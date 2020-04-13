@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
 
 public class Player {
@@ -7,13 +8,15 @@ public class Player {
     private int id;
     private int shots;
     private int score;
+    private String ballColor;
     private Ball ball;
     private Vector3 cameraPosition=new Vector3(-5f,5f,-5f);
 
 
-    public Player(String name,int id){
+    public Player(String name,int id, String color){
         this.name = name;
         this.id=id;
+        this.ballColor=color;
         shots=0;
         score=0;
     }
@@ -54,7 +57,7 @@ public class Player {
     }
 
     public String toString(){
-        return id + " "+name;
+        return id + " "+name+" "+ballColor;
     }
 
     public Ball getBall(){
@@ -63,6 +66,9 @@ public class Player {
 
     public void setBall(Ball ball){
         this.ball = ball;
+    }
+    public String getBallColor(){
+        return ballColor;
     }
 
 }
