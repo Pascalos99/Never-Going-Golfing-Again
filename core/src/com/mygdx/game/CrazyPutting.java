@@ -49,11 +49,13 @@ public class CrazyPutting implements ApplicationListener {
     private PhysicsEngine world_physics;
     private double previous_time;
     private List<Player> players;
-
+    private Player currentPlayer;
+    private boolean shotMade =false;
     public CrazyPutting( PuttingCourse c, GameInfo gameAspects){
         GAME_ASPECTS = gameAspects;
         this.course=c;
         players = new ArrayList<Player>(gameAspects.players);
+        currentPlayer=players.get(0);
     }
 
     public static float getBallRadius() {
@@ -96,11 +98,13 @@ public class CrazyPutting implements ApplicationListener {
                 new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
                 Usage.Position | Usage.Normal
         );
+        float side =(float) ((2*GAME_ASPECTS.getTolerance())/Math.pow(3,.5));
 
         terrainInstance = buildTerrain();
         waterInstance = buildWater();
         wallInstance = buildWalls();
 //        flagBoxInstance = new ModelInstance(box,0,0, 0);
+
 
         // A model holds all of the information about an, um, model, such as vertex data and texture info
         // However, you need an instance to actually render it.  The instance contains all the
@@ -315,14 +319,14 @@ public class CrazyPutting implements ApplicationListener {
             modelBatch.render(p.getBall().getModel(course,p), environment);
 
         previous_time = world_physics.frameStep(previous_time);
-        Player currentPlayer = GAME_ASPECTS.players.get(0);
+
         float ballX = currentPlayer.getBall().realX;
         float ballY = currentPlayer.getBall().realY;
         float ballZ = currentPlayer.getBall().realZ;
         Vector3 currentBallPos = new Vector3(ballX, ballY, ballZ);
 
         CAMERA.position.set(currentPlayer.getCameraPosition());
-        System.out.println(currentPlayer.getCameraPosition());
+       // System.out.println(currentPlayer.getCameraPosition());
         CAMERA.lookAt(currentBallPos);
         CAMERA.update();
 
@@ -344,6 +348,8 @@ public class CrazyPutting implements ApplicationListener {
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            shotMade=true;
+            currentPlayer.newShot();
             double standard_factor = Math.sqrt(3)/Math.sqrt(2);
             if (!currentPlayer.getBall().isMoving()) currentPlayer.getBall().addVelocity(CAMERA.direction.x * standard_factor * SHOT_VELOCITY, CAMERA.direction.z * standard_factor * SHOT_VELOCITY);
         }
@@ -404,10 +410,16 @@ public class CrazyPutting implements ApplicationListener {
             modelBatch.render(terrainInstance[i], environment);
         modelBatch.render(waterInstance, environment);
         modelBatch.render(wallInstance, environment);
-        //modelBatch.render(flagBoxInstance,environment);
         modelBatch.end();
 
         if(!currentPlayer.getBall().isMoving()){
+            if(currentPlayer.getBall().isTouchingFlag(course)){
+                currentPlayer.addScore(currentPlayer.getshots());
+                System.out.println(currentPlayer+ "reached flag in "+currentPlayer.getshots());
+                players.remove(currentPlayer);
+            }
+
+
             if(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().z>0)
                 arrowInstance.transform.setToRotation(Vector3.Y, 90+(float)Math.toDegrees((Math.asin(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().x))));
             else
@@ -417,7 +429,15 @@ public class CrazyPutting implements ApplicationListener {
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
             modelBatch.render(arrowInstance, environment);
             modelBatch.end();
+            if(players.indexOf(currentPlayer)==players.size()-1 && shotMade)  {
+                shotMade=false;
+                currentPlayer=players.get(0);
+            }else if(players.indexOf(currentPlayer)<players.size() &&shotMade){
+                shotMade=false;
+                currentPlayer = players.get(players.indexOf(currentPlayer)+1);
+            }
         }
+
     }
 
     @Override

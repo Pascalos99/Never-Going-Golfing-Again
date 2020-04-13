@@ -90,13 +90,15 @@ public class PlayerScreen implements Screen {
 
     }
 
-    private void enterPlayer(){
-        Label id = new Label(""+playerNumber, MENU_SKIN);
-        TextField name = new TextField(" ", MENU_SKIN);
-        playerTable.add(id);
-        playerTable.add(name);
-        playerTable.row().pad(0, 0, 5, 0);
-        ++playerNumber;
+    private void enterPlayer() {
+        if (playerNumber <= 8){
+            Label id = new Label("" + playerNumber, MENU_SKIN);
+            TextField name = new TextField(" ", MENU_SKIN);
+            playerTable.add(id);
+            playerTable.add(name);
+            playerTable.row().pad(0, 0, 5, 0);
+            ++playerNumber;
+        }
 
     }
 

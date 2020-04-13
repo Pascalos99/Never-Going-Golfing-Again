@@ -9,7 +9,7 @@ public class Player {
     private int score;
     private Ball ball;
     private Vector3 cameraPosition=new Vector3(-5f,5f,-5f);
-    //private camerax cameraY
+
 
     public Player(String name,int id){
         this.name = name;
