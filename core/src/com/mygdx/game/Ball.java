@@ -13,7 +13,7 @@ public class Ball implements TopDownPhysicsObject {
     public Vector2d velocity;
     public double x, y;
     public float realX, realY, realZ;
-    public static float worldScaling = 8.0f;
+    public static float worldScaling = (float)(1/(2f*Math.PI/ 50));
     public double r;
     private boolean isMoving = true;
     private ModelInstance model;
@@ -98,7 +98,7 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     @Override
-    public ModelInstance getModel(PuttingCourse world) {
+    public ModelInstance getModel(PuttingCourse world, Player p) {
         float oldX=realX;
         float oldY=realY;
         float oldZ=realZ;
@@ -108,10 +108,7 @@ public class Ball implements TopDownPhysicsObject {
         realZ = (float) pos.get_y() * worldScaling;
         model.transform.setTranslation(realX, realY, realZ);
 
-        CAMERA.translate(new Vector3(realX-oldX,realY-oldY,realZ-oldZ));
-        CAMERA.lookAt(realX,realY,realZ);
-        CAMERA.update();
-
+        p.setCameraPosition(new Vector3(realX-oldX,realY-oldY,realZ-oldZ).add(p.getCameraPosition()));
         return model;
     }
 

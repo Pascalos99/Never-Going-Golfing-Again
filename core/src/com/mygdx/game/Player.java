@@ -1,11 +1,14 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.math.Vector3;
+
 public class Player {
     private String name;
     private int id;
     private int shots;
     private int score;
     private Ball ball;
+    private Vector3 cameraPosition=new Vector3(-5f,5f,-5f);
     //private camerax cameraY
 
     public Player(String name,int id){
@@ -13,6 +16,11 @@ public class Player {
         this.id=id;
         shots=0;
         score=0;
+    }
+
+
+    public int Vector3(){
+        return shots;
     }
 
     public int getshots(){
@@ -29,6 +37,16 @@ public class Player {
     }
     public void newShot(){
         ++shots;
+    }
+
+    public void setCameraPosition(Vector3 pos){
+        cameraPosition.x=pos.x;
+        cameraPosition.y=pos.y;
+        cameraPosition.z=pos.z;
+    }
+
+    public Vector3 getCameraPosition(){
+        return cameraPosition;
     }
 
     public int getId(){
