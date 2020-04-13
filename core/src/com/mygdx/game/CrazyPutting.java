@@ -48,7 +48,6 @@ public class CrazyPutting implements ApplicationListener {
     private Environment environment;
     private PhysicsEngine world_physics;
     private double previous_time;
-
     private List<Player> players;
 
     public CrazyPutting( PuttingCourse c, GameInfo gameAspects){
@@ -93,10 +92,10 @@ public class CrazyPutting implements ApplicationListener {
                 new Material(ColorAttribute.createDiffuse(Variables.BALL_COLOR)),
                 Usage.Position | Usage.Normal
         );
-        /*shadow = modelBuilder.createBox(1, 0.05f, 0.05f,
+        shadow = modelBuilder.createBox(1, 0.05f, 0.05f,
                 new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
                 Usage.Position | Usage.Normal
-        );*/
+        );
 
         rectInstance = buildTerrain();
         waterInstance = buildWater();
@@ -120,7 +119,7 @@ public class CrazyPutting implements ApplicationListener {
             world_physics.addBody(ball_obj);
         }
 
-        //shadowInstance = new ModelInstance(shadow, 0, 0, 0);
+        shadowInstance = new ModelInstance(shadow, 0, 0, 0);
 
         // Finally we want some light, or we wont see our color.  The environment gets passed in during
         // the rendering process.  Create one, then create an Ambient ( non-positioned, non-directional ) light.
@@ -392,7 +391,7 @@ public class CrazyPutting implements ApplicationListener {
         //modelBatch.render(flagBoxInstance,environment);
         modelBatch.end();
 
-        /*if(currentPlayer.getBall().velocity.get_x()==0&&currentPlayer.getBall().velocity.get_y()==0){
+        if(currentPlayer.getBall().velocity.get_x()==0&&currentPlayer.getBall().velocity.get_y()==0){
             if(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().z>0)
                 shadowInstance.transform.setToRotation(Vector3.Y, 90+(float)Math.toDegrees((Math.asin(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().x))));
             else
@@ -402,7 +401,7 @@ public class CrazyPutting implements ApplicationListener {
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
             modelBatch.render(shadowInstance, environment);
             modelBatch.end();
-        }*/
+        }
     }
 
     @Override
