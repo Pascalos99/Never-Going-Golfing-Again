@@ -367,22 +367,27 @@ public class CrazyPutting implements ApplicationListener {
             }
         }
         for(Player p : GAME_ASPECTS.players) {
-                if (p.getBall().x < BALL_RADIUS / worldScaling) {
-                    p.getBall().x = (BALL_RADIUS + 0.01) / worldScaling;
-                    p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
-                }
-                if (p.getBall().x > (50 - BALL_RADIUS) / worldScaling) {
-                    p.getBall().x = (49.9 - BALL_RADIUS) / worldScaling;
-                    p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
-                }
-                if (p.getBall().y < BALL_RADIUS / worldScaling) {
-                    p.getBall().y = (BALL_RADIUS + 0.01) / worldScaling;
-                    p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
-                }
-                if (p.getBall().y > (50 - BALL_RADIUS) / worldScaling) {
-                    p.getBall().y = (49.9 - BALL_RADIUS) / worldScaling;
-                    p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
-                }
+            double velocity = p.getBall().velocity.get_length();
+            if (p.getBall().x < BALL_RADIUS / worldScaling) {
+                if (velocity < VELOCITY_CUTTOFF) p.getBall().setConsideredMoving(false);
+                p.getBall().x = (BALL_RADIUS + 0.01) / worldScaling;
+                p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
+            }
+            if (p.getBall().x > (50 - BALL_RADIUS) / worldScaling) {
+                if (velocity < VELOCITY_CUTTOFF) p.getBall().setConsideredMoving(false);
+                p.getBall().x = (49.9 - BALL_RADIUS) / worldScaling;
+                p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
+            }
+            if (p.getBall().y < BALL_RADIUS / worldScaling) {
+                if (velocity < VELOCITY_CUTTOFF) p.getBall().setConsideredMoving(false);
+                p.getBall().y = (BALL_RADIUS + 0.01) / worldScaling;
+                p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
+            }
+            if (p.getBall().y > (50 - BALL_RADIUS) / worldScaling) {
+                if (velocity < VELOCITY_CUTTOFF) p.getBall().setConsideredMoving(false);
+                p.getBall().y = (49.9 - BALL_RADIUS) / worldScaling;
+                p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
+            }
         }
         CAMERA.update();
 //        flagBoxInstance.transform.set(new Vector3(x2,(float) course.getHeightAt(x2/8,y2/8),y2),new Quaternion(0,0,0,0));

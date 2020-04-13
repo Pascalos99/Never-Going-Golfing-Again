@@ -73,6 +73,9 @@ public class Ball implements TopDownPhysicsObject {
     public boolean isMoving() {
         return isMoving;
     }
+    public void setConsideredMoving(boolean moving) {
+        isMoving = moving;
+    }
 
     @Override
     public Vector3d getPosition(PuttingCourse world) {
