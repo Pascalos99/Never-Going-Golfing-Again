@@ -16,15 +16,10 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class CrazyPutting implements ApplicationListener {
     public static PerspectiveCamera camera;
@@ -35,28 +30,21 @@ public class CrazyPutting implements ApplicationListener {
     private Model water;
     private PuttingCourse course;
     public static GameInfo game_aspects;
-    private static float cameraRotationSpeed = 100;
-    private static float cameraZoomSpeed = 0.7f;
-    private static float resolution = 0.2f;
+    private float cameraRotationSpeed = 100;
+    private float cameraZoomSpeed = 0.7f;
+    private float resolution = 0.2f;
     private static float ballRadius = 0.05f;
-    private static float worldScaling = 8;
-    private static ModelInstance shadowInstance;
-    private static ModelInstance [] rectInstance;
-    private static ModelInstance waterInstance;
-    private static ModelInstance wallInstance;
-    private static ArrayList<Vector3> borderPoints1= new ArrayList<Vector3>();
-    private static ArrayList<Vector3> borderPoints2= new ArrayList<Vector3>();
-    private static ArrayList<Vector3> borderPoints3= new ArrayList<Vector3>();
-    private static ArrayList<Vector3> borderPoints4= new ArrayList<Vector3>();
-    private ModelInstance flagBoxInstance;
-    private static ModelInstance [] boxInstance;
-    private float x2=0f;
-    private float y2=0f;
+    private float worldScaling = 8;
+    private ModelInstance shadowInstance;
+    private ModelInstance [] rectInstance;
+    private ModelInstance waterInstance;
+    private ModelInstance wallInstance;
+    public ArrayList<Vector3> borderPoints1= new ArrayList<Vector3>();
+    public ArrayList<Vector3> borderPoints2= new ArrayList<Vector3>();
+    public ArrayList<Vector3> borderPoints3= new ArrayList<Vector3>();
+    public ArrayList<Vector3> borderPoints4= new ArrayList<Vector3>();
 
-    private MeshPartBuilder meshPartBuilder;
     private Environment environment;
-    private float speed = 5f;
-    private float ballVelocity = 0f;
 
     private PhysicsEngine world_physics;
     private double previous_time;
@@ -105,10 +93,10 @@ public class CrazyPutting implements ApplicationListener {
                 new Material(ColorAttribute.createDiffuse(Variables.BALL_COLOR)),
                 Usage.Position | Usage.Normal
         );
-        shadow = modelBuilder.createBox(1, 0.05f, 0.05f,
+        /*shadow = modelBuilder.createBox(1, 0.05f, 0.05f,
                 new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
                 Usage.Position | Usage.Normal
-        );
+        );*/
 
         rectInstance = buildTerrain();
         waterInstance = buildWater();
@@ -141,7 +129,7 @@ public class CrazyPutting implements ApplicationListener {
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
     }
 
-    public static ModelInstance buildWater(){
+    public ModelInstance buildWater(){
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 0.2f, 1, 1f)), new BlendingAttribute(0.5f)));
@@ -159,7 +147,7 @@ public class CrazyPutting implements ApplicationListener {
         return waterInstance;
     }
 
-    public static ModelInstance buildWalls(){
+    public ModelInstance buildWalls(){
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(IntAttribute.createCullFace(GL20.GL_NONE),ColorAttribute.createDiffuse(Color.BROWN)));
@@ -226,7 +214,7 @@ public class CrazyPutting implements ApplicationListener {
         return wallInstance;
     }
 
-    public static ModelInstance[] buildTerrain() {
+    public ModelInstance[] buildTerrain() {
         Vector3 pos1, pos2, pos3, pos4;
         Vector3 nor1, nor2, nor3, nor4;
         Vector2d vec1, vec2, vec3, vec4;
@@ -405,7 +393,6 @@ public class CrazyPutting implements ApplicationListener {
         modelBatch.end();
 
         if(currentPlayer.getBall().velocity.get_x()==0&&currentPlayer.getBall().velocity.get_y()==0){
-            System.out.println((float)Math.toDegrees((Math.asin(new Vector3(camera.direction.x, 0, camera.direction.z).nor().x))));
             if(new Vector3(camera.direction.x, 0, camera.direction.z).nor().z>0)
                 shadowInstance.transform.setToRotation(Vector3.Y, 90+(float)Math.toDegrees((Math.asin(new Vector3(camera.direction.x, 0, camera.direction.z).nor().x))));
             else

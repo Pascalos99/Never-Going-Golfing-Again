@@ -13,6 +13,7 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width= (int) screenSize.getWidth();
 		config.height=(int) screenSize.getHeight();
+		config.samples=3;
 		new LwjglApplication(new Menu(), config);
 	}
 }
