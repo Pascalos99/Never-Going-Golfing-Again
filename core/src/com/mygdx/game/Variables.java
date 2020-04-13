@@ -68,4 +68,7 @@ public final class Variables {
 	public static PerspectiveCamera CAMERA;
 	public static float BALL_RADIUS = 0.05f;
 	public static GameInfo GAME_ASPECTS;
+
+	//main menu
+	public static Skin MenuSkin = new Skin(Gdx.files.internal("glassy-ui.json"));
 }
