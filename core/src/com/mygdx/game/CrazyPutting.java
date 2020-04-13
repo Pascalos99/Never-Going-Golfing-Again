@@ -419,7 +419,6 @@ public class CrazyPutting implements ApplicationListener {
                 players.remove(currentPlayer);
             }
 
-
             if(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().z>0)
                 arrowInstance.transform.setToRotation(Vector3.Y, 90+(float)Math.toDegrees((Math.asin(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().x))));
             else
