@@ -17,6 +17,9 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import static com.mygdx.game.Variables.CAMERA;
+import static com.mygdx.game.Variables.BALL_RADIUS;
+import static com.mygdx.game.Variables.GAME_ASPECTS;
 
 
 import java.util.ArrayList;
@@ -33,7 +36,7 @@ public class CrazyPutting implements ApplicationListener {
     private float cameraRotationSpeed = 100;
     private float cameraZoomSpeed = 0.7f;
     private float resolution = 0.2f;
-    private float worldScaling = 8;
+    private float worldScaling = (float)(1/(2f*Math.PI/ 50)); //TODO static
     private ModelInstance arrowInstance;
     private ModelInstance [] terrainInstance;
     private ModelInstance waterInstance;
@@ -106,7 +109,7 @@ public class CrazyPutting implements ApplicationListener {
         world_physics = new PuttingCoursePhysics(course);
         previous_time = System.currentTimeMillis() / 1000.0;
 
-        for(Player p : GAME_ASPECTS.players){
+        for(Player p : GAME_ASPECTS.players){  //TODO implement with game loop
             Vector2d start = GAME_ASPECTS.getStart();
             double x = start.get_x();
             double y = start.get_y();
@@ -124,7 +127,7 @@ public class CrazyPutting implements ApplicationListener {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
     }
-
+    //TODO move these to a different class
     public ModelInstance buildWater(){
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
@@ -239,7 +242,6 @@ public class CrazyPutting implements ApplicationListener {
                 float x, y = 0;
                 for (int i = 0; i < gridWidth; i++) {
                     for (int k = 0; k < gridDepth; k++) {
-
                         pos1 = new Vector3(i*resolution, (float) func.evaluate((i+(a*gridWidth)) * gw, (k+(b*gridDepth)) * gd), k*resolution);
                         pos2 = new Vector3(i*resolution, (float) func.evaluate((i+(a*gridWidth)) * gw, (k+1+(b*gridDepth)) * gd), (k + 1)*resolution);
                         pos3 = new Vector3((i + 1)*resolution, (float) func.evaluate((i+1+(a*gridWidth)) * gw, (k+1+(b*gridDepth)) * gd), (k + 1)*resolution);
@@ -309,6 +311,9 @@ public class CrazyPutting implements ApplicationListener {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
+        for(Player p : GAME_ASPECTS.players)
+            modelBatch.render(p.getBall().getModel(course,p), environment);
+
         previous_time = world_physics.frameStep(previous_time);
         Player currentPlayer = GAME_ASPECTS.players.get(0);
         float ballX = currentPlayer.getBall().realX;
@@ -316,6 +321,10 @@ public class CrazyPutting implements ApplicationListener {
         float ballZ = currentPlayer.getBall().realZ;
         Vector3 currentBallPos = new Vector3(ballX, ballY, ballZ);
 
+        CAMERA.position.set(currentPlayer.getCameraPosition());
+        System.out.println(currentPlayer.getCameraPosition());
+        CAMERA.lookAt(currentBallPos);
+        CAMERA.update();
 
 //        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
 //            float x = Gdx.input.getDeltaX();
@@ -326,10 +335,12 @@ public class CrazyPutting implements ApplicationListener {
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             CAMERA.rotateAround(new Vector3(ballX,ballY,ballZ),Vector3.Y,-Gdx.graphics.getDeltaTime()*cameraRotationSpeed);
+            currentPlayer.setCameraPosition(CAMERA.position);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             CAMERA.rotateAround(new Vector3(ballX,ballY,ballZ),Vector3.Y,Gdx.graphics.getDeltaTime()*cameraRotationSpeed);
+            currentPlayer.setCameraPosition(CAMERA.position);
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
@@ -382,8 +393,7 @@ public class CrazyPutting implements ApplicationListener {
 
         modelBatch.begin(CAMERA);
 
-        for(Player p : GAME_ASPECTS.players)
-            modelBatch.render(p.getBall().getModel(course), environment);
+
 
         for (int i = 0; i < 25; i++)
             modelBatch.render(terrainInstance[i], environment);
