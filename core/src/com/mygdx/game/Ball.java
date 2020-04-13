@@ -15,6 +15,7 @@ public class Ball implements TopDownPhysicsObject {
     public float realX, realY, realZ;
     public static float worldScaling = 8.0f;
     public double r;
+    private boolean isMoving = true;
     private ModelInstance model;
 
     private final boolean EXPERIMENTAL_CLIPPING_CORRECTION = false;
@@ -51,7 +52,10 @@ public class Ball implements TopDownPhysicsObject {
 
         Vector2d gradient = world.height_function.gradient(x, y);
 
-        if (velocity.get_length() < VELOCITY_CUTTOFF && gradient.get_length() < VELOCITY_CUTTOFF) velocity = new Vector2d(0,0);
+        if (velocity.get_length() < VELOCITY_CUTTOFF && gradient.get_length() < GRADIENT_CUTTOFF) {
+            velocity = new Vector2d(0,0);
+            isMoving = false;
+        }
 
         x += velocity.get_x() * delta;
         y += velocity.get_y() * delta;
@@ -59,7 +63,15 @@ public class Ball implements TopDownPhysicsObject {
 
 
     public void addVelocity(Vector2d v) {
-        velocity.add(v);
+        addVelocity(v.get_x(), v.get_y());
+    }
+    public void addVelocity(double dx, double dy) {
+        isMoving = true;
+        velocity = velocity.add(dx, dy);
+    }
+
+    public boolean isMoving() {
+        return isMoving;
     }
 
     @Override

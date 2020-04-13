@@ -27,9 +27,12 @@ public class Vector2d {
 		return circle.intersects(square);
 	}
 
-	public void add(Vector2d v){
-		x += v.get_x();
-		y += v.get_y();
+	public Vector2d add(Vector2d v){
+		return add(v.get_x(), v.get_y());
+	}
+
+	public Vector2d add(double dx, double dy) {
+		return new Vector2d(x + dx, y + dy);
 	}
 
 	public String toString() {

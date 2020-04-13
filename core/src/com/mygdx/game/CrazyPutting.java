@@ -17,13 +17,12 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
-import static com.mygdx.game.Variables.CAMERA;
-import static com.mygdx.game.Variables.BALL_RADIUS;
-import static com.mygdx.game.Variables.GAME_ASPECTS;
 
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mygdx.game.Variables.*;
 
 public class CrazyPutting implements ApplicationListener {
 
@@ -334,7 +333,10 @@ public class CrazyPutting implements ApplicationListener {
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
-            currentPlayer.getBall().addVelocity(new Vector2d(CAMERA.direction.x/2.0,CAMERA.direction.z/2.0));
+            double old_velocity = currentPlayer.getBall().velocity.get_length();
+            currentPlayer.getBall().addVelocity(CAMERA.direction.x/2.0, CAMERA.direction.z/2.0);
+            double new_velocity = currentPlayer.getBall().velocity.get_length();
+            System.out.println("velocity of "+old_velocity+" + "+(new_velocity-old_velocity)+" = "+new_velocity);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
@@ -356,22 +358,22 @@ public class CrazyPutting implements ApplicationListener {
             }
         }
         for(Player p : GAME_ASPECTS.players) {
-            if (p.getBall().x < BALL_RADIUS/worldScaling){
-                p.getBall().x=(BALL_RADIUS+0.01)/worldScaling;
-                p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
-            }
-            if (p.getBall().x >(50-BALL_RADIUS)/worldScaling){
-                p.getBall().x=(49.9-BALL_RADIUS)/worldScaling;
-                p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
-            }
-            if (p.getBall().y<BALL_RADIUS/worldScaling){
-                p.getBall().y=(BALL_RADIUS+0.01)/worldScaling;
-                p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
-            }
-            if (p.getBall().y >(50-BALL_RADIUS)/worldScaling){
-                p.getBall().y=(49.9-BALL_RADIUS)/worldScaling;
-                p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
-            }
+                if (p.getBall().x < BALL_RADIUS / worldScaling) {
+                    p.getBall().x = (BALL_RADIUS + 0.01) / worldScaling;
+                    p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
+                }
+                if (p.getBall().x > (50 - BALL_RADIUS) / worldScaling) {
+                    p.getBall().x = (49.9 - BALL_RADIUS) / worldScaling;
+                    p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
+                }
+                if (p.getBall().y < BALL_RADIUS / worldScaling) {
+                    p.getBall().y = (BALL_RADIUS + 0.01) / worldScaling;
+                    p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
+                }
+                if (p.getBall().y > (50 - BALL_RADIUS) / worldScaling) {
+                    p.getBall().y = (49.9 - BALL_RADIUS) / worldScaling;
+                    p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
+                }
         }
         CAMERA.update();
 //        flagBoxInstance.transform.set(new Vector3(x2,(float) course.getHeightAt(x2/8,y2/8),y2),new Quaternion(0,0,0,0));
@@ -392,7 +394,7 @@ public class CrazyPutting implements ApplicationListener {
         //modelBatch.render(flagBoxInstance,environment);
         modelBatch.end();
 
-        if(currentPlayer.getBall().velocity.get_x()==0&&currentPlayer.getBall().velocity.get_y()==0){
+        if(!currentPlayer.getBall().isMoving()){
             if(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().z>0)
                 arrowInstance.transform.setToRotation(Vector3.Y, 90+(float)Math.toDegrees((Math.asin(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().x))));
             else
