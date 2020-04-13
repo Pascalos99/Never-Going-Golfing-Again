@@ -1,5 +1,5 @@
 package com.mygdx.game;
-import static com.mygdx.game.Variables.MenuSkin;
+import static com.mygdx.game.Variables.MENU_SKIN;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
@@ -35,9 +34,9 @@ public class PlayerScreen implements Screen {
         stage.addActor(overall);
 
         enterPlayer();
-        TextButton addPlayer = new TextButton("Add Player", MenuSkin);
+        TextButton addPlayer = new TextButton("Add Player", MENU_SKIN);
      //   TextButton deletePlayer =new TextButton("Delete Player", MenuSkin);
-        TextButton chooseGameMode = new TextButton("Choose Game Mode", MenuSkin);
+        TextButton chooseGameMode = new TextButton("Choose Game Mode", MENU_SKIN);
         buttons.add(addPlayer);
         buttons.row().padBottom(10);
         buttons.add(chooseGameMode).expandX();
@@ -63,7 +62,7 @@ public class PlayerScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 //TODO: if anyone can figure out a better way to turn the table to players, go for it
-                Label dummy = new Label("AA" ,MenuSkin);
+                Label dummy = new Label("AA" , MENU_SKIN);
                 int id =-1;
                 String name="";
                for(int i=0;i<playerTable.getCells().size;i++){
@@ -92,8 +91,8 @@ public class PlayerScreen implements Screen {
     }
 
     private void enterPlayer(){
-        Label id = new Label(""+playerNumber, MenuSkin);
-        TextField name = new TextField(" ",MenuSkin);
+        Label id = new Label(""+playerNumber, MENU_SKIN);
+        TextField name = new TextField(" ", MENU_SKIN);
         playerTable.add(id);
         playerTable.add(name);
         playerTable.row().pad(0, 0, 5, 0);

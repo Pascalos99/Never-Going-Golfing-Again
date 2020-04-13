@@ -1,11 +1,10 @@
 package com.mygdx.game;
 
-import static com.mygdx.game.Variables.MenuSkin;
+import static com.mygdx.game.Variables.MENU_SKIN;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -14,7 +13,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.io.File;
-import java.io.IOException;
 
 public class SettingsScreen implements Screen {
     private Menu parent;
@@ -57,12 +55,12 @@ public class SettingsScreen implements Screen {
         table.setFillParent(true);
         table.add(tabler).expandY().expandX();
         table.add(tablel).expandY().expandX();
-        TextButton play=new TextButton("PLAY",MenuSkin);
-        TextButton input = new TextButton("Save course to file", MenuSkin);
-        TextButton output = new TextButton("Load course from file", MenuSkin);
+        TextButton play=new TextButton("PLAY", MENU_SKIN);
+        TextButton input = new TextButton("Save course to file", MENU_SKIN);
+        TextButton output = new TextButton("Load course from file", MENU_SKIN);
         table.add(play);
-        TextField inputPath= new TextField("", MenuSkin);
-        TextField outputPath =new TextField("",MenuSkin);
+        TextField inputPath= new TextField("", MENU_SKIN);
+        TextField outputPath =new TextField("", MENU_SKIN);
 
         input.addListener(new ChangeListener() {
 
@@ -116,37 +114,37 @@ public class SettingsScreen implements Screen {
             }
         });
 
-        gravity = new TextField("9.81",MenuSkin);
-        Label g =new Label("Gravity in m/s^2: ",MenuSkin);
-        ballMass = new TextField("45.93", MenuSkin);
-        Label bm =new Label("Mass of Ball (grams): ",MenuSkin);
-        coefff = new TextField("0.131", MenuSkin);
-        Label cf =new Label("Coefficient of friction: ",MenuSkin);
+        gravity = new TextField("9.81", MENU_SKIN);
+        Label g =new Label("Gravity in m/s^2: ", MENU_SKIN);
+        ballMass = new TextField("45.93", MENU_SKIN);
+        Label bm =new Label("Mass of Ball (grams): ", MENU_SKIN);
+        coefff = new TextField("0.131", MENU_SKIN);
+        Label cf =new Label("Coefficient of friction: ", MENU_SKIN);
 
-        vMax = new TextField("3", MenuSkin);
-        Label vm =new Label("Maximum Velocity (m/s): ",MenuSkin);
-        tolerance = new TextField("0.02", MenuSkin);
-        Label t =new Label("Hole tolerance: ",MenuSkin);
+        vMax = new TextField("3", MENU_SKIN);
+        Label vm =new Label("Maximum Velocity (m/s): ", MENU_SKIN);
+        tolerance = new TextField("0.02", MENU_SKIN);
+        Label t =new Label("Hole tolerance: ", MENU_SKIN);
 
-        color_select=new SelectBox<String>(MenuSkin);
+        color_select=new SelectBox<String>(MENU_SKIN);
         Array<String> items = new Array<String>();
         for (int i=0; i < Variables.BALL_COLORS.length; i++)
             items.add(Variables.BALL_COLORS[i].name);
         color_select.setItems(items);
-        Label cs = new Label("Ball Color: ",MenuSkin);
+        Label cs = new Label("Ball Color: ", MENU_SKIN);
 
-        startX = new TextField("1", MenuSkin);
-        Label sX =new Label("Start X: ",MenuSkin);
-        startY = new TextField("1", MenuSkin);
-        Label sY =new Label("Start Y: ",MenuSkin);
+        startX = new TextField("1", MENU_SKIN);
+        Label sX =new Label("Start X: ", MENU_SKIN);
+        startY = new TextField("1", MENU_SKIN);
+        Label sY =new Label("Start Y: ", MENU_SKIN);
 
-        goalX = new TextField("0", MenuSkin);
-        Label gX =new Label("Goal X: ",MenuSkin);
-        goalY = new TextField("10", MenuSkin);
-        Label gY =new Label("Goal Y: ",MenuSkin);
+        goalX = new TextField("0", MENU_SKIN);
+        Label gX =new Label("Goal X: ", MENU_SKIN);
+        goalY = new TextField("10", MENU_SKIN);
+        Label gY =new Label("Goal Y: ", MENU_SKIN);
 
-        height = new TextField("sin(x)", MenuSkin);
-        Label h =new Label("Height function: ",MenuSkin);
+        height = new TextField("sin(x)+cos(y)", MENU_SKIN);
+        Label h =new Label("Height function: ", MENU_SKIN);
 
 
         int margine =10;

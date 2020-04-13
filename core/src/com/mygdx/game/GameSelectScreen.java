@@ -22,9 +22,9 @@ public class GameSelectScreen implements Screen {
         //table.setDebug(true);
         stage.addActor(table);
 
-        TextButton defGame = new TextButton("Default Game", Variables.MenuSkin);
-        TextButton customGame = new TextButton("Custom Game", Variables.MenuSkin);
-        TextButton randomGame = new TextButton("Random Game", Variables.MenuSkin);
+        TextButton defGame = new TextButton("Default Game", Variables.MENU_SKIN);
+        TextButton customGame = new TextButton("Custom Game", Variables.MENU_SKIN);
+        TextButton randomGame = new TextButton("Random Game", Variables.MENU_SKIN);
 
         table.row().pad(10, 0, 10, 0);
         table.add(defGame).fillX().uniformX();

@@ -25,9 +25,9 @@ public class MainMenuScreen implements Screen {
         //  table.setDebug(true);
         stage.addActor(table);
 
-        TextButton chosePlayers = new TextButton("Add Players", Variables.MenuSkin);
+        TextButton chosePlayers = new TextButton("Add Players", Variables.MENU_SKIN);
 
-        TextButton exit = new TextButton("Exit", Variables.MenuSkin);
+        TextButton exit = new TextButton("Exit", Variables.MENU_SKIN);
 
         int margine = 10;
         table.row().pad(margine, 0, 0, 0);

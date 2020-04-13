@@ -72,7 +72,7 @@ public final class Variables {
 	public static GameInfo GAME_ASPECTS;
 
 	//main menu
-	public static Skin MenuSkin = new Skin(Gdx.files.internal("glassy-ui.json"));
+	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("glassy-ui.json"));
 
 	//PHYSICS
 	public static double VELOCITY_CUTTOFF = 0.05; // in m/s
