@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 
 public final class Variables {
 	// MATERIAL SETTINGS
@@ -62,4 +63,9 @@ public final class Variables {
 			new SettingsScreen.ColorSelection("Purple", Color.PURPLE),
 			new SettingsScreen.ColorSelection("White", Color.WHITE)
 	};
+
+	//CRAZY PUTTING
+	public static PerspectiveCamera CAMERA;
+	public static float BALL_RADIUS = 0.05f;
+	public static GameInfo GAME_ASPECTS;
 }

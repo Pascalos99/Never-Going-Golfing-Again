@@ -2,6 +2,8 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
+import static com.mygdx.game.Variables.CAMERA;
+import static com.mygdx.game.Variables.BALL_RADIUS;
 
 import java.util.List;
 
@@ -78,7 +80,7 @@ public class Ball implements TopDownPhysicsObject {
             return pos;
         }
 
-        return new Vector3d(x, y, (world.get_height().evaluate(new Vector2d(x, y)) + CrazyPutting.getBallRadius()*2.0));
+        return new Vector3d(x, y, (world.get_height().evaluate(new Vector2d(x, y)) + BALL_RADIUS*2.0));
     }
 
     @Override
@@ -92,9 +94,9 @@ public class Ball implements TopDownPhysicsObject {
         realZ = (float) pos.get_y() * worldScaling;
         model.transform.setTranslation(realX, realY, realZ);
 
-        CrazyPutting.camera.translate(new Vector3(realX-oldX,realY-oldY,realZ-oldZ));
-        CrazyPutting.camera.lookAt(realX,realY,realZ);
-        CrazyPutting.camera.update();
+        CAMERA.translate(new Vector3(realX-oldX,realY-oldY,realZ-oldZ));
+        CAMERA.lookAt(realX,realY,realZ);
+        CAMERA.update();
 
         return model;
     }
