@@ -332,11 +332,9 @@ public class CrazyPutting implements ApplicationListener {
             CAMERA.rotateAround(new Vector3(ballX,ballY,ballZ),Vector3.Y,Gdx.graphics.getDeltaTime()*cameraRotationSpeed);
         }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)){
-            double old_velocity = currentPlayer.getBall().velocity.get_length();
-            currentPlayer.getBall().addVelocity(CAMERA.direction.x/2.0, CAMERA.direction.z/2.0);
-            double new_velocity = currentPlayer.getBall().velocity.get_length();
-            System.out.println("velocity of "+old_velocity+" + "+(new_velocity-old_velocity)+" = "+new_velocity);
+        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            double standard_factor = Math.sqrt(3)/Math.sqrt(2);
+            if (!currentPlayer.getBall().isMoving()) currentPlayer.getBall().addVelocity(CAMERA.direction.x * standard_factor * SHOT_VELOCITY, CAMERA.direction.z * standard_factor * SHOT_VELOCITY);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
@@ -345,7 +343,7 @@ public class CrazyPutting implements ApplicationListener {
             }
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            if (CAMERA.position.dst(currentBallPos) < 50) {
+                if (CAMERA.position.dst(currentBallPos) < 50) {
                 CAMERA.translate(new Vector3(CAMERA.direction.x * -0.7f, CAMERA.direction.y * -cameraZoomSpeed, CAMERA.direction.z * -cameraZoomSpeed));
             }
         }
