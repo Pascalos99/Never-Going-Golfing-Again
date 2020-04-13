@@ -1,23 +1,20 @@
 package com.mygdx.game;
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class MainMenuScreen implements Screen {
     private Menu parent;
     private static Stage stage;
-    public static Skin skin = new Skin(Gdx.files.internal("glassy-ui.json"));
+
 
     public MainMenuScreen(Menu menu) {
         parent = menu;
@@ -28,9 +25,9 @@ public class MainMenuScreen implements Screen {
         //  table.setDebug(true);
         stage.addActor(table);
 
-        TextButton chosePlayers = new TextButton("Add Players", MainMenuScreen.skin);
+        TextButton chosePlayers = new TextButton("Add Players", Variables.MenuSkin);
 
-        TextButton exit = new TextButton("Exit", skin);
+        TextButton exit = new TextButton("Exit", Variables.MenuSkin);
 
         int margine = 10;
         table.row().pad(margine, 0, 0, 0);

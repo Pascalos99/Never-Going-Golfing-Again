@@ -1,6 +1,8 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public final class Variables {
 	// MATERIAL SETTINGS
@@ -62,4 +64,7 @@ public final class Variables {
 			new SettingsScreen.ColorSelection("Purple", Color.PURPLE),
 			new SettingsScreen.ColorSelection("White", Color.WHITE)
 	};
+
+	//main menu
+	public static Skin MenuSkin = new Skin(Gdx.files.internal("glassy-ui.json"));
 }
