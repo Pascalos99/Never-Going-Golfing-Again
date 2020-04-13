@@ -328,6 +328,7 @@ public class CrazyPutting implements ApplicationListener {
         CAMERA.position.set(currentPlayer.getCameraPosition());
        // System.out.println(currentPlayer.getCameraPosition());
         CAMERA.lookAt(currentBallPos);
+        CAMERA.up.set(Vector3.Y);
         CAMERA.update();
 
 //        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
@@ -357,11 +358,13 @@ public class CrazyPutting implements ApplicationListener {
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             if (CAMERA.position.dst(currentBallPos) > 1) {
                 CAMERA.translate(new Vector3(CAMERA.direction.x * 0.7f, CAMERA.direction.y * cameraZoomSpeed, CAMERA.direction.z * cameraZoomSpeed));
+                currentPlayer.setCameraPosition(CAMERA.position);
             }
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
                 if (CAMERA.position.dst(currentBallPos) < 50) {
                 CAMERA.translate(new Vector3(CAMERA.direction.x * -0.7f, CAMERA.direction.y * -cameraZoomSpeed, CAMERA.direction.z * -cameraZoomSpeed));
+                currentPlayer.setCameraPosition(CAMERA.position);
             }
         }
 
