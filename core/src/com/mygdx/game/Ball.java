@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 import static com.mygdx.game.Variables.CAMERA;
 import static com.mygdx.game.Variables.BALL_RADIUS;
+import static com.mygdx.game.Variables.VELOCITY_CUTTOFF;
+import static com.mygdx.game.Variables.GRADIENT_CUTTOFF;
 
 import java.util.List;
 
@@ -49,7 +51,7 @@ public class Ball implements TopDownPhysicsObject {
 
         Vector2d gradient = world.height_function.gradient(x, y);
 
-        if (velocity.get_length() < 0.05 && gradient.get_length() < 1) velocity = new Vector2d(0,0);
+        if (velocity.get_length() < VELOCITY_CUTTOFF && gradient.get_length() < VELOCITY_CUTTOFF) velocity = new Vector2d(0,0);
 
         x += velocity.get_x() * delta;
         y += velocity.get_y() * delta;
