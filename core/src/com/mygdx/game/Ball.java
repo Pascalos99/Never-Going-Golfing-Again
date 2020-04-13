@@ -43,16 +43,16 @@ public class Ball implements TopDownPhysicsObject {
 
         Vector2d acceleration = new Vector2d(half_x, half_y);
 
-        double velocity_x = velocity.get_x() + acceleration.get_x() * delta;
-        double velocity_y = velocity.get_y() + acceleration.get_y() * delta;
-        if(Math.abs(velocity_x)<0.05) velocity_x=0.0;
-        if(Math.abs(velocity_y)<0.05) velocity_y=0.0;
+        velocity = new Vector2d(
+                velocity.get_x() + acceleration.get_x() * delta,
+                velocity.get_y() + acceleration.get_y() * delta);
 
-        velocity = new Vector2d(velocity_x, velocity_y);
+        Vector2d gradient = world.height_function.gradient(x, y);
 
+        if (velocity.get_length() < 0.05 && gradient.get_length() < 1) velocity = new Vector2d(0,0);
 
-        x += velocity_x * delta;
-        y += velocity_y * delta;
+        x += velocity.get_x() * delta;
+        y += velocity.get_y() * delta;
     }
 
 
