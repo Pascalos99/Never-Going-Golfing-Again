@@ -35,6 +35,7 @@ public class CrazyPutting implements ApplicationListener {
 
     private ModelBatch modelBatch;
     private Model arrow;
+    private double lastShotVelocity = SHOT_VELOCITY;
     private PuttingCourse course;
     private float cameraRotationSpeed = 100;
     private float cameraZoomSpeed = 0.7f;
@@ -95,10 +96,6 @@ public class CrazyPutting implements ApplicationListener {
         // It also has the handy ability to make certain premade shapes, like a Cube
         // We pass in a ColorAttribute, making our cubes diffuse ( aka, color ) red.
         // And let openGL know we are interested in the Position and Normal channels
-        arrow = modelBuilder.createBox(1f, 0.05f, 0.05f,
-                new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
-                Usage.Position | Usage.Normal
-        );
         float side =(float) ((2*GAME_ASPECTS.getTolerance())/Math.pow(3,.5));
 
         terrainInstance = buildTerrain();
@@ -131,6 +128,10 @@ public class CrazyPutting implements ApplicationListener {
             world_physics.addBody(ball_obj);
         }
 
+        arrow = modelBuilder.createBox((float)((2 * SHOT_VELOCITY) / MAX_SHOT_VELOCITY), 0.05f, 0.05f,
+                new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
+                Usage.Position | Usage.Normal
+        );
         arrowInstance = new ModelInstance(arrow, 0, 0, 0);
 
         // Finally we want some light, or we wont see our color.  The environment gets passed in during
@@ -455,11 +456,23 @@ public class CrazyPutting implements ApplicationListener {
                 players.remove(currentPlayer);
             }
 
+            // changing arrow length based on speed
+            if (lastShotVelocity != SHOT_VELOCITY) {
+                lastShotVelocity = SHOT_VELOCITY;
+                ModelBuilder modelBuilder = new ModelBuilder();
+                arrow = modelBuilder.createBox((float)((2 * SHOT_VELOCITY) / MAX_SHOT_VELOCITY), 0.05f, 0.05f,
+                        new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
+                        Usage.Position | Usage.Normal
+                );
+                arrowInstance = new ModelInstance(arrow, 0, 0, 0);
+            }
+
             if(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().z>0)
                 arrowInstance.transform.setToRotation(Vector3.Y, 90+(float)Math.toDegrees((Math.asin(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().x))));
             else
                 arrowInstance.transform.setToRotation(Vector3.Y, 90-(float)Math.toDegrees((Math.asin(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().x))));
-            arrowInstance.transform.setTranslation(new Vector3(ballX, ballY, ballZ).add(new Vector3(CAMERA.position.x, 0, CAMERA.position.z).sub(new Vector3(ballX, 0, ballZ)).nor().scl(-0.7f)));
+            arrowInstance.transform.setTranslation(new Vector3(ballX, ballY, ballZ).add(new Vector3(CAMERA.position.x, 0, CAMERA.position.z).sub(new Vector3(ballX, 0, ballZ)).nor().scl(
+                    (float)(-0.3f - 0.7f * (2 * SHOT_VELOCITY) / MAX_SHOT_VELOCITY))));
             modelBatch.begin(CAMERA);
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
             modelBatch.render(arrowInstance, environment);
