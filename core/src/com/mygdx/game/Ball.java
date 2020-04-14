@@ -34,7 +34,7 @@ public class Ball implements TopDownPhysicsObject {
         Function2d h = world.get_height();
         double gravity = world.get_gravity();
 //        double friction = world.get_friction_coefficient();//world.getFrictionAt(x, y);
-        double friction = 1;//world.getFrictionAt(x, y);
+        double friction = world.getFrictionAt(x, y) * 8;
         double mass = 1 / 8f;
 
         Vector2d gradients = h.gradient(new Vector2d(x, y));
