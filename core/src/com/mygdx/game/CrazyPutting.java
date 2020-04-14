@@ -57,6 +57,7 @@ public class CrazyPutting implements ApplicationListener {
     private SpriteBatch batch;
     private Texture waterTexture;
     private Sprite waterSprite;
+    private Sprite skySprite;
     private double previous_time;
     private List<Player> players;
     private Player currentPlayer;
@@ -103,6 +104,12 @@ public class CrazyPutting implements ApplicationListener {
         waterSprite.setOrigin(0,0);
         waterSprite.setPosition(0,0);
         waterSprite.setSize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+
+        /*skySprite = new Sprite(waterTexture);
+        skySprite.setColor(1, 1, 1, 0.2f);
+        skySprite.setOrigin(0,0);
+        skySprite.setPosition(0,0);
+        skySprite.setSize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());*/
 
         // A ModelBuilder can be used to build meshes by hand
         ModelBuilder modelBuilder = new ModelBuilder();
@@ -338,6 +345,10 @@ public class CrazyPutting implements ApplicationListener {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
+        /*batch.begin();
+        skySprite.draw(batch);
+        batch.end();*/
+        
         for(int w=GAME_ASPECTS.players.size()-1; w >= 0; w--) {
             Player p = GAME_ASPECTS.players.get(w);
             modelBatch.render(p.getBall().getModel(course, p), environment);
