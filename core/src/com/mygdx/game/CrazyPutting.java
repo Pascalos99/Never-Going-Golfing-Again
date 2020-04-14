@@ -6,7 +6,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
@@ -51,6 +54,9 @@ public class CrazyPutting implements ApplicationListener {
     private ArrayList<Vector3> borderPoints4= new ArrayList<Vector3>();
     private Environment environment;
     private PhysicsEngine world_physics;
+    private SpriteBatch batch;
+    private Texture waterTexture;
+    private Sprite waterSprite;
     private double previous_time;
     private List<Player> players;
     private Player currentPlayer;
@@ -89,6 +95,14 @@ public class CrazyPutting implements ApplicationListener {
 
         // A ModelBatch is like a SpriteBatch, just for models.  Use it to batch up geometry for OpenGL
         modelBatch = new ModelBatch();
+
+        batch = new SpriteBatch();
+        waterTexture = new Texture(Gdx.files.internal("water.jpg"));
+        waterSprite = new Sprite(waterTexture);
+        waterSprite.setColor(0, 0, 1, 0.3f);
+        waterSprite.setOrigin(0,0);
+        waterSprite.setPosition(0,0);
+        waterSprite.setSize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
 
         // A ModelBuilder can be used to build meshes by hand
         ModelBuilder modelBuilder = new ModelBuilder();
@@ -489,7 +503,11 @@ public class CrazyPutting implements ApplicationListener {
                 currentPlayer = players.get(players.indexOf(currentPlayer)+1);
             }
         }
-
+        if(CAMERA.position.y<0){
+            batch.begin();
+            waterSprite.draw(batch);
+            batch.end();
+        }
     }
 
     public void add_shot_velocity(double amount) {

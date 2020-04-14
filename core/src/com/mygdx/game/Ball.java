@@ -98,7 +98,7 @@ public class Ball implements TopDownPhysicsObject {
             return pos;
         }
 
-        return new Vector3d(x, y, (world.get_height().evaluate(new Vector2d(x, y)) + BALL_RADIUS*2.0));
+        return new Vector3d(x, y, (world.get_height().evaluate(new Vector2d(x, y)) + BALL_RADIUS));
     }
 
     @Override
