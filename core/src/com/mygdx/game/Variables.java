@@ -82,6 +82,6 @@ public final class Variables {
 	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is
 	public static double MAX_SHOT_VELOCITY = 4d;
 	public static double SHOT_VELOCITY = MAX_SHOT_VELOCITY/2d;
-	public static double SHOT_VELOCITY_INCREASE = 0.01 * MAX_SHOT_VELOCITY;
+	public static double SHOT_VELOCITY_INCREASE() { return 0.01 * MAX_SHOT_VELOCITY; }
 	public static double VELOCITY_FACTOR_FROM_BOUNCING_AGAINST_WALL = 0.9;
 }

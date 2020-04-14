@@ -388,10 +388,10 @@ public class CrazyPutting implements ApplicationListener {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            add_shot_velocity(SHOT_VELOCITY_INCREASE);
+            add_shot_velocity(SHOT_VELOCITY_INCREASE());
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            add_shot_velocity(-SHOT_VELOCITY_INCREASE);
+            add_shot_velocity(-SHOT_VELOCITY_INCREASE());
         }
         double f = VELOCITY_FACTOR_FROM_BOUNCING_AGAINST_WALL;
         for(Player p : GAME_ASPECTS.players) {
