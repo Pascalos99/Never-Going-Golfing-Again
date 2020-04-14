@@ -2,117 +2,109 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
-import static com.mygdx.game.Variables.CAMERA;
-import static com.mygdx.game.Variables.BALL_RADIUS;
-import static com.mygdx.game.Variables.VELOCITY_CUTTOFF;
-import static com.mygdx.game.Variables.GRADIENT_CUTTOFF;
 
 import java.util.List;
 
+import static com.mygdx.game.Variables.*;
+
 public class Ball implements TopDownPhysicsObject {
     public Vector2d velocity;
-    public double x, y;
-    public float realX, realY, realZ;
-    public static float worldScaling = (float)(1/(2f*Math.PI/ 50));
+    public double x, y, old_x, old_y, real_x, real_y, old_h, real_h;
     public double r;
-    private boolean isMoving = false;
-    private boolean first_shot = true;
+    public double mass = 0.005;
+
     private ModelInstance model;
 
-    private final boolean EXPERIMENTAL_CLIPPING_CORRECTION = false;
+    public boolean is_moving = false;
+    public Player owner;
+    private int hit_count;
 
-    Ball(double radius, double x_pos, double y_pos, ModelInstance model) {
+    Ball(double radius, double x_pos, double y_pos, ModelInstance model, Player owner) {
         x = x_pos;
         y = y_pos;
         r = radius;
         velocity = new Vector2d(0, 0);
+        hit_count = 0;
         this.model = model;
+        this.owner = owner;
     }
 
     public void step(double delta, PuttingCourse world, List<TopDownPhysicsObject> ents) {
-        if ((Variables.BALL_NOT_MOVING_AT_START && first_shot) || (Variables.HOLD_BALL_IN_PLACE && !isMoving)) return;
-        Function2d h = world.get_height();
-        double gravity = world.get_gravity();
-//        double friction = world.get_friction_coefficient();//world.getFrictionAt(x, y);
-        double friction = 1;//world.getFrictionAt(x, y);
-        double mass = 1 / 8f;
 
-        Vector2d gradients = h.gradient(new Vector2d(x, y));
-        double half_x = -mass * gravity * gradients.get_x();
-        double half_y = -mass * gravity * gradients.get_y();
+        if(is_moving) {
+            Function2d h = world.get_height();
+            double gravity = world.get_gravity();
+            double friction = world.get_friction_coefficient();
 
-        if (velocity.get_length() > 0) {
-            half_x -= mass * gravity * friction * velocity.get_x() / velocity.get_length();
-            half_y -= mass * gravity * friction * velocity.get_y() / velocity.get_length();
+            Vector2d gradient = h.gradient(new Vector2d(x, y));
+            double half_x = -mass * gravity * gradient.get_x();
+            double half_y = -mass * gravity * gradient.get_y();
+
+            if (velocity.get_length() > 0) {
+                half_x -= mass * gravity * friction * velocity.get_x() / velocity.get_length();
+                half_y -= mass * gravity * friction * velocity.get_y() / velocity.get_length();
+            }
+
+            Vector2d acceleration = new Vector2d(half_x, half_y);
+
+            double velocity_x = velocity.get_x() + acceleration.get_x();
+            double velocity_y = velocity.get_y() + acceleration.get_y();
+            velocity = new Vector2d(velocity_x, velocity_y);
+
+            if (velocity.get_length() < VELOCITY_CUTTOFF && gradient.get_length() < GRADIENT_CUTTOFF) {
+                velocity = new Vector2d(0, 0);
+                is_moving = false;
+            }
+
+            x += velocity_x * delta;
+            y += velocity_y * delta;
         }
 
-        Vector2d acceleration = new Vector2d(half_x, half_y);
-
-        velocity = new Vector2d(
-                velocity.get_x() + acceleration.get_x() * delta,
-                velocity.get_y() + acceleration.get_y() * delta);
-
-        if (velocity.get_length() < VELOCITY_CUTTOFF && gradients.get_length() < GRADIENT_CUTTOFF) {
-            velocity = new Vector2d(0,0);
-            isMoving = false;
-        }
-
-        x += velocity.get_x() * delta;
-        y += velocity.get_y() * delta;
     }
 
 
     public void addVelocity(Vector2d v) {
-        addVelocity(v.get_x(), v.get_y());
-    }
-    public void addVelocity(double dx, double dy) {
-        isMoving = true;
-        first_shot = false;
-        velocity = velocity.add(dx, dy);
+        is_moving = true;
+        velocity = velocity.add(v);
     }
 
-    public boolean isMoving() {
-        return isMoving;
+    public float toWorldScale(double n){
+        return (float)(n * WORLD_SCALING);
     }
-    public void setConsideredMoving(boolean moving) {
-        isMoving = moving;
+
+    public double fromWorldScale(float n){
+        return  n / WORLD_SCALING;
     }
 
     @Override
     public Vector3d getPosition(PuttingCourse world) {
-
-        if (EXPERIMENTAL_CLIPPING_CORRECTION) {
-            Function2d h = world.get_height();
-            Vector2d gradients = h.gradient(new Vector2d(x, y));
-
-            double mx = gradients.get_x();
-            double my = gradients.get_y();
-            double z = 1;
-
-            Vector3d n = new Vector3d(-mx, 1, -my);
-            double nx = n.get_x() / n.get_length();
-            double ny = n.get_y() / n.get_length();
-            double nz = n.get_z() / n.get_length();
-
-            Vector3d pos = new Vector3d(x + nx * r, y + ny * r, h.evaluate(x, y) + nz * r);
-            return pos;
-        }
-
-        return new Vector3d(x, y, (world.get_height().evaluate(new Vector2d(x, y)) + BALL_RADIUS*2.0));
+        return new Vector3d(
+                toWorldScale(x),
+                world.get_height().evaluate(new Vector2d(x, y)) + BALL_RADIUS * WORLD_SCALING,
+                toWorldScale(y)
+        );
     }
 
     @Override
-    public ModelInstance getModel(PuttingCourse world, Player p) {
-        float oldX=realX;
-        float oldY=realY;
-        float oldZ=realZ;
-        Vector3d pos = getPosition(world);
-        realX = (float) pos.get_x() * worldScaling;
-        realY = (float) pos.get_z();
-        realZ = (float) pos.get_y() * worldScaling;
-        model.transform.setTranslation(realX, realY, realZ);
+    public ModelInstance getModel(PuttingCourse world) {
+        old_x = real_x;
+        old_y = real_y;
+        old_h = real_h;
 
-        p.setCameraPosition(new Vector3(realX-oldX,realY-oldY,realZ-oldZ).add(p.getCameraPosition()));
+        real_x = toWorldScale(x);
+        real_h = (float) world.get_height().evaluate(x, y) + BALL_RADIUS * WORLD_SCALING;
+        real_y = toWorldScale(y);
+
+        model.transform.setTranslation((float) real_x, (float) real_h, (float) real_y);
+
+        owner.setCameraPosition(
+                new Vector3(
+                        (float) (real_x - old_x),
+                        (float) (real_h - old_h),
+                        (float) (real_y - old_y)
+                ).add(owner.getCameraPosition())
+        );
+
         return model;
     }
 
@@ -140,8 +132,13 @@ public class Ball implements TopDownPhysicsObject {
         return false;
     }
 
-    public void hit(double direction, double speed) {
+    public void hit(Vector2d direction, double speed){
+        addVelocity(new Vector2d(direction.get_x() * speed, direction.get_y() * speed));
+        hit_count += 1;
+    }
 
+    public int getHits(){
+        return hit_count;
     }
 
 }

@@ -56,6 +56,7 @@ public final class Variables {
 	public static final double	MAXIMUM_FLAG_FRICTION = 0.169; // exclusive
 
 		// Ball color
+	public static Color 		BALL_COLOR = Color.RED;
 	public static SettingsScreen.ColorSelection[] BALL_COLORS = {
 			new SettingsScreen.ColorSelection("Red", Color.RED),
 			new SettingsScreen.ColorSelection("Yellow", Color.YELLOW),
@@ -68,19 +69,21 @@ public final class Variables {
 
 	//CRAZY PUTTING
 	public static PerspectiveCamera CAMERA;
-	public static float BALL_RADIUS = 0.05f;
 	public static GameInfo GAME_ASPECTS;
+	public static final float WORLD_SCALING = (float)(1/(2f*Math.PI/ 50));
+	public static final float BALL_RADIUS = 0.05f / WORLD_SCALING;
+
+	public static double VELOCITY_CUTTOFF = 0.1;
+	public static double GRADIENT_CUTTOFF = 1.3d;
+	public static double SHOT_VELOCITY = 45d;
 	/*** Will make sure the ball does not move during the 'shoot' step */
-	public static boolean HOLD_BALL_IN_PLACE = true;
-	public static boolean BALL_NOT_MOVING_AT_START = true;
+	public static boolean HOLD_BALL_IN_PLACE = false;
+	public static boolean BALL_NOT_MOVING_AT_START = false;
 
 	//main menu
 	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("glassy-ui.json"));
 
 	//PHYSICS
-	public static double VELOCITY_CUTTOFF = 0.05d; // in m/s
-	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is
-	public static double SHOT_VELOCITY = 4d;
 	public static double SHOT_VELOCITY_INCREASE = 0.01 * SHOT_VELOCITY;
 	public static double VELOCITY_FACTOR_FROM_BOUNCING_AGAINST_WALL = 0.9;
 }
