@@ -371,10 +371,11 @@ public class CrazyPutting implements ApplicationListener {
         if(Gdx.input.isKeyPressed(Input.Keys.R)){
             for(Player p : GAME_ASPECTS.players){
                 p.getBall().velocity=(new Vector2d(0,0));
-                p.getBall().x=1;
-                p.getBall().y=1;
+                p.getBall().x=GAME_ASPECTS.startX;
+                p.getBall().y=GAME_ASPECTS.startY;
             }
         }
+        
         for(Player p : GAME_ASPECTS.players) {
             double velocity = p.getBall().velocity.get_length();
             if (p.getBall().x < BALL_RADIUS / worldScaling) {

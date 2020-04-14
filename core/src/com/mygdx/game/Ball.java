@@ -15,7 +15,8 @@ public class Ball implements TopDownPhysicsObject {
     public float realX, realY, realZ;
     public static float worldScaling = (float)(1/(2f*Math.PI/ 50));
     public double r;
-    private boolean isMoving = true;
+    private boolean isMoving = false;
+    private boolean first_shot = true;
     private ModelInstance model;
 
     private final boolean EXPERIMENTAL_CLIPPING_CORRECTION = false;
@@ -29,6 +30,7 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     public void step(double delta, PuttingCourse world, List<TopDownPhysicsObject> ents) {
+        if ((Variables.BALL_NOT_MOVING_AT_START && first_shot) || (Variables.HOLD_BALL_IN_PLACE && !isMoving)) return;
         Function2d h = world.get_height();
         double gravity = world.get_gravity();
 //        double friction = world.get_friction_coefficient();//world.getFrictionAt(x, y);
@@ -50,9 +52,7 @@ public class Ball implements TopDownPhysicsObject {
                 velocity.get_x() + acceleration.get_x() * delta,
                 velocity.get_y() + acceleration.get_y() * delta);
 
-        Vector2d gradient = world.height_function.gradient(x, y);
-
-        if (velocity.get_length() < VELOCITY_CUTTOFF && gradient.get_length() < GRADIENT_CUTTOFF) {
+        if (velocity.get_length() < VELOCITY_CUTTOFF && gradients.get_length() < GRADIENT_CUTTOFF) {
             velocity = new Vector2d(0,0);
             isMoving = false;
         }
@@ -67,6 +67,7 @@ public class Ball implements TopDownPhysicsObject {
     }
     public void addVelocity(double dx, double dy) {
         isMoving = true;
+        first_shot = false;
         velocity = velocity.add(dx, dy);
     }
 

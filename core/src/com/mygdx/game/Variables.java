@@ -70,12 +70,15 @@ public final class Variables {
 	public static PerspectiveCamera CAMERA;
 	public static float BALL_RADIUS = 0.05f;
 	public static GameInfo GAME_ASPECTS;
+	/*** Will make sure the ball does not move during the 'shoot' step */
+	public static boolean HOLD_BALL_IN_PLACE = true;
+	public static boolean BALL_NOT_MOVING_AT_START = true;
 
 	//main menu
 	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("glassy-ui.json"));
 
 	//PHYSICS
-	public static double VELOCITY_CUTTOFF = 0.05; // in m/s
+	public static double VELOCITY_CUTTOFF = 0.05d; // in m/s
 	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is
-	public static double SHOT_VELOCITY = 7d;
+	public static double SHOT_VELOCITY = 4d;
 }
