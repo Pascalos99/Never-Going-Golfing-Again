@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.io.File;
@@ -21,7 +20,6 @@ public class SettingsScreen implements Screen {
     private TextField gravity;
     private TextField ballMass;
     private TextField coefff;
-    private SelectBox<String> color_select;
 
     private TextField vMax;
     private TextField tolerance;
@@ -107,9 +105,6 @@ public class SettingsScreen implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
-                setBallColor();
-
                 parent.changeScreen(Menu.PLAY);
             }
         });
@@ -125,13 +120,6 @@ public class SettingsScreen implements Screen {
         Label vm =new Label("Maximum Velocity (m/s): ", MENU_SKIN);
         tolerance = new TextField("0.02", MENU_SKIN);
         Label t =new Label("Hole tolerance: ", MENU_SKIN);
-
-        color_select=new SelectBox<String>(MENU_SKIN);
-        Array<String> items = new Array<String>();
-        for (int i=0; i < Variables.BALL_COLORS.length; i++)
-            items.add(Variables.BALL_COLORS[i].name);
-        color_select.setItems(items);
-        Label cs = new Label("Ball Color: ", MENU_SKIN);
 
         startX = new TextField("1", MENU_SKIN);
         Label sX =new Label("Start X: ", MENU_SKIN);
@@ -156,7 +144,6 @@ public class SettingsScreen implements Screen {
         addToTable(tabler,cf,coefff,0,0,margine,0);
         addToTable(tabler,vm,vMax,0,0,margine,0);
         addToTable(tabler,t,tolerance,margine,0,margine,0);
-        addToTable(tabler,cs,color_select, margine, 0, margine, 0);
         addToTable(tablel,sX,startX,margine,0,margine,0);
         addToTable(tablel,sY,startY,0,0,margine,0);
         addToTable(tablel,gX,goalX,0,0,margine,0);
@@ -185,12 +172,6 @@ public class SettingsScreen implements Screen {
         table.add(label).expand();
         table.add(field).expand();
         table.row().pad(top, left, bottom, right);
-    }
-
-    private void setBallColor() {
-        String selected = color_select.getSelected();
-        for (int i=0; i < Variables.BALL_COLORS.length; i++)
-            if (selected.equals(Variables.BALL_COLORS[i].name)) Variables.BALL_COLOR = Variables.BALL_COLORS[i].color;
     }
 
     @Override

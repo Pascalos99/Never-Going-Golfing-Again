@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
@@ -43,6 +45,9 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         game.render();
+        if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
+            // TODO add code for going back to main menu
+        }
     }
 
     @Override

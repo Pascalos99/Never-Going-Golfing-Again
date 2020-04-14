@@ -31,7 +31,6 @@ public class CrazyPutting implements ApplicationListener {
 
     private ModelBatch modelBatch;
     private Model arrow;
-    private Model ball;
     private PuttingCourse course;
     private float cameraRotationSpeed = 100;
     private float cameraZoomSpeed = 0.7f;
@@ -90,10 +89,6 @@ public class CrazyPutting implements ApplicationListener {
         // It also has the handy ability to make certain premade shapes, like a Cube
         // We pass in a ColorAttribute, making our cubes diffuse ( aka, color ) red.
         // And let openGL know we are interested in the Position and Normal channels
-        ball = modelBuilder.createSphere(BALL_RADIUS * 2, BALL_RADIUS * 2, BALL_RADIUS * 2, 30, 30,
-                new Material(ColorAttribute.createDiffuse(Variables.BALL_COLOR)),
-                Usage.Position | Usage.Normal
-        );
         arrow = modelBuilder.createBox(1, 0.05f, 0.05f,
                 new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
                 Usage.Position | Usage.Normal
@@ -117,6 +112,13 @@ public class CrazyPutting implements ApplicationListener {
             Vector2d start = GAME_ASPECTS.getStart();
             double x = start.get_x();
             double y = start.get_y();
+            Color ball_color = null;
+            for (int i=0; i < BALL_COLORS.length; i++)
+                if (p.getBallColor().equals(BALL_COLORS[i].name)) { ball_color = BALL_COLORS[i].color; break; }
+            Model ball = modelBuilder.createSphere(BALL_RADIUS * 2, BALL_RADIUS * 2, BALL_RADIUS * 2, 30, 30,
+                    new Material(ColorAttribute.createDiffuse(ball_color)),
+                    Usage.Position | Usage.Normal
+            );
             ModelInstance model = new ModelInstance(ball, 0, 0, 0);
             Ball ball_obj = new Ball(PuttingCoursePhysics.BALL_SIZE, x, y, model);
             p.setBall(ball_obj);
@@ -375,7 +377,7 @@ public class CrazyPutting implements ApplicationListener {
                 p.getBall().y=GAME_ASPECTS.startY;
             }
         }
-        
+
         for(Player p : GAME_ASPECTS.players) {
             double velocity = p.getBall().velocity.get_length();
             if (p.getBall().x < BALL_RADIUS / worldScaling) {
