@@ -81,4 +81,5 @@ public final class Variables {
 	public static double VELOCITY_CUTTOFF = 0.05d; // in m/s
 	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is
 	public static double SHOT_VELOCITY = 4d;
+	public static double SHOT_VELOCITY_INCREASE = 0.01 * SHOT_VELOCITY;
 }

@@ -55,6 +55,7 @@ public class CrazyPutting implements ApplicationListener {
         this.course=c;
         players = new ArrayList<Player>(gameAspects.players);
         currentPlayer=players.get(0);
+        if (SHOT_VELOCITY > gameAspects.maxVelocity) SHOT_VELOCITY = gameAspects.maxVelocity;
     }
 
     public static float getBallRadius() {
@@ -89,7 +90,7 @@ public class CrazyPutting implements ApplicationListener {
         // It also has the handy ability to make certain premade shapes, like a Cube
         // We pass in a ColorAttribute, making our cubes diffuse ( aka, color ) red.
         // And let openGL know we are interested in the Position and Normal channels
-        arrow = modelBuilder.createBox(1, 0.05f, 0.05f,
+        arrow = modelBuilder.createBox(1f, 0.05f, 0.05f,
                 new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
                 Usage.Position | Usage.Normal
         );
@@ -378,6 +379,13 @@ public class CrazyPutting implements ApplicationListener {
             }
         }
 
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            add_shot_velocity(SHOT_VELOCITY_INCREASE);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            add_shot_velocity(-SHOT_VELOCITY_INCREASE);
+        }
+
         for(Player p : GAME_ASPECTS.players) {
             double velocity = p.getBall().velocity.get_length();
             if (p.getBall().x < BALL_RADIUS / worldScaling) {
@@ -443,6 +451,13 @@ public class CrazyPutting implements ApplicationListener {
             }
         }
 
+    }
+
+    public void add_shot_velocity(double amount) {
+        double temp = SHOT_VELOCITY + amount;
+        if (temp < 0) temp = 0;
+        if (temp > GAME_ASPECTS.maxVelocity) temp = GAME_ASPECTS.maxVelocity;
+        SHOT_VELOCITY = temp;
     }
 
     @Override
