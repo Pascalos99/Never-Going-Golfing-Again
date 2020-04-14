@@ -61,6 +61,7 @@ public class CrazyPutting implements ApplicationListener {
         this.course=c;
         players = new ArrayList<Player>(gameAspects.players);
         currentPlayer=players.get(0);
+        if (SHOT_VELOCITY > gameAspects.maxVelocity) SHOT_VELOCITY = gameAspects.maxVelocity;
 
     }
 
@@ -98,7 +99,7 @@ public class CrazyPutting implements ApplicationListener {
         // It also has the handy ability to make certain premade shapes, like a Cube
         // We pass in a ColorAttribute, making our cubes diffuse ( aka, color ) red.
         // And let openGL know we are interested in the Position and Normal channels
-        arrow = modelBuilder.createBox(1, 0.05f, 0.05f,
+        arrow = modelBuilder.createBox(1f, 0.05f, 0.05f,
                 new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
                 Usage.Position | Usage.Normal
         );
@@ -327,8 +328,10 @@ public class CrazyPutting implements ApplicationListener {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
-        for(Player p : GAME_ASPECTS.players)
-            modelBatch.render(p.getBall().getModel(course,p), environment);
+        for(int w=GAME_ASPECTS.players.size()-1; w >= 0; w--) {
+            Player p = GAME_ASPECTS.players.get(w);
+            modelBatch.render(p.getBall().getModel(course, p), environment);
+        }
 
         previous_time = world_physics.frameStep(previous_time);
 
@@ -387,27 +390,34 @@ public class CrazyPutting implements ApplicationListener {
             }
         }
 
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            add_shot_velocity(SHOT_VELOCITY_INCREASE);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            add_shot_velocity(-SHOT_VELOCITY_INCREASE);
+        }
+        double f = VELOCITY_FACTOR_FROM_BOUNCING_AGAINST_WALL;
         for(Player p : GAME_ASPECTS.players) {
             double velocity = p.getBall().velocity.get_length();
             if (p.getBall().x < BALL_RADIUS / worldScaling) {
                 if (velocity < VELOCITY_CUTTOFF) p.getBall().setConsideredMoving(false);
                 p.getBall().x = (BALL_RADIUS + 0.01) / worldScaling;
-                p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
+                p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x() * f, p.getBall().velocity.get_y() * f));
             }
             if (p.getBall().x > (50 - BALL_RADIUS) / worldScaling) {
                 if (velocity < VELOCITY_CUTTOFF) p.getBall().setConsideredMoving(false);
                 p.getBall().x = (49.9 - BALL_RADIUS) / worldScaling;
-                p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
+                p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x() * f, p.getBall().velocity.get_y() * f));
             }
             if (p.getBall().y < BALL_RADIUS / worldScaling) {
                 if (velocity < VELOCITY_CUTTOFF) p.getBall().setConsideredMoving(false);
                 p.getBall().y = (BALL_RADIUS + 0.01) / worldScaling;
-                p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
+                p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x() * f, -p.getBall().velocity.get_y() * f));
             }
             if (p.getBall().y > (50 - BALL_RADIUS) / worldScaling) {
                 if (velocity < VELOCITY_CUTTOFF) p.getBall().setConsideredMoving(false);
                 p.getBall().y = (49.9 - BALL_RADIUS) / worldScaling;
-                p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
+                p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x() * f, -p.getBall().velocity.get_y() * f));
             }
         }
         CAMERA.update();
@@ -455,6 +465,13 @@ public class CrazyPutting implements ApplicationListener {
             }
         }
 
+    }
+
+    public void add_shot_velocity(double amount) {
+        double temp = SHOT_VELOCITY + amount;
+        if (temp < 0) temp = 0;
+        if (temp > GAME_ASPECTS.maxVelocity) temp = GAME_ASPECTS.maxVelocity;
+        SHOT_VELOCITY = temp;
     }
 
     @Override
