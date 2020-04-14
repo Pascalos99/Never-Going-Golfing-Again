@@ -17,9 +17,14 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
 import static com.mygdx.game.Variables.CAMERA;
 import static com.mygdx.game.Variables.BALL_RADIUS;
 import static com.mygdx.game.Variables.GAME_ASPECTS;
+
 
 
 import java.util.ArrayList;
@@ -50,11 +55,13 @@ public class CrazyPutting implements ApplicationListener {
     private List<Player> players;
     private Player currentPlayer;
     private boolean shotMade =false;
+
     public CrazyPutting( PuttingCourse c, GameInfo gameAspects){
         GAME_ASPECTS = gameAspects;
         this.course=c;
         players = new ArrayList<Player>(gameAspects.players);
         currentPlayer=players.get(0);
+
     }
 
     public static float getBallRadius() {
@@ -67,6 +74,8 @@ public class CrazyPutting implements ApplicationListener {
 
     @Override
     public void create() {
+
+
         // Create camera sized to screens width/height with Field of View of 75 degrees
         CAMERA = new PerspectiveCamera(75,
                                         Gdx.graphics.getWidth(),
@@ -311,6 +320,7 @@ public class CrazyPutting implements ApplicationListener {
 
     @Override
     public void render() {
+
         // You've seen all this before, just be sure to clear the GL_DEPTH_BUFFER_BIT when working in 3D
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClearColor(1, 1, 1, 1);
@@ -352,7 +362,6 @@ public class CrazyPutting implements ApplicationListener {
 
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             shotMade=true;
-            currentPlayer.newShot();
             double standard_factor = Math.sqrt(3)/Math.sqrt(2);
             if (!currentPlayer.getBall().isMoving()) currentPlayer.getBall().addVelocity(CAMERA.direction.x * standard_factor * SHOT_VELOCITY, CAMERA.direction.z * standard_factor * SHOT_VELOCITY);
         }
@@ -420,7 +429,6 @@ public class CrazyPutting implements ApplicationListener {
 
         if(!currentPlayer.getBall().isMoving()){
             if(currentPlayer.getBall().isTouchingFlag(course)){
-                currentPlayer.addScore(currentPlayer.getshots());
                 System.out.println(currentPlayer+ "reached flag in "+currentPlayer.getshots());
                 players.remove(currentPlayer);
             }
@@ -434,11 +442,15 @@ public class CrazyPutting implements ApplicationListener {
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
             modelBatch.render(arrowInstance, environment);
             modelBatch.end();
-            if(players.indexOf(currentPlayer)==players.size()-1 && shotMade)  {
+            if(shotMade&& players.indexOf(currentPlayer)==players.size()-1 )  {
+                currentPlayer.newShot();
                 shotMade=false;
+                System.out.println(currentPlayer+ " has attempted "+currentPlayer.getshots()+" shots");
                 currentPlayer=players.get(0);
-            }else if(players.indexOf(currentPlayer)<players.size() &&shotMade){
+            }else if(shotMade&& players.indexOf(currentPlayer)<players.size() ){
+                currentPlayer.newShot();
                 shotMade=false;
+                System.out.println(currentPlayer+ " has attempted "+currentPlayer.getshots()+" shots");
                 currentPlayer = players.get(players.indexOf(currentPlayer)+1);
             }
         }

@@ -7,7 +7,6 @@ public class Player {
     private String name;
     private int id;
     private int shots;
-    private int score;
     private String ballColor;
     private Ball ball;
     private Vector3 cameraPosition=new Vector3(-5f,5f,-5f);
@@ -18,7 +17,6 @@ public class Player {
         this.id=id;
         this.ballColor=color;
         shots=0;
-        score=0;
     }
 
 
@@ -29,15 +27,7 @@ public class Player {
     public int getshots(){
         return shots;
     }
-    public void setShots(int n){
-        shots=n;
-    }
-    public int getScore(){
-        return score;
-    }
-    public void addScore(int pts){
-        score+=pts;
-    }
+
     public void newShot(){
         ++shots;
     }
