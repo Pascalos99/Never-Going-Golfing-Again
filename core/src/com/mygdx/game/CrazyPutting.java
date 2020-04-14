@@ -318,8 +318,10 @@ public class CrazyPutting implements ApplicationListener {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
-        for(Player p : GAME_ASPECTS.players)
-            modelBatch.render(p.getBall().getModel(course,p), environment);
+        for(int w=GAME_ASPECTS.players.size()-1; w >= 0; w--) {
+            Player p = GAME_ASPECTS.players.get(w);
+            modelBatch.render(p.getBall().getModel(course, p), environment);
+        }
 
         previous_time = world_physics.frameStep(previous_time);
 
