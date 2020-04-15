@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import static com.mygdx.game.Variables.MAX_SHOT_VELOCITY;
 import static com.mygdx.game.Variables.MENU_SKIN;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -105,6 +106,7 @@ public class SettingsScreen implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                MAX_SHOT_VELOCITY = getMaxV();
                 parent.changeScreen(Menu.PLAY);
             }
         });
@@ -116,7 +118,7 @@ public class SettingsScreen implements Screen {
         coefff = new TextField("0.131", MENU_SKIN);
         Label cf =new Label("Coefficient of friction: ", MENU_SKIN);
 
-        vMax = new TextField("3", MENU_SKIN);
+        vMax = new TextField(""+MAX_SHOT_VELOCITY, MENU_SKIN);
         Label vm =new Label("Maximum Velocity (m/s): ", MENU_SKIN);
         tolerance = new TextField("0.02", MENU_SKIN);
         Label t =new Label("Hole tolerance: ", MENU_SKIN);

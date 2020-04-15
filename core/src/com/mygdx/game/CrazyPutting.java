@@ -6,7 +6,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
@@ -36,6 +39,7 @@ public class CrazyPutting extends Actor implements ApplicationListener {
 
     private ModelBatch modelBatch;
     private Model arrow;
+    private double lastShotVelocity = SHOT_VELOCITY;
     private PuttingCourse course;
     private float cameraRotationSpeed = 100;
     private float cameraZoomSpeed = 0.7f;
@@ -51,6 +55,10 @@ public class CrazyPutting extends Actor implements ApplicationListener {
     private ArrayList<Vector3> borderPoints4= new ArrayList<Vector3>();
     private Environment environment;
     private PhysicsEngine world_physics;
+    private SpriteBatch batch;
+    private Texture waterTexture;
+    private Sprite waterSprite;
+    private Sprite skySprite;
     private double previous_time;
     private List<Player> players;
     private Player currentPlayer;
@@ -92,16 +100,26 @@ public class CrazyPutting extends Actor implements ApplicationListener {
         // A ModelBatch is like a SpriteBatch, just for models.  Use it to batch up geometry for OpenGL
         modelBatch = new ModelBatch();
 
+        batch = new SpriteBatch();
+        waterTexture = new Texture(Gdx.files.internal("water.jpg"));
+        waterSprite = new Sprite(waterTexture);
+        waterSprite.setColor(0, 0, 1, 0.3f);
+        waterSprite.setOrigin(0,0);
+        waterSprite.setPosition(0,0);
+        waterSprite.setSize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+
+        /*skySprite = new Sprite(waterTexture);
+        skySprite.setColor(1, 1, 1, 0.2f);
+        skySprite.setOrigin(0,0);
+        skySprite.setPosition(0,0);
+        skySprite.setSize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());*/
+
         // A ModelBuilder can be used to build meshes by hand
         ModelBuilder modelBuilder = new ModelBuilder();
 
         // It also has the handy ability to make certain premade shapes, like a Cube
         // We pass in a ColorAttribute, making our cubes diffuse ( aka, color ) red.
         // And let openGL know we are interested in the Position and Normal channels
-        arrow = modelBuilder.createBox(1f, 0.05f, 0.05f,
-                new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
-                Usage.Position | Usage.Normal
-        );
         float side =(float) ((2*GAME_ASPECTS.getTolerance())/Math.pow(3,.5));
 
         terrainInstance = buildTerrain();
@@ -134,6 +152,10 @@ public class CrazyPutting extends Actor implements ApplicationListener {
             world_physics.addBody(ball_obj);
         }
 
+        arrow = modelBuilder.createBox((float)((2 * SHOT_VELOCITY) / MAX_SHOT_VELOCITY), 0.05f, 0.05f,
+                new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
+                Usage.Position | Usage.Normal
+        );
         arrowInstance = new ModelInstance(arrow, 0, 0, 0);
 
         // Finally we want some light, or we wont see our color.  The environment gets passed in during
@@ -327,6 +349,10 @@ public class CrazyPutting extends Actor implements ApplicationListener {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
+        /*batch.begin();
+        skySprite.draw(batch);
+        batch.end();*/
+        
         for(int w=GAME_ASPECTS.players.size()-1; w >= 0; w--) {
             Player p = GAME_ASPECTS.players.get(w);
             modelBatch.render(p.getBall().getModel(course, p), environment);
@@ -391,10 +417,10 @@ public class CrazyPutting extends Actor implements ApplicationListener {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            add_shot_velocity(SHOT_VELOCITY_INCREASE);
+            add_shot_velocity(SHOT_VELOCITY_INCREASE());
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            add_shot_velocity(-SHOT_VELOCITY_INCREASE);
+            add_shot_velocity(-SHOT_VELOCITY_INCREASE());
         }
         double f = VELOCITY_FACTOR_FROM_BOUNCING_AGAINST_WALL;
         for(Player p : GAME_ASPECTS.players) {
@@ -459,11 +485,23 @@ public class CrazyPutting extends Actor implements ApplicationListener {
                 players.remove(currentPlayer);
             }
 
+            // changing arrow length based on speed
+            if (lastShotVelocity != SHOT_VELOCITY) {
+                lastShotVelocity = SHOT_VELOCITY;
+                ModelBuilder modelBuilder = new ModelBuilder();
+                arrow = modelBuilder.createBox((float)((2 * SHOT_VELOCITY) / MAX_SHOT_VELOCITY), 0.05f, 0.05f,
+                        new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
+                        Usage.Position | Usage.Normal
+                );
+                arrowInstance = new ModelInstance(arrow, 0, 0, 0);
+            }
+
             if(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().z>0)
                 arrowInstance.transform.setToRotation(Vector3.Y, 90+(float)Math.toDegrees((Math.asin(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().x))));
             else
                 arrowInstance.transform.setToRotation(Vector3.Y, 90-(float)Math.toDegrees((Math.asin(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().x))));
-            arrowInstance.transform.setTranslation(new Vector3(ballX, ballY, ballZ).add(new Vector3(CAMERA.position.x, 0, CAMERA.position.z).sub(new Vector3(ballX, 0, ballZ)).nor().scl(-0.7f)));
+            arrowInstance.transform.setTranslation(new Vector3(ballX, ballY, ballZ).add(new Vector3(CAMERA.position.x, 0, CAMERA.position.z).sub(new Vector3(ballX, 0, ballZ)).nor().scl(
+                    (float)(-0.3f - 0.7f * (2 * SHOT_VELOCITY) / MAX_SHOT_VELOCITY))));
             modelBatch.begin(CAMERA);
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
             modelBatch.render(arrowInstance, environment);
@@ -480,7 +518,11 @@ public class CrazyPutting extends Actor implements ApplicationListener {
                 currentPlayer = players.get(players.indexOf(currentPlayer)+1);
             }
         }
-
+        if(CAMERA.position.y<0){
+            batch.begin();
+            waterSprite.draw(batch);
+            batch.end();
+        }
     }
 
     public void add_shot_velocity(double amount) {
