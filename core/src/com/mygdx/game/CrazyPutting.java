@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -34,7 +35,7 @@ import java.util.List;
 
 import static com.mygdx.game.Variables.*;
 
-public class CrazyPutting implements ApplicationListener {
+public class CrazyPutting  implements ApplicationListener {
 
     private ModelBatch modelBatch;
     private Model arrow;
@@ -62,7 +63,9 @@ public class CrazyPutting implements ApplicationListener {
     private List<Player> players;
     private Player currentPlayer;
     private boolean shotMade =false;
-    public CrazyPutting( PuttingCourse c, GameInfo gameAspects){
+    private GameScreen gameScreen;
+    public CrazyPutting( PuttingCourse c, GameInfo gameAspects,GameScreen p){
+        this.gameScreen=p;
         GAME_ASPECTS = gameAspects;
         this.course=c;
         players = new ArrayList<Player>(gameAspects.players);
@@ -339,6 +342,7 @@ public class CrazyPutting implements ApplicationListener {
 
     @Override
     public void render() {
+
         // You've seen all this before, just be sure to clear the GL_DEPTH_BUFFER_BIT when working in 3D
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClearColor(1, 1, 1, 1);
@@ -385,8 +389,8 @@ public class CrazyPutting implements ApplicationListener {
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            SHOT_VELOCITY=gameScreen.getInputVelocity();
             shotMade=true;
-            currentPlayer.newShot();
             double standard_factor = Math.sqrt(3)/Math.sqrt(2);
             if (!currentPlayer.getBall().isMoving()) currentPlayer.getBall().addVelocity(CAMERA.direction.x * standard_factor * SHOT_VELOCITY, CAMERA.direction.z * standard_factor * SHOT_VELOCITY);
         }
@@ -538,5 +542,9 @@ public class CrazyPutting implements ApplicationListener {
 
     @Override
     public void resume() {
+    }
+
+    public Player getCurrentPlayer(){
+        return currentPlayer;
     }
 }
