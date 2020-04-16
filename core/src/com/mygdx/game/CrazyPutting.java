@@ -35,7 +35,7 @@ import java.util.List;
 
 import static com.mygdx.game.Variables.*;
 
-public class CrazyPutting extends Actor implements ApplicationListener {
+public class CrazyPutting  implements ApplicationListener {
 
     private ModelBatch modelBatch;
     private Model arrow;

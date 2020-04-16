@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -47,8 +48,6 @@ public class GameScreen implements Screen {
             course = generator.fractalGeneratedCourse(size, 1,0.8,0.7,size/200,3,9.81);
         }
         game =new CrazyPutting(course, gameAspects, this);
-        //add the game to the table
-        table.add(game);
         game.create();
         currentPlayerShotNum=new Label("", Variables.MENU_SKIN);
         currentPlayerLabel = new Label("", Variables.MENU_SKIN);
@@ -73,7 +72,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.render();
@@ -81,7 +79,7 @@ public class GameScreen implements Screen {
         currentPlayerShotNum.setText("Attempts: "+game.getCurrentPlayer().getshots());
         stage.act(delta);
         stage.draw();
-        if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
+        if(Gdx.input.isKeyPressed(Input.Keys.U)){
             parent.changeScreen(0);
         }
     }
@@ -114,8 +112,10 @@ public class GameScreen implements Screen {
     public static PuttingCourse getCourse(){
         return course;
     }
+
     public double getInputVelocity(){
-        double input = Double.parseDouble(inputVelocity.getText());
+
+        double input = Double.parseDouble(inputVelocity.getText().replaceAll("\\s",""));
         if(input<=gameAspects.maxVelocity){
             return input;
         }else{
