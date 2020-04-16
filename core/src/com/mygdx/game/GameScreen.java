@@ -114,14 +114,27 @@ public class GameScreen implements Screen {
     }
 
     public double getInputVelocity(){
-
-        double input = Double.parseDouble(inputVelocity.getText().replaceAll("\\s",""));
-        if(input<=gameAspects.maxVelocity){
+        String inputtxt =inputVelocity.getText();
+        double input;
+        try {
+             input = Double.parseDouble(inputtxt.replaceAll("\\s", ""));
+        }catch(NumberFormatException e){
+            String res= "";
+            for(int i=0;i<inputtxt.length();i++){
+                if(Character.isDigit(inputtxt.charAt(i)) ||inputtxt.charAt(i)=='.' ){
+                   res=res+inputtxt.charAt(i);
+                }
+            }
+            inputVelocity.setText(res);
+            return Double.parseDouble(res);
+        }
+        if (input <= gameAspects.maxVelocity) {
             return input;
-        }else{
-            inputVelocity.setText(""+gameAspects.maxVelocity);
+        } else {
+            inputVelocity.setText("" + gameAspects.maxVelocity);
             return gameAspects.maxVelocity;
         }
+
 
     }
 }
