@@ -87,4 +87,7 @@ public final class Variables {
 	public static double SHOT_VELOCITY = MAX_SHOT_VELOCITY/2d;
 	public static double SHOT_VELOCITY_INCREASE() { return 0.01 * MAX_SHOT_VELOCITY; }
 	public static double VELOCITY_FACTOR_FROM_BOUNCING_AGAINST_WALL = 0.9;
+
+	public static double view_angle = 0;
+	public static double view_zoom = 7;
 }

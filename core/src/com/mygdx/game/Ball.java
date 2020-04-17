@@ -103,9 +103,10 @@ public class Ball implements TopDownPhysicsObject {
         old_y = real_y;
         old_h = real_h;
 
-        real_x = toWorldScale(x);
-        real_h = (float) world.get_height().evaluate(x, y) + BALL_RADIUS * WORLD_SCALING;
-        real_y = toWorldScale(y);
+        Vector3d real_pos = getPosition(world);
+        real_x = real_pos.get_x();
+        real_h = real_pos.get_y();
+        real_y = real_pos.get_z();
 
         model.transform.setTranslation((float) real_x, (float) real_h, (float) real_y);
 
@@ -113,19 +114,8 @@ public class Ball implements TopDownPhysicsObject {
                 (float) (real_x - old_x),
                 (float) (real_h - old_h),
                 (float) (real_y - old_y)
-        ).add(owner.getCameraPosition());
-
-        /*vector = new Vector3(
-                        (float) toWorldScale(slide_x),
-                        (float) slide_h,
-                        (float) toWorldScale(slide_y)
-                ).add(owner.getCameraPosition()); */
-
+        ).add(owner.getCameraPosition(world));
         owner.setCameraPosition(vector);
-
-        //System.out.println("moving camera to "+vector);
-
-
         return model;
     }
 

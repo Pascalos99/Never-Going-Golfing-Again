@@ -39,4 +39,11 @@ public class Vector2d {
 		return String.format("(% f, % f)", x, y);
 	}
 
+	public Vector2d rotate(double radians){
+		double _x = x * Math.cos(radians) - y * Math.sin(radians);
+		double _y = x * Math.sin(radians) + y * Math.cos(radians);
+
+		return new Vector2d(_x, _y);
+	}
+
 }

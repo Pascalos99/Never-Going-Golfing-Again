@@ -21,7 +21,6 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 
-
 import static com.mygdx.game.Variables.CAMERA;
 import static com.mygdx.game.Variables.BALL_RADIUS;
 import static com.mygdx.game.Variables.GAME_ASPECTS;
@@ -38,7 +37,7 @@ public class CrazyPutting  implements ApplicationListener {
     private Model arrow;
     private double lastShotVelocity = SHOT_VELOCITY;
     private PuttingCourse course;
-    private float cameraRotationSpeed = 100;
+    private float cameraRotationSpeed = 1.4f;//100;
     private float cameraZoomSpeed = 0.7f;
     private float resolution = 0.2f;
     private ModelInstance arrowInstance;
@@ -73,20 +72,17 @@ public class CrazyPutting  implements ApplicationListener {
 
     @Override
     public void create() {
-        // Create camera sized to screens width/height with Field of View of 75 degrees
+        System.out.println(new Vector2d(5, 0).rotate(1.5708));
         CAMERA = new PerspectiveCamera(75,
                 Gdx.graphics.getWidth(),
                 Gdx.graphics.getHeight());
 
-        // Move the camera 3 units back along the z-axis and look at the origin
         CAMERA.position.set(-5f, 5f, -5f);
         CAMERA.lookAt(0f, 0f, 0f);
 
-        // Near and Far (plane) repesent the minimum and maximum ranges of the camera in, um, units
         CAMERA.near = 0.1f;
         CAMERA.far = 200.0f;
 
-        // A ModelBatch is like a SpriteBatch, just for models.  Use it to batch up geometry for OpenGL
         modelBatch = new ModelBatch();
 
         batch = new SpriteBatch();
@@ -103,23 +99,13 @@ public class CrazyPutting  implements ApplicationListener {
         skySprite.setPosition(0,0);
         skySprite.setSize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
 
-        // A ModelBuilder can be used to build meshes by hand
         ModelBuilder modelBuilder = new ModelBuilder();
 
-        // It also has the handy ability to make certain premade shapes, like a Cube
-        // We pass in a ColorAttribute, making our cubes diffuse ( aka, color ) red.
-        // And let openGL know we are interested in the Position and Normal channels
         float side =(float) ((2*GAME_ASPECTS.getTolerance())/Math.pow(3,.5));
 
         terrainInstance = buildTerrain();
         waterInstance = buildWater();
         wallInstance = buildWalls();
-//        flagBoxInstance = new ModelInstance(box,0,0, 0);
-
-
-        // A model holds all of the information about an, um, model, such as vertex data and texture info
-        // However, you need an instance to actually render it.  The instance contains all the
-        // positioning information ( and more ).  Remember Model==heavy ModelInstance==Light
 
         world_physics = new PuttingCoursePhysics(course);
         previous_time = System.currentTimeMillis() / 1000.0;
@@ -128,9 +114,15 @@ public class CrazyPutting  implements ApplicationListener {
             Vector2d start = GAME_ASPECTS.getStart();
             double x = start.get_x();
             double y = start.get_y();
+
             Color ball_color = null;
+
             for (int i=0; i < BALL_COLORS.length; i++)
-                if (p.getBallColor().equals(BALL_COLORS[i].name)) { ball_color = BALL_COLORS[i].color; break; }
+                if (p.getBallColor().equals(BALL_COLORS[i].name)) {
+                    ball_color = BALL_COLORS[i].color;
+                    break;
+                }
+
             Model ball = modelBuilder.createSphere(BALL_RADIUS * WORLD_SCALING * 2, BALL_RADIUS * WORLD_SCALING * 2, BALL_RADIUS * WORLD_SCALING * 2, 30, 30,
                     new Material(ColorAttribute.createDiffuse(ball_color)),
                     Usage.Position | Usage.Normal
@@ -146,26 +138,28 @@ public class CrazyPutting  implements ApplicationListener {
                 Usage.Position | Usage.Normal
         );
         arrowInstance = new ModelInstance(arrow, 0, 0, 0);
-
-        // Finally we want some light, or we wont see our color.  The environment gets passed in during
-        // the rendering process.  Create one, then create an Ambient ( non-positioned, non-directional ) light.
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
     }
+
     //TODO move these to a different class
     public ModelInstance buildWater(){
         ModelBuilder modelBuilder = new ModelBuilder();
+
         modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 0.2f, 1, 1f)), new BlendingAttribute(0.5f)));
+
         Vector3 pos1 = new Vector3(0,0,0);
         Vector3 pos2 = new Vector3(0,0,50);
         Vector3 pos3 = new Vector3(50,0,50);
         Vector3 pos4 = new Vector3(50,0,0);
+
         VertexInfo v1 = new VertexInfo().setPos(pos1).setNor(new Vector3(0,1,0)).setCol(null).setUV(0.5f, 0.0f);
         VertexInfo v2 = new VertexInfo().setPos(pos2).setNor(new Vector3(0,1,0)).setCol(null).setUV(0.0f, 0.0f);
         VertexInfo v3 = new VertexInfo().setPos(pos3).setNor(new Vector3(0,1,0)).setCol(null).setUV(0.0f, 0.5f);
         VertexInfo v4 = new VertexInfo().setPos(pos4).setNor(new Vector3(0,1,0)).setCol(null).setUV(0.5f, 0.5f);
+
         builder.rect(v1, v2, v3, v4);
         Model water = modelBuilder.end();
         ModelInstance waterInstance = new ModelInstance(water, 0, 0, 0);
@@ -175,9 +169,15 @@ public class CrazyPutting  implements ApplicationListener {
     public ModelInstance buildWalls(){
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
-        MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(IntAttribute.createCullFace(GL20.GL_NONE),ColorAttribute.createDiffuse(Color.BROWN)));
+        MeshPartBuilder builder = modelBuilder.part(
+                "grid",
+                GL20.GL_TRIANGLES,
+                Usage.Position | Usage.Normal,
+                new Material(IntAttribute.createCullFace(GL20.GL_NONE),ColorAttribute.createDiffuse(Color.BROWN))
+        );
         VertexInfo v1, v2, v3, v4;
-        Vector3 nor1=new Vector3(-1,0,0);
+        Vector3 nor1 = new Vector3(-1,0,0);
+
         for(int i=0;i<borderPoints1.size()-1;i++){
             Vector3 p1=new Vector3(borderPoints1.get(i).x,borderPoints1.get(i).y,borderPoints1.get(i).z);
             Vector3 p2=new Vector3(borderPoints1.get(i+1).x,borderPoints1.get(i+1).y,borderPoints1.get(i+1).z);
@@ -189,7 +189,9 @@ public class CrazyPutting  implements ApplicationListener {
 
             builder.rect(v1, v2, v3, v4);
         }
+
         nor1=new Vector3(1,0,0);
+
         for(int i=0;i<borderPoints3.size()-1;i++){
             Vector3 p1=new Vector3(borderPoints3.get(i).x,borderPoints3.get(i).y,borderPoints3.get(i).z);
             Vector3 p2=new Vector3(borderPoints3.get(i+1).x,borderPoints3.get(i+1).y,borderPoints3.get(i+1).z);
@@ -201,7 +203,9 @@ public class CrazyPutting  implements ApplicationListener {
 
             builder.rect(v1, v2, v3, v4);
         }
+
         nor1=new Vector3(0,0,-1);
+
         for(int i=0;i<borderPoints2.size()-1;i++){
             Vector3 p1=new Vector3(borderPoints2.get(i).x,borderPoints2.get(i).y,borderPoints2.get(i).z);
             Vector3 p2=new Vector3(borderPoints2.get(i+1).x,borderPoints2.get(i+1).y,borderPoints2.get(i+1).z);
@@ -213,7 +217,9 @@ public class CrazyPutting  implements ApplicationListener {
 
             builder.rect(v1, v2, v3, v4);
         }
+
         nor1=new Vector3(0,0,1);
+
         for(int i=0;i<borderPoints4.size()-1;i++){
             Vector3 p1=new Vector3(borderPoints4.get(i).x,borderPoints4.get(i).y,borderPoints4.get(i).z);
             Vector3 p2=new Vector3(borderPoints4.get(i+1).x,borderPoints4.get(i+1).y,borderPoints4.get(i+1).z);
@@ -267,33 +273,50 @@ public class CrazyPutting  implements ApplicationListener {
                 modelBuilder.begin();
                 builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));
                 float x, y = 0;
+
                 for (int i = 0; i < gridWidth; i++) {
+
                     for (int k = 0; k < gridDepth; k++) {
+
                         pos1 = new Vector3(i*resolution, (float) func.evaluate((i+(a*gridWidth)) * gw, (k+(b*gridDepth)) * gd), k*resolution);
                         pos2 = new Vector3(i*resolution, (float) func.evaluate((i+(a*gridWidth)) * gw, (k+1+(b*gridDepth)) * gd), (k + 1)*resolution);
                         pos3 = new Vector3((i + 1)*resolution, (float) func.evaluate((i+1+(a*gridWidth)) * gw, (k+1+(b*gridDepth)) * gd), (k + 1)*resolution);
                         pos4 = new Vector3((i + 1)*resolution, (float) func.evaluate((i+1+(a*gridWidth)) * gw, (k+(b*gridDepth)) * gd), k*resolution);
+
                         if(i==0&&a==0){
                             borderPoints1.add(new Vector3(pos1.x+a*10,pos1.y,pos1.z+b*10));
+
                             if(k==gridDepth-1&&b==4)
                                 borderPoints1.add(new Vector3(pos2.x+a*10,pos2.y,pos2.z+b*10));
+
                         }
+
                         if(k==0&&b==0){
                             borderPoints2.add(new Vector3(pos1.x+a*10,pos1.y,pos1.z+b*10));
+
                             if(i==gridDepth-1&&a==4)
                                 borderPoints2.add(new Vector3(pos4.x+a*10,pos4.y,pos4.z+b*10));
+
                         }
+
                         if(i==gridWidth-1&&a==4){
                             borderPoints3.add(new Vector3(pos3.x+a*10,pos3.y,pos3.z+b*10));
+
                             if(k==0&&b==0)
                                 borderPoints3.add(new Vector3(pos4.x+a*10,pos4.y,pos4.z+b*10));
+
                         }
+
                         if(k==gridDepth-1&&b==4){
                             borderPoints4.add(new Vector3(pos3.x+a*10,pos3.y,pos3.z+b*10));
+
                             if(i==0&&a==0)
                                 borderPoints4.add(new Vector3(pos2.x+a*10,pos2.y,pos2.z+b*10));
+
                         }
+
                         float d=1/resolution;
+
                         vec1 = new Vector2d((i+(a*gridWidth)) * gw, (k+(b*gridDepth)) * gd);
                         nor1 = new Vector3(-(float) (func.gradient(vec1).get_x()), d, 0).add(new Vector3(0, d, -(float) (func.gradient(vec1).get_y())));
                         nor1.nor();
@@ -316,13 +339,14 @@ public class CrazyPutting  implements ApplicationListener {
                         v4 = new VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(0.5f, 0.5f);
 
                         builder.rect(v1, v2, v3, v4);
-//                        builder.line(pos1,nor1.add(pos1));
                     }
                 }
+
                 rect = modelBuilder.end();
                 terrainInstance[a * 5 + b] = new ModelInstance(rect, a * 10, 0, b * 10);
             }
         }
+
         return terrainInstance;
     }
 
@@ -332,8 +356,6 @@ public class CrazyPutting  implements ApplicationListener {
 
     @Override
     public void render() {
-
-        // You've seen all this before, just be sure to clear the GL_DEPTH_BUFFER_BIT when working in 3D
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -343,42 +365,25 @@ public class CrazyPutting  implements ApplicationListener {
         skySprite.draw(batch);
         batch.end();
 
-        for(int w=GAME_ASPECTS.players.size()-1; w >= 0; w--) {
-            Player p = GAME_ASPECTS.players.get(w);
-            modelBatch.render(p.getBall().getModel(course), environment);
-        }
-
         previous_time = world_physics.frameStep(previous_time);
+
         Vector3d real_pos = currentPlayer.getBall().getPosition(course);
         float ballX = (float) real_pos.get_x();
         float ballY = (float) real_pos.get_y();
         float ballZ = (float) real_pos.get_z();
         Vector3 currentBallPos = new Vector3(ballX, ballY, ballZ);
 
-
-        CAMERA.position.set(currentPlayer.getCameraPosition());
+        CAMERA.position.set(currentPlayer.getCameraPosition(course));
         CAMERA.up.set(Vector3.Y);
-        //CAMERA.lookAt(new Vector3(ballX,ballY, ballZ));
+        CAMERA.lookAt(currentBallPos);
         CAMERA.update();
 
-
-//        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-//            float x = Gdx.input.getDeltaX();
-//            float y = Gdx.input.getDeltaY();
-//            camera.rotateAround(new Vector3(GAME_ASPECTS.players.get(0).getBall().realX,GAME_ASPECTS.players.get(0).getBall().realY,GAME_ASPECTS.players.get(0).getBall().realZ),Vector3.Y,Gdx.graphics.getDeltaTime()*10*x);
-//            //CAMERA.rotate(new Vector3(-CAMERA.direction.z,0,CAMERA.direction.x),-y/3f);
-//        }
-
-        in: if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            if (currentPlayer.getBall().is_moving) break in;
-            CAMERA.rotateAround(new Vector3(ballX, ballY, ballZ),Vector3.Y,-Gdx.graphics.getDeltaTime()*cameraRotationSpeed);
-            currentPlayer.setCameraPosition(CAMERA.position);
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            view_angle += -Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
         }
 
-        in: if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            if (currentPlayer.getBall().is_moving) break in;
-            CAMERA.rotateAround(new Vector3(ballX,ballY,ballZ),Vector3.Y,Gdx.graphics.getDeltaTime()*cameraRotationSpeed);
-            currentPlayer.setCameraPosition(CAMERA.position);
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            view_angle += Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
@@ -389,16 +394,27 @@ public class CrazyPutting  implements ApplicationListener {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            if (CAMERA.position.dst(currentBallPos) > 1) {
-                CAMERA.translate(new Vector3(CAMERA.direction.x * 0.7f, CAMERA.direction.y * cameraZoomSpeed, CAMERA.direction.z * cameraZoomSpeed));
-                currentPlayer.setCameraPosition(CAMERA.position);
+
+            if (view_zoom > 1f) {
+                view_zoom -= 0.5f;
             }
+
+            else{
+                view_zoom = 1f;
+            }
+
         }
+
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            if (CAMERA.position.dst(currentBallPos) < 50) {
-                CAMERA.translate(new Vector3(CAMERA.direction.x * -0.7f, CAMERA.direction.y * -cameraZoomSpeed, CAMERA.direction.z * -cameraZoomSpeed));
-                currentPlayer.setCameraPosition(CAMERA.position);
+
+            if (view_zoom < 50f) {
+                view_zoom += 0.5f;
             }
+
+            else{
+                view_zoom = 50f;
+            }
+
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.R)){
@@ -413,59 +429,76 @@ public class CrazyPutting  implements ApplicationListener {
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             add_shot_velocity(SHOT_VELOCITY_INCREASE());
         }
+
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             add_shot_velocity(-SHOT_VELOCITY_INCREASE());
         }
+
         double f = VELOCITY_FACTOR_FROM_BOUNCING_AGAINST_WALL;
+
         for(Player p : GAME_ASPECTS.players) {
             double velocity = p.getBall().velocity.get_length();
+
             if (p.getBall().x < BALL_RADIUS) {
+
                 if (velocity < VELOCITY_CUTTOFF){
                     p.getBall().is_moving = false;
                     p.getBall().velocity=new Vector2d(0,0);
-                } else {
+                }
+
+                else {
                     p.getBall().x = (BALL_RADIUS + 0.001 / WORLD_SCALING);
                     p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
                 }
+
             }
+
             if (p.getBall().x > (50 / WORLD_SCALING - BALL_RADIUS)) {
+
                 if (velocity < VELOCITY_CUTTOFF){
                     p.getBall().is_moving = false;
                     p.getBall().velocity=new Vector2d(0,0);
-                } else {
+                }
+
+                else {
                     p.getBall().x = (49.99 / WORLD_SCALING - BALL_RADIUS);
                     p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
                 }
+
             }
+
             if (p.getBall().y < BALL_RADIUS) {
+
                 if (velocity < VELOCITY_CUTTOFF){
                     p.getBall().is_moving = false;
                     p.getBall().velocity=new Vector2d(0,0);
-                } else {
+                }
+
+                else {
                     p.getBall().y = (BALL_RADIUS + 0.001 / WORLD_SCALING);
                     p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
                 }
+
             }
+
             if (p.getBall().y > (50 / WORLD_SCALING - BALL_RADIUS)) {
+
                 if (velocity < VELOCITY_CUTTOFF){
                     p.getBall().is_moving = false;
                     p.getBall().velocity=new Vector2d(0,0);
-                } else {
+                }
+
+                else {
                     p.getBall().y = (49.99 / WORLD_SCALING - BALL_RADIUS);
                     p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
                 }
+
             }
+
+            modelBatch.render(p.getBall().getModel(course), environment);
         }
-        CAMERA.update();
-//        flagBoxInstance.transform.set(new Vector3(x2,(float) course.getHeightAt(x2/8,y2/8),y2),new Quaternion(0,0,0,0));
-
-        // When you change the camera details, you need to call update();
-        // Also note, you need to call update() at least once.
-
 
         modelBatch.begin(CAMERA);
-
-
 
         for (int i = 0; i < 25; i++)
             modelBatch.render(terrainInstance[i], environment);
@@ -474,17 +507,17 @@ public class CrazyPutting  implements ApplicationListener {
         modelBatch.render(wallInstance, environment);
         modelBatch.end();
 
-        //in water game logic
         if(currentPlayer.getBall().isOnWater(course)){
 
         }
+
         if(!currentPlayer.getBall().is_moving){
+
             if(currentPlayer.getBall().isTouchingFlag(course)){
                 System.out.println(currentPlayer+ "reached flag in "+currentPlayer.getshots());
                 players.remove(currentPlayer);
             }
 
-            // changing arrow length based on speed
             if (lastShotVelocity != SHOT_VELOCITY) {
                 lastShotVelocity = SHOT_VELOCITY;
                 ModelBuilder modelBuilder = new ModelBuilder();
@@ -499,29 +532,37 @@ public class CrazyPutting  implements ApplicationListener {
                 arrowInstance.transform.setToRotation(Vector3.Y, 90+(float)Math.toDegrees((Math.asin(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().x))));
             else
                 arrowInstance.transform.setToRotation(Vector3.Y, 90-(float)Math.toDegrees((Math.asin(new Vector3(CAMERA.direction.x, 0, CAMERA.direction.z).nor().x))));
+
             arrowInstance.transform.setTranslation(new Vector3(ballX, ballY, ballZ).add(new Vector3(CAMERA.position.x, 0, CAMERA.position.z).sub(new Vector3(ballX, 0, ballZ)).nor().scl(
                     (float)(-0.3f - 0.7f * (2 * SHOT_VELOCITY) / MAX_SHOT_VELOCITY))));
             modelBatch.begin(CAMERA);
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
             modelBatch.render(arrowInstance, environment);
             modelBatch.end();
+
             if (shotMade) {
                 currentPlayer.newShot();
                 shotMade=false;
                 System.out.println(currentPlayer+ " has attempted "+currentPlayer.getshots()+" shots");
+
                 if(players.indexOf(currentPlayer)==players.size()-1 )  {
                     currentPlayer=players.get(0);
-                }else {
+                }
+
+                else {
                     currentPlayer = players.get(players.indexOf(currentPlayer)+1);
                 }
+
             }
 
         }
+
         if(CAMERA.position.y<0){
             batch.begin();
             waterSprite.draw(batch);
             batch.end();
         }
+
     }
 
     public void add_shot_velocity(double amount) {

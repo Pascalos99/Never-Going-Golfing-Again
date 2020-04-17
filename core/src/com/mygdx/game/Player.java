@@ -1,7 +1,7 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector3;
+import static com.mygdx.game.Variables.*;
 
 public class Player {
     private String name;
@@ -40,8 +40,13 @@ public class Player {
         cameraPosition.z=pos.z;
     }
 
-    public Vector3 getCameraPosition(){
-        return cameraPosition;
+    public Vector3 getCameraPosition(PuttingCourse world){
+        Vector2d view_vector = new Vector2d(view_zoom, 0).rotate(view_angle);
+        Vector3 pre = new Vector3((float) view_vector.get_x(), (float) ball.getPosition(world).get_y() + 5f, (float) view_vector.get_y());
+
+        Vector3d ball_pos = ball.getPosition(world);
+        return pre.add(new Vector3((float) ball_pos.get_x(), (float) ball_pos.get_y(), (float) ball_pos.get_z()));
+        //return cameraPosition;
     }
 
     public int getId(){
