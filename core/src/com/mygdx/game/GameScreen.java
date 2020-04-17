@@ -3,7 +3,6 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -26,6 +25,7 @@ public class GameScreen implements Screen {
     Label currentPlayerShotNum;
     public TextField inputVelocity;
     CrazyPutting game;
+
     public  GameScreen(Menu menu, GameInfo gameInfo) {
         parent = menu;
         gameAspects=gameInfo;
@@ -38,7 +38,6 @@ public class GameScreen implements Screen {
        // table.setDebug(true);
         table.right().bottom();
         stage.addActor(table);
-
         generator.setPathPreference(true);
         if(gameAspects!=null){
           //  figure out how to amke function 2D
@@ -52,6 +51,14 @@ public class GameScreen implements Screen {
         currentPlayerShotNum=new Label("", Variables.MENU_SKIN);
         currentPlayerLabel = new Label("", Variables.MENU_SKIN);
         inputVelocity=new TextField(""+Variables.SHOT_VELOCITY,Variables.MENU_SKIN);
+        inputVelocity.setTextFieldListener(new TextField.TextFieldListener() {
+            @Override
+            public void keyTyped(TextField textField, char c) {
+                String input = inputVelocity.getText();
+                if (input.matches("[0-9]*\\.*[0-9]+")) setInputVel(Double.parseDouble(input));
+                else setInputVel(0.0);
+            }
+        });
         Label inputVel= new Label("Initial Velocity: ",Variables.MENU_SKIN);
         table.row().pad(0, 0, 10, 0);
         table.add(currentPlayerLabel);
@@ -74,6 +81,7 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         game.render();
         currentPlayerLabel.setText("CurrentPlayer : "+game.getCurrentPlayer().getName());
         currentPlayerShotNum.setText("Attempts: "+game.getCurrentPlayer().getshots());
@@ -113,12 +121,19 @@ public class GameScreen implements Screen {
         return course;
     }
 
+    public void setInputVel(double i){
+        if (i > gameAspects.maxVelocity) i = gameAspects.maxVelocity;
+        if (i < 0) i = 0;
+        inputVelocity.setText(String.format("%.2f",i));
+        Variables.SHOT_VELOCITY = i;
+    }
+
     public double getInputVelocity(){
         String inputtxt =inputVelocity.getText();
         double input;
         try {
              input = Double.parseDouble(inputtxt.replaceAll("\\s", ""));
-        }catch(NumberFormatException e){
+        }catch(NumberFormatException e) {
             String res= "";
             for(int i=0;i<inputtxt.length();i++){
                 if(Character.isDigit(inputtxt.charAt(i)) ||inputtxt.charAt(i)=='.' ){

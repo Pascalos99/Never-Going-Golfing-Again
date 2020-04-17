@@ -6,6 +6,6 @@ public interface TopDownPhysicsObject {
 
     public Vector3d getPosition(PuttingCourse world);
     public double getOrientation();
-    public ModelInstance getModel(PuttingCourse world, Player p);
+    public ModelInstance getModel(PuttingCourse world);
 
 }
