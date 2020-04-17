@@ -358,11 +358,11 @@ public class CrazyPutting  implements ApplicationListener {
         float ballZ = (float) real_pos.get_z();
         Vector3 currentBallPos = new Vector3(ballX, ballY, ballZ);
 
+
         CAMERA.position.set(currentPlayer.getCameraPosition());
-       // System.out.println(currentPlayer.getCameraPosition());
-        CAMERA.lookAt(currentBallPos);
         CAMERA.up.set(Vector3.Y);
         CAMERA.update();
+
 
 //        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
 //            float x = Gdx.input.getDeltaX();
@@ -372,7 +372,7 @@ public class CrazyPutting  implements ApplicationListener {
 //        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            CAMERA.rotateAround(new Vector3(ballX,ballY,ballZ),Vector3.Y,-Gdx.graphics.getDeltaTime()*cameraRotationSpeed);
+            CAMERA.rotateAround(new Vector3(ballX, ballY, ballZ),Vector3.Y,-Gdx.graphics.getDeltaTime()*cameraRotationSpeed);
             currentPlayer.setCameraPosition(CAMERA.position);
         }
 

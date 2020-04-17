@@ -32,7 +32,7 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     public void step(double delta, PuttingCourse world, List<TopDownPhysicsObject> ents) {
-        System.out.println("Velocity: " + velocity.toString() + " Length: " + velocity.get_length());
+        //System.out.println("Velocity: " + velocity.toString() + " Length: " + velocity.get_length());
         if(is_moving) {
             Function2d h = world.get_height();
             double gravity = world.get_gravity();
@@ -92,7 +92,7 @@ public class Ball implements TopDownPhysicsObject {
     public Vector3d getPosition(PuttingCourse world) {
         return new Vector3d(
                 toWorldScale(x),
-                world.get_height().evaluate(new Vector2d(x, y)) + BALL_RADIUS * WORLD_SCALING,
+                world.get_height().evaluate(x, y) + BALL_RADIUS * WORLD_SCALING,
                 toWorldScale(y)
         );
     }
@@ -109,21 +109,21 @@ public class Ball implements TopDownPhysicsObject {
 
         model.transform.setTranslation((float) real_x, (float) real_h, (float) real_y);
 
-        /*owner.setCameraPosition(
-                new Vector3(
-                        (float) (real_x - old_x),
-                        (float) (real_h - old_h),
-                        (float) (real_y - old_y)
-                ).add(owner.getCameraPosition())
-        );*/
+        Vector3 vector = new Vector3(
+                (float) (real_x - old_x),
+                (float) (real_h - old_h),
+                (float) (real_y - old_y)
+        ).add(owner.getCameraPosition());
 
-        owner.setCameraPosition(
-                new Vector3(
+        /*vector = new Vector3(
                         (float) toWorldScale(slide_x),
                         (float) slide_h,
                         (float) toWorldScale(slide_y)
-                ).add(owner.getCameraPosition())
-        );
+                ).add(owner.getCameraPosition()); */
+
+        owner.setCameraPosition(vector);
+
+        System.out.println("moving camera to "+vector);
 
         return model;
     }
