@@ -56,6 +56,7 @@ public class GameScreen implements Screen {
             public void keyTyped(TextField textField, char c) {
                 String input = inputVelocity.getText();
                 if (input.matches("[0-9]*\\.*[0-9]+")) setInputVel(Double.parseDouble(input));
+                else setInputVel(0.0);
             }
         });
         Label inputVel= new Label("Initial Velocity: ",Variables.MENU_SKIN);
