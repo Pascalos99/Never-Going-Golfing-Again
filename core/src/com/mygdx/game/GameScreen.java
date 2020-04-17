@@ -121,6 +121,8 @@ public class GameScreen implements Screen {
     }
 
     public void setInputVel(double i){
+        if (i > gameAspects.maxVelocity) i = gameAspects.maxVelocity;
+        if (i < 0) i = 0;
         inputVelocity.setText(String.format("%.2f",i));
         Variables.SHOT_VELOCITY = i;
     }
