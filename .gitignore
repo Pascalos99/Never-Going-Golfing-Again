@@ -73,10 +73,7 @@ gradlew.bat
 settings.gradle
 .idea/
 bin/
-core/.project
-.project
-.settings/org.eclipse.buildship.core.prefs
-core/.classpath
-core/.settings/org.eclipse.buildship.core.prefs
-desktop/.classpath
-desktop/.settings/org.eclipse.buildship.core.prefs
+core/assets/arrow.g3db
+core/assets/arrow.obj
+desktop/build/resources/main/arrow.g3db
+desktop/build/resources/main/arrow.obj

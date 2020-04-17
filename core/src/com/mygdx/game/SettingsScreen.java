@@ -106,6 +106,7 @@ public class SettingsScreen implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                MAX_SHOT_VELOCITY = getMaxV();
                 parent.changeScreen(Menu.PLAY);
             }
         });

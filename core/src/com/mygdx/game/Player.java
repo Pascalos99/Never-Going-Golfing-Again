@@ -31,7 +31,9 @@ public class Player {
     public void newShot(){
         ++shots;
     }
-
+    public String getName(){
+        return name;
+    }
     public void setCameraPosition(Vector3 pos){
         cameraPosition.x=pos.x;
         cameraPosition.y=pos.y;
