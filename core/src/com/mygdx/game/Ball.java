@@ -14,7 +14,7 @@ public class Ball implements TopDownPhysicsObject {
     public double mass = 0.005;
 
     private ModelInstance model;
-
+    public double pastX,pastY;
     public boolean is_moving = false;
     public Player owner;
     private int hit_count;
@@ -24,6 +24,8 @@ public class Ball implements TopDownPhysicsObject {
     Ball(double radius, double x_pos, double y_pos, ModelInstance model, Player owner) {
         x = x_pos;
         y = y_pos;
+        pastX=x;
+        pastY=y;
         r = radius;
         velocity = new Vector2d(0, 0);
         hit_count = 0;
@@ -160,6 +162,16 @@ public class Ball implements TopDownPhysicsObject {
 
     public int getHits(){
         return hit_count;
+    }
+
+    public void recordPastPos(){
+        pastX=x;
+        pastY=y;
+    }
+
+    public void resetToPast(){
+        x=pastX;
+        y=pastY;
     }
 
 }

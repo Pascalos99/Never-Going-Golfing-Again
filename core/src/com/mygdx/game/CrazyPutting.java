@@ -60,6 +60,7 @@ public class CrazyPutting  implements ApplicationListener {
     private Player currentPlayer;
     private boolean shotMade =false;
     private GameScreen gameScreen;
+    private boolean penaltyServed =true;
 
     public CrazyPutting( PuttingCourse c, GameInfo gameAspects,GameScreen p){
         this.gameScreen=p;
@@ -379,7 +380,8 @@ public class CrazyPutting  implements ApplicationListener {
             currentPlayer.setCameraPosition(CAMERA.position);
         }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+        if(Gdx.input.isKeyPressed(Input.Keys.SPACE) &&penaltyServed ) {
+            gameScreen.allowNextTurn=true;
             SHOT_VELOCITY=gameScreen.getInputVelocity();
             shotMade=true;
             double standard_factor = Math.sqrt(3)/Math.sqrt(2);
@@ -396,15 +398,6 @@ public class CrazyPutting  implements ApplicationListener {
             if (CAMERA.position.dst(currentBallPos) < 50) {
                 CAMERA.translate(new Vector3(CAMERA.direction.x * -0.7f, CAMERA.direction.y * -cameraZoomSpeed, CAMERA.direction.z * -cameraZoomSpeed));
                 currentPlayer.setCameraPosition(CAMERA.position);
-            }
-        }
-
-        if(Gdx.input.isKeyPressed(Input.Keys.R)){
-            for(Player p : GAME_ASPECTS.players){
-                p.getBall().velocity=(new Vector2d(0, 0));
-                p.getBall().is_moving = false;
-                p.getBall().x=GAME_ASPECTS.startX;
-                p.getBall().y=GAME_ASPECTS.startY;
             }
         }
 
@@ -463,8 +456,6 @@ public class CrazyPutting  implements ApplicationListener {
 
         modelBatch.begin(CAMERA);
 
-
-
         for (int i = 0; i < 25; i++)
             modelBatch.render(terrainInstance[i], environment);
 
@@ -474,9 +465,19 @@ public class CrazyPutting  implements ApplicationListener {
 
         //in water game logic
         if(currentPlayer.getBall().isOnWater(course)){
-
+            gameScreen.allowNextTurn=false;
+            penaltyServed=false;
+            currentPlayer.getBall().is_moving = false;
+            if(Gdx.input.isKeyPressed(Input.Keys.R)){
+                currentPlayer.newShot();
+                currentPlayer.newShot();
+                currentPlayer.getBall().velocity=(new Vector2d(0, 0));
+                currentPlayer.getBall().resetToPast();
+                penaltyServed=true;
+            }
         }
-        if(!currentPlayer.getBall().is_moving){
+
+        if(!currentPlayer.getBall().is_moving ){
             if(currentPlayer.getBall().isTouchingFlag(course)){
                 System.out.println(currentPlayer+ "reached flag in "+currentPlayer.getshots());
                 players.remove(currentPlayer);
@@ -503,7 +504,8 @@ public class CrazyPutting  implements ApplicationListener {
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
             modelBatch.render(arrowInstance, environment);
             modelBatch.end();
-            if (shotMade) {
+            if (shotMade && gameScreen.allowNextTurn) {
+                currentPlayer.getBall().recordPastPos();
                 currentPlayer.newShot();
                 shotMade=false;
                 System.out.println(currentPlayer+ " has attempted "+currentPlayer.getshots()+" shots");

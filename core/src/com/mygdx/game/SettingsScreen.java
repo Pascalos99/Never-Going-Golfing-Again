@@ -133,7 +133,7 @@ public class SettingsScreen implements Screen {
         goalY = new TextField("10", MENU_SKIN);
         Label gY =new Label("Goal Y: ", MENU_SKIN);
 
-        height = new TextField("sin(2x)+cos(2y)", MENU_SKIN);
+        height = new TextField("-0.01*x+0.003*x^2+0.04*y", MENU_SKIN);
         Label h =new Label("Height function: ", MENU_SKIN);
 
 

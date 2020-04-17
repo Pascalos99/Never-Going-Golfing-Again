@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class GameScreen implements Screen {
@@ -23,8 +24,12 @@ public class GameScreen implements Screen {
     static PuttingCourse course = generator.randomCourse(size, hole_tolerance, max_speed, gravity);
     Label currentPlayerLabel;
     Label currentPlayerShotNum;
+    Label currentAction;
     public TextField inputVelocity;
     CrazyPutting game;
+    public boolean allowNextTurn=true;
+    private final String inAction= "W & S to zoom in/out\nUP & DOWN to increase/decrease\nLEFT & RIGHT rotate camera";
+    private final String inWater="R is your only option";
 
     public  GameScreen(Menu menu, GameInfo gameInfo) {
         parent = menu;
@@ -50,6 +55,8 @@ public class GameScreen implements Screen {
         game.create();
         currentPlayerShotNum=new Label("", Variables.MENU_SKIN);
         currentPlayerLabel = new Label("", Variables.MENU_SKIN);
+        currentAction= new Label("",Variables.MENU_SKIN);
+        currentAction.setAlignment(Align.bottomLeft);
         inputVelocity=new TextField(""+Variables.SHOT_VELOCITY,Variables.MENU_SKIN);
         inputVelocity.setTextFieldListener(new TextField.TextFieldListener() {
             @Override
@@ -66,6 +73,7 @@ public class GameScreen implements Screen {
         table.row().pad(0, 0, 10, 0);
         table.add(inputVel);
         table.add(inputVelocity);
+        stage.addActor(currentAction);
         System.out.println("END");
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
@@ -83,6 +91,11 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         game.render();
+        if(!game.getCurrentPlayer().getBall().isOnWater(course)){
+            currentAction.setText(inAction);
+        }else{
+            currentAction.setText(inWater);
+        }
         currentPlayerLabel.setText("CurrentPlayer : "+game.getCurrentPlayer().getName());
         currentPlayerShotNum.setText("Attempts: "+game.getCurrentPlayer().getshots());
         stage.act(delta);
