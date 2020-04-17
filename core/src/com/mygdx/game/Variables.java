@@ -88,7 +88,7 @@ public final class Variables {
 	public static double SHOT_VELOCITY_INCREASE() { return 0.01 * MAX_SHOT_VELOCITY; }
 	public static double VELOCITY_FACTOR_FROM_BOUNCING_AGAINST_WALL = 0.9;
 
-	public static double pitch = 0.558505f;
-	public static double yaw = +1.5707963f;
+	public static double pitch = Math.PI * (2/9d);
+	public static double yaw = Math.PI * 0.75;
 	public static double view_zoom = 7;
 }
