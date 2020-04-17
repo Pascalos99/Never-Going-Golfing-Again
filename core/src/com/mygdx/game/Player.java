@@ -41,12 +41,19 @@ public class Player {
     }
 
     public Vector3 getCameraPosition(PuttingCourse world){
-        Vector2d view_vector = new Vector2d(view_zoom, 0).rotate(view_angle);
-        Vector3 pre = new Vector3((float) view_vector.get_x(), (float) ball.getPosition(world).get_y() + 5f, (float) view_vector.get_y());
+        double xzLen = Math.cos(pitch);
+        double _x = xzLen * Math.cos(yaw);
+        double _y = Math.sin(pitch);
+        double _z = xzLen * Math.sin(-yaw);
 
-        Vector3d ball_pos = ball.getPosition(world);
-        return pre.add(new Vector3((float) ball_pos.get_x(), (float) ball_pos.get_y(), (float) ball_pos.get_z()));
-        //return cameraPosition;
+        _x *= view_zoom;
+        _y *= view_zoom;
+        _z *= view_zoom;
+
+        Vector3d add = ball.getPosition(world);
+        Vector3 pre = new Vector3((float)_x, (float)_y, (float)_z);
+
+        return pre.add(new Vector3((float) add.get_x(), (float) add.get_y(), (float) add.get_z()));
     }
 
     public int getId(){

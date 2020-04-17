@@ -379,17 +379,18 @@ public class CrazyPutting  implements ApplicationListener {
         CAMERA.update();
 
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            view_angle += -Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
+            yaw += -Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            view_angle += Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
+            yaw += Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             SHOT_VELOCITY=gameScreen.getInputVelocity();
             shotMade=true;
             double standard_factor = Math.sqrt(3)/Math.sqrt(2);
+
             if (!currentPlayer.getBall().is_moving) currentPlayer.getBall().hit(new Vector2d(CAMERA.direction.x, CAMERA.direction.z), SHOT_VELOCITY * standard_factor);
         }
 
