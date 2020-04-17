@@ -19,6 +19,8 @@ public class Ball implements TopDownPhysicsObject {
     public Player owner;
     private int hit_count;
 
+    private double slide_x, slide_y, slide_h;
+
     Ball(double radius, double x_pos, double y_pos, ModelInstance model, Player owner) {
         x = x_pos;
         y = y_pos;
@@ -56,8 +58,18 @@ public class Ball implements TopDownPhysicsObject {
                 is_moving = false;
             }
 
-            x += velocity_x * delta;
-            y += velocity_y * delta;
+            slide_x = velocity_x * delta;
+            slide_y = velocity_y * delta;
+            slide_h = h.evaluate(x + slide_x, y + slide_y) - h.evaluate(x, y);
+
+            x += slide_x;
+            y += slide_y;
+        }
+
+        else{
+            slide_x = 0;
+            slide_y = 0;
+            slide_h = 0;
         }
 
     }
@@ -97,11 +109,19 @@ public class Ball implements TopDownPhysicsObject {
 
         model.transform.setTranslation((float) real_x, (float) real_h, (float) real_y);
 
-        owner.setCameraPosition(
+        /*owner.setCameraPosition(
                 new Vector3(
                         (float) (real_x - old_x),
                         (float) (real_h - old_h),
                         (float) (real_y - old_y)
+                ).add(owner.getCameraPosition())
+        );*/
+
+        owner.setCameraPosition(
+                new Vector3(
+                        (float) toWorldScale(slide_x),
+                        (float) slide_h,
+                        (float) toWorldScale(slide_y)
                 ).add(owner.getCameraPosition())
         );
 
