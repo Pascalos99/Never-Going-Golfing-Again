@@ -36,6 +36,7 @@ public class PuttingCourse {
 		this.course_width = course_width_cm;
 		this.course_height = course_height_cm;
 		this.gravity = gravity;
+		WORLD = this;
 	}
 	
 	public PuttingCourse(Function2d height, Vector2d flag, Vector2d start) {
