@@ -352,7 +352,6 @@ public class CrazyPutting  implements ApplicationListener {
         }
 
         previous_time = world_physics.frameStep(previous_time);
-        Player currentPlayer = GAME_ASPECTS.players.get(0);
         Vector3d real_pos = currentPlayer.getBall().getPosition(course);
         float ballX = (float) real_pos.get_x();
         float ballY = (float) real_pos.get_y();
@@ -510,8 +509,7 @@ public class CrazyPutting  implements ApplicationListener {
                 currentPlayer.newShot();
                 shotMade=false;
                 System.out.println(currentPlayer+ " has attempted "+currentPlayer.getshots()+" shots");
-                if( players.indexOf(currentPlayer)==players.size()-1 )  {
-
+                if(players.indexOf(currentPlayer)==players.size()-1 )  {
                     currentPlayer=players.get(0);
                 }else {
                     currentPlayer = players.get(players.indexOf(currentPlayer)+1);
