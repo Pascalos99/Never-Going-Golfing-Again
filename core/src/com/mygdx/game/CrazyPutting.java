@@ -20,10 +20,7 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
 
 import static com.mygdx.game.Variables.CAMERA;
 import static com.mygdx.game.Variables.BALL_RADIUS;
@@ -361,6 +358,7 @@ public class CrazyPutting  implements ApplicationListener {
 
         CAMERA.position.set(currentPlayer.getCameraPosition());
         CAMERA.up.set(Vector3.Y);
+        CAMERA.lookAt(new Vector3(ballX,ballY, ballZ));
         CAMERA.update();
 
 

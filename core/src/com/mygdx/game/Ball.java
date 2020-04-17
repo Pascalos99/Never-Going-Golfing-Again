@@ -123,7 +123,7 @@ public class Ball implements TopDownPhysicsObject {
 
         owner.setCameraPosition(vector);
 
-        System.out.println("moving camera to "+vector);
+        //System.out.println("moving camera to "+vector);
 
         return model;
     }
