@@ -386,7 +386,7 @@ public class CrazyPutting  implements ApplicationListener {
             SHOT_VELOCITY=gameScreen.getInputVelocity();
             shotMade=true;
             double standard_factor = Math.sqrt(3)/Math.sqrt(2);
-            if (!currentPlayer.getBall().is_moving) currentPlayer.getBall().addVelocity(CAMERA.direction.x * standard_factor * SHOT_VELOCITY, CAMERA.direction.z * standard_factor * SHOT_VELOCITY);
+            if (!currentPlayer.getBall().is_moving) currentPlayer.getBall().hit(new Vector2d(CAMERA.direction.x, CAMERA.direction.z), SHOT_VELOCITY * standard_factor);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
