@@ -479,6 +479,10 @@ public class CrazyPutting  implements ApplicationListener {
         modelBatch.render(wallInstance, environment);
         modelBatch.end();
 
+        //in water game logic
+        if(currentPlayer.getBall().isOnWater(course)){
+
+        }
         if(!currentPlayer.getBall().isMoving()){
             if(currentPlayer.getBall().isTouchingFlag(course)){
                 System.out.println(currentPlayer+ "reached flag in "+currentPlayer.getshots());
@@ -506,17 +510,18 @@ public class CrazyPutting  implements ApplicationListener {
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
             modelBatch.render(arrowInstance, environment);
             modelBatch.end();
-            if(shotMade&& players.indexOf(currentPlayer)==players.size()-1 )  {
+            if (shotMade) {
                 currentPlayer.newShot();
                 shotMade=false;
                 System.out.println(currentPlayer+ " has attempted "+currentPlayer.getshots()+" shots");
-                currentPlayer=players.get(0);
-            }else if(shotMade&& players.indexOf(currentPlayer)<players.size() ){
-                currentPlayer.newShot();
-                shotMade=false;
-                System.out.println(currentPlayer+ " has attempted "+currentPlayer.getshots()+" shots");
-                currentPlayer = players.get(players.indexOf(currentPlayer)+1);
+                if( players.indexOf(currentPlayer)==players.size()-1 )  {
+
+                    currentPlayer=players.get(0);
+                }else {
+                    currentPlayer = players.get(players.indexOf(currentPlayer)+1);
+                }
             }
+
         }
         if(CAMERA.position.y<0){
             batch.begin();
@@ -530,6 +535,7 @@ public class CrazyPutting  implements ApplicationListener {
         if (temp < 0) temp = 0;
         if (temp > GAME_ASPECTS.maxVelocity) temp = GAME_ASPECTS.maxVelocity;
         SHOT_VELOCITY = temp;
+        gameScreen.setInputVel(SHOT_VELOCITY);
     }
 
     @Override
