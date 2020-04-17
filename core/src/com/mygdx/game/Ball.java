@@ -125,6 +125,7 @@ public class Ball implements TopDownPhysicsObject {
 
         //System.out.println("moving camera to "+vector);
 
+
         return model;
     }
 
