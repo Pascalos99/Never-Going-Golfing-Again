@@ -80,7 +80,7 @@ public final class Variables {
 	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("glassy-ui.json"));
 
 	//PHYSICS
-	public static double VELOCITY_CUTTOFF = 0.05d; // in m/s
+	public static double VELOCITY_CUTTOFF = 0.1d; // in m/s
 	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is
 	public static double MAX_SHOT_VELOCITY = 4d;
 	public static double SHOT_VELOCITY = MAX_SHOT_VELOCITY/2d;

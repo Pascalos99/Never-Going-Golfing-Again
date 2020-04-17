@@ -30,7 +30,7 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     public void step(double delta, PuttingCourse world, List<TopDownPhysicsObject> ents) {
-
+        System.out.println("Velocity: " + velocity.toString() + " Length: " + velocity.get_length());
         if(is_moving) {
             Function2d h = world.get_height();
             double gravity = world.get_gravity();

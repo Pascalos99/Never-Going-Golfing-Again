@@ -360,7 +360,8 @@ public class CrazyPutting implements ApplicationListener {
 
         if(Gdx.input.isKeyPressed(Input.Keys.R)){
             for(Player p : GAME_ASPECTS.players){
-                p.getBall().velocity=(new Vector2d(0,0));
+                p.getBall().velocity=(new Vector2d(0, 0));
+                p.getBall().is_moving = false;
                 p.getBall().x=GAME_ASPECTS.startX;
                 p.getBall().y=GAME_ASPECTS.startY;
             }
@@ -372,28 +373,61 @@ public class CrazyPutting implements ApplicationListener {
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             add_shot_velocity(-SHOT_VELOCITY_INCREASE);
         }
-        double f = VELOCITY_FACTOR_FROM_BOUNCING_AGAINST_WALL;
+
         for(Player p : GAME_ASPECTS.players) {
-            double velocity = p.getBall().velocity.get_length();
-            if (p.getBall().x < BALL_RADIUS) {
-                //if (velocity < VELOCITY_CUTTOFF) p.getBall().is_moving = true;
-                p.getBall().x = (BALL_RADIUS + 0.01 / WORLD_SCALING);
-                p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x() / 2f, p.getBall().velocity.get_y()));
+            Vector2d velocity = p.getBall().velocity;
+
+            if (p.getBall().x <= BALL_RADIUS) {
+                p.getBall().x = (BALL_RADIUS - 0.01 / WORLD_SCALING);
+
+                if(velocity.get_length() < VELOCITY_CUTTOFF) {
+                    p.getBall().is_moving = false;
+                    p.getBall().velocity = new Vector2d(0, 0);
+                }
+
+                else{
+                    p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x() / 2f, p.getBall().velocity.get_y() / 2f));
+                }
+
             }
-            if (p.getBall().x > (50 / WORLD_SCALING - BALL_RADIUS)) {
-                //if (velocity < VELOCITY_CUTTOFF) p.getBall().is_moving = true;
-                p.getBall().x = (49.9 / WORLD_SCALING - BALL_RADIUS);
-                p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x() / 2f, p.getBall().velocity.get_y()));
+            if (p.getBall().x >= (50 / WORLD_SCALING - BALL_RADIUS)) {
+                p.getBall().x = (50.01 / WORLD_SCALING - BALL_RADIUS);
+
+                if(velocity.get_length() < VELOCITY_CUTTOFF) {
+                    p.getBall().is_moving = false;
+                    p.getBall().velocity = new Vector2d(0, 0);
+                }
+
+                else{
+                    p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x() / 2f, p.getBall().velocity.get_y() / 2f));
+                }
+
             }
-            if (p.getBall().y < BALL_RADIUS) {
-                //if (velocity < VELOCITY_CUTTOFF) p.getBall().is_moving = true;
-                p.getBall().y = (BALL_RADIUS + 0.01 / WORLD_SCALING);
-                p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y() / 2f));
+            if (p.getBall().y <= BALL_RADIUS) {
+                p.getBall().y = (BALL_RADIUS - 0.01 / WORLD_SCALING);
+
+                if(velocity.get_length() < VELOCITY_CUTTOFF) {
+                    p.getBall().is_moving = false;
+                    p.getBall().velocity = new Vector2d(0, 0);
+                }
+
+                else{
+                    p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x() / 2f, p.getBall().velocity.get_y() / 2f));
+                }
+
             }
-            if (p.getBall().y > (50 / WORLD_SCALING - BALL_RADIUS)) {
-                //if (velocity < VELOCITY_CUTTOFF) p.getBall().is_moving = true;
-                p.getBall().y = (49.9 / WORLD_SCALING - BALL_RADIUS);
-                p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y() / 2f));
+            if (p.getBall().y >= (50.0 / WORLD_SCALING - BALL_RADIUS)) {
+                p.getBall().y = (50.01 / WORLD_SCALING - BALL_RADIUS);
+
+                if(velocity.get_length() < VELOCITY_CUTTOFF) {
+                    p.getBall().is_moving = false;
+                    p.getBall().velocity = new Vector2d(0, 0);
+                }
+
+                else{
+                    p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x() / 2f, p.getBall().velocity.get_y() / 2f));
+                }
+
             }
         }
         CAMERA.update();
