@@ -51,6 +51,13 @@ public class GameScreen implements Screen {
         currentPlayerShotNum=new Label("", Variables.MENU_SKIN);
         currentPlayerLabel = new Label("", Variables.MENU_SKIN);
         inputVelocity=new TextField(""+Variables.SHOT_VELOCITY,Variables.MENU_SKIN);
+        inputVelocity.setTextFieldListener(new TextField.TextFieldListener() {
+            @Override
+            public void keyTyped(TextField textField, char c) {
+                String input = inputVelocity.getText();
+                if (input.matches("[0-9]*\\.*[0-9]+")) setInputVel(Double.parseDouble(input));
+            }
+        });
         Label inputVel= new Label("Initial Velocity: ",Variables.MENU_SKIN);
         table.row().pad(0, 0, 10, 0);
         table.add(currentPlayerLabel);
@@ -113,8 +120,9 @@ public class GameScreen implements Screen {
         return course;
     }
 
-    public  void setInputVel(double i){
-        inputVelocity.setText(""+i);
+    public void setInputVel(double i){
+        inputVelocity.setText(String.format("%.2f",i));
+        Variables.SHOT_VELOCITY = i;
     }
 
     public double getInputVelocity(){
@@ -122,7 +130,7 @@ public class GameScreen implements Screen {
         double input;
         try {
              input = Double.parseDouble(inputtxt.replaceAll("\\s", ""));
-        }catch(NumberFormatException e){
+        }catch(NumberFormatException e) {
             String res= "";
             for(int i=0;i<inputtxt.length();i++){
                 if(Character.isDigit(inputtxt.charAt(i)) ||inputtxt.charAt(i)=='.' ){
