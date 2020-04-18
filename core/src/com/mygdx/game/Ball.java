@@ -134,7 +134,7 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     public boolean isTouchingFlag(PuttingCourse world) {
-        Vector2d flag = world.get_flag_position();
+        Vector2d flag = world.get_flag_position(); //putting course vector
         double _r = world.get_hole_tolerance();
 
         if (Math.sqrt(((x - flag.get_x()) * (x - flag.get_x()) + (y - flag.get_y()) * (y - flag.get_y()))) < _r + r) {
