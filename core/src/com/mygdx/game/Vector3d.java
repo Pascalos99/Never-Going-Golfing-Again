@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.math.Vector3;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
@@ -31,5 +33,9 @@ public class Vector3d {
 
     public String toString() {
         return String.format("(% f, % f, % f)", x, y, z);
+    }
+
+    public Vector3 toVector3() {
+        return new Vector3((float)x, (float)y, (float)z);
     }
 }

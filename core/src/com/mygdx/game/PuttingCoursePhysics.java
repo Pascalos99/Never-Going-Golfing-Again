@@ -3,13 +3,13 @@ package com.mygdx.game;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mygdx.game.Variables.*;
+
 public class PuttingCoursePhysics implements PhysicsEngine {
     public static final double BALL_SIZE = 0.22;
     protected List<TopDownPhysicsObject> ents;
-    protected PuttingCourse world;
 
-    PuttingCoursePhysics(PuttingCourse world_map){
-        this.world = world_map;
+    PuttingCoursePhysics(){
         ents = new ArrayList<TopDownPhysicsObject>();
     }
 
@@ -21,7 +21,7 @@ public class PuttingCoursePhysics implements PhysicsEngine {
         for(TopDownPhysicsObject obj : ents){
 
             if(obj instanceof Ball){
-                ((Ball) obj).step(delta, world, ents);
+                ((Ball) obj).step(delta, ents);
             }
 
         }

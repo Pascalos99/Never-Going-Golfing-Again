@@ -1,7 +1,9 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
+import static com.mygdx.game.Variables.*;
 
 public class Player {
     private String name;
@@ -41,7 +43,19 @@ public class Player {
     }
 
     public Vector3 getCameraPosition(){
-        return cameraPosition;
+        double xzLen = Math.cos(pitch);
+        double _x = xzLen * Math.cos(yaw);
+        double _y = Math.sin(pitch);
+        double _z = xzLen * Math.sin(-yaw);
+
+        _x *= view_zoom;
+        _y *= view_zoom;
+        _z *= view_zoom;
+
+        Vector3d add = ball.getPosition();
+        Vector3 pre = new Vector3((float)_x, (float)_y, (float)_z);
+
+        return pre.add(new Vector3((float) add.get_x(), (float) add.get_y(), (float) add.get_z()));
     }
 
     public int getId(){
@@ -61,6 +75,38 @@ public class Player {
     }
     public String getBallColor(){
         return ballColor;
+    }
+
+    public boolean requestedHit(){
+        return Gdx.input.isKeyPressed(Input.Keys.SPACE);
+    }
+
+    public boolean requestedTurnRight(){
+        return Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+    }
+
+    public boolean requestedTurnLeft(){
+        return Gdx.input.isKeyPressed(Input.Keys.LEFT);
+    }
+
+    public boolean requestedZoomIn(){
+        return Gdx.input.isKeyPressed(Input.Keys.W);
+    }
+
+    public boolean requestedZoomOut(){
+        return Gdx.input.isKeyPressed(Input.Keys.S);
+    }
+
+    public boolean requestedIncreaseHitVelocity(){
+        return Gdx.input.isKeyPressed(Input.Keys.UP);
+    }
+
+    public boolean requestedDecreaseHitVelocity(){
+        return Gdx.input.isKeyPressed(Input.Keys.DOWN);
+    }
+
+    public boolean requestedReset(){
+        return Gdx.input.isKeyPressed(Input.Keys.R);
     }
 
 }

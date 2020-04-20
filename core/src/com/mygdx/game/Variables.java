@@ -71,6 +71,7 @@ public final class Variables {
 	public static GameInfo GAME_ASPECTS;
 	public static final float WORLD_SCALING = (float)(1/(2f*Math.PI/ 50));
 	public static final float BALL_RADIUS = 0.05f / WORLD_SCALING;
+	public static PuttingCourse WORLD;
 
 	/*** Will make sure the ball does not move during the 'shoot' step */
 	public static boolean HOLD_BALL_IN_PLACE = false;
@@ -86,4 +87,8 @@ public final class Variables {
 	public static double SHOT_VELOCITY = MAX_SHOT_VELOCITY/2d;
 	public static double SHOT_VELOCITY_INCREASE() { return 0.01 * MAX_SHOT_VELOCITY; }
 	public static double VELOCITY_FACTOR_FROM_BOUNCING_AGAINST_WALL = 0.9;
+
+	public static double pitch = Math.PI * (2/9d);
+	public static double yaw = Math.PI * 0.75;
+	public static double view_zoom = 7;
 }

@@ -8,7 +8,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
+import java.util.ArrayList;
 
 public class GameScreen implements Screen {
 
@@ -23,12 +26,19 @@ public class GameScreen implements Screen {
     static PuttingCourse course = generator.randomCourse(size, hole_tolerance, max_speed, gravity);
     Label currentPlayerLabel;
     Label currentPlayerShotNum;
+    Label currentAction;
     public TextField inputVelocity;
     CrazyPutting game;
+    public boolean allowNextTurn=true;
+    public boolean endGame=false;
+    private final String inAction= "W & S to zoom in/out\nUP & DOWN to increase/decrease\nLEFT & RIGHT rotate camera";
+    private final String inWater="R is your only option";
+    public ArrayList<Player> winners;
 
     public  GameScreen(Menu menu, GameInfo gameInfo) {
         parent = menu;
         gameAspects=gameInfo;
+        winners= new ArrayList<>();
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         //table
@@ -50,6 +60,8 @@ public class GameScreen implements Screen {
         game.create();
         currentPlayerShotNum=new Label("", Variables.MENU_SKIN);
         currentPlayerLabel = new Label("", Variables.MENU_SKIN);
+        currentAction= new Label("",Variables.MENU_SKIN);
+        currentAction.setAlignment(Align.bottomLeft);
         inputVelocity=new TextField(""+Variables.SHOT_VELOCITY,Variables.MENU_SKIN);
         inputVelocity.setTextFieldListener(new TextField.TextFieldListener() {
             @Override
@@ -66,6 +78,7 @@ public class GameScreen implements Screen {
         table.row().pad(0, 0, 10, 0);
         table.add(inputVel);
         table.add(inputVelocity);
+        stage.addActor(currentAction);
         System.out.println("END");
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
@@ -81,8 +94,27 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        if(!endGame) {
+            game.render();
+        }else{
+            Table winList = new Table();
+            winList.setFillParent(true);
+            winList.center();
+            stage.addActor(winList);
+            for(int i=0;i<winners.size();i++){
+                winList.add(new Label(winners.get(i).toString()+" "+ winners.get(i).getshots(), Variables.MENU_SKIN));
+                winList.row();
+            }
+        }
 
-        game.render();
+
+
+
+        if(!game.getCurrentPlayer().getBall().isOnWater()){
+            currentAction.setText(inAction);
+        }else{
+            currentAction.setText(inWater);
+        }
         currentPlayerLabel.setText("CurrentPlayer : "+game.getCurrentPlayer().getName());
         currentPlayerShotNum.setText("Attempts: "+game.getCurrentPlayer().getshots());
         stage.act(delta);

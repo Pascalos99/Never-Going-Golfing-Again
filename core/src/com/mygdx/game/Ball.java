@@ -14,7 +14,7 @@ public class Ball implements TopDownPhysicsObject {
     public double mass = 0.005;
 
     private ModelInstance model;
-
+    public double pastX,pastY;
     public boolean is_moving = false;
     public Player owner;
     private int hit_count;
@@ -24,6 +24,8 @@ public class Ball implements TopDownPhysicsObject {
     Ball(double radius, double x_pos, double y_pos, ModelInstance model, Player owner) {
         x = x_pos;
         y = y_pos;
+        pastX=x;
+        pastY=y;
         r = radius;
         velocity = new Vector2d(0, 0);
         hit_count = 0;
@@ -31,12 +33,16 @@ public class Ball implements TopDownPhysicsObject {
         this.owner = owner;
     }
 
-    public void step(double delta, PuttingCourse world, List<TopDownPhysicsObject> ents) {
-        System.out.println("Velocity: " + velocity.toString() + " Length: " + velocity.get_length());
+    public void step(double delta, List<TopDownPhysicsObject> ents) {
+
         if(is_moving) {
-            Function2d h = world.get_height();
-            double gravity = world.get_gravity();
-            double friction = world.get_friction_coefficient() * 8;
+            Function2d h = WORLD.get_height();
+            double gravity = WORLD.get_gravity();
+            double friction = WORLD.get_friction_coefficient() * 8;
+
+            if(isOnWater()){
+                friction = 6d;
+            }
 
             Vector2d gradient = h.gradient(new Vector2d(x, y));
             double half_x = -mass * gravity * gradient.get_x();
@@ -64,6 +70,63 @@ public class Ball implements TopDownPhysicsObject {
 
             x += slide_x;
             y += slide_y;
+
+            if (x < BALL_RADIUS) {
+
+                if (velocity.get_length() < VELOCITY_CUTTOFF){
+                    is_moving = false;
+                    velocity = new Vector2d(0,0);
+                }
+
+                else {
+                    x = (BALL_RADIUS + 0.001 / WORLD_SCALING);
+                    velocity = (new Vector2d(-velocity.get_x(), velocity.get_y()));
+                }
+
+            }
+
+            if (x > (50 / WORLD_SCALING - BALL_RADIUS)) {
+
+                if (velocity.get_length() < VELOCITY_CUTTOFF){
+                    is_moving = false;
+                    velocity = new Vector2d(0,0);
+                }
+
+                else {
+                    x = (49.99 / WORLD_SCALING - BALL_RADIUS);
+                    velocity = (new Vector2d(-velocity.get_x(), velocity.get_y()));
+                }
+
+            }
+
+            if (y < BALL_RADIUS) {
+
+                if (velocity.get_length() < VELOCITY_CUTTOFF){
+                    is_moving = false;
+                    velocity = new Vector2d(0,0);
+                }
+
+                else {
+                    y = (BALL_RADIUS + 0.001 / WORLD_SCALING);
+                    velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()));
+                }
+
+            }
+
+            if (y > (50 / WORLD_SCALING - BALL_RADIUS)) {
+
+                if (velocity.get_length() < VELOCITY_CUTTOFF){
+                    is_moving = false;
+                    velocity = new Vector2d(0,0);
+                }
+
+                else {
+                    y = (49.99 / WORLD_SCALING - BALL_RADIUS);
+                    velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()));
+                }
+
+            }
+
         }
 
         else{
@@ -89,42 +152,33 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     @Override
-    public Vector3d getPosition(PuttingCourse world) {
+    public Vector3d getPosition() {
         return new Vector3d(
                 toWorldScale(x),
-                world.get_height().evaluate(new Vector2d(x, y)) + BALL_RADIUS * WORLD_SCALING,
-                toWorldScale(y)
+                WORLD.get_height().evaluate(x, y) + BALL_RADIUS * WORLD_SCALING,
+        toWorldScale(y)
         );
     }
 
     @Override
-    public ModelInstance getModel(PuttingCourse world) {
+    public ModelInstance getModel() {
         old_x = real_x;
         old_y = real_y;
         old_h = real_h;
 
-        real_x = toWorldScale(x);
-        real_h = (float) world.get_height().evaluate(x, y) + BALL_RADIUS * WORLD_SCALING;
-        real_y = toWorldScale(y);
+        Vector3d real_pos = getPosition();
+        real_x = real_pos.get_x();
+        real_h = real_pos.get_y();
+        real_y = real_pos.get_z();
 
         model.transform.setTranslation((float) real_x, (float) real_h, (float) real_y);
 
-        /*owner.setCameraPosition(
-                new Vector3(
-                        (float) (real_x - old_x),
-                        (float) (real_h - old_h),
-                        (float) (real_y - old_y)
-                ).add(owner.getCameraPosition())
-        );*/
-
-        owner.setCameraPosition(
-                new Vector3(
-                        (float) toWorldScale(slide_x),
-                        (float) slide_h,
-                        (float) toWorldScale(slide_y)
-                ).add(owner.getCameraPosition())
-        );
-
+        Vector3 vector = new Vector3(
+                (float) (real_x - old_x),
+                (float) (real_h - old_h),
+                (float) (real_y - old_y)
+        ).add(owner.getCameraPosition());
+        owner.setCameraPosition(vector);
         return model;
     }
 
@@ -133,9 +187,9 @@ public class Ball implements TopDownPhysicsObject {
         return 0;
     }
 
-    public boolean isTouchingFlag(PuttingCourse world) {
-        Vector2d flag = world.get_flag_position(); //putting course vector
-        double _r = world.get_hole_tolerance();
+    public boolean isTouchingFlag() {
+        Vector2d flag = WORLD.get_flag_position();
+        double _r = WORLD.get_hole_tolerance();
 
         if (Math.sqrt(((x - flag.get_x()) * (x - flag.get_x()) + (y - flag.get_y()) * (y - flag.get_y()))) < _r + r) {
             return true;
@@ -144,9 +198,9 @@ public class Ball implements TopDownPhysicsObject {
         return false;
     }
 
-    public boolean isOnWater(PuttingCourse world) {
+    public boolean isOnWater() {
 
-        if (world.getHeightAt(x, y) <= 0)
+        if (WORLD.getHeightAt(x, y) <= 0)
             return true;
 
         return false;
@@ -159,6 +213,16 @@ public class Ball implements TopDownPhysicsObject {
 
     public int getHits(){
         return hit_count;
+    }
+
+    public void recordPastPos(){
+        pastX=x;
+        pastY=y;
+    }
+
+    public void resetToPast(){
+        x=pastX;
+        y=pastY;
     }
 
 }
