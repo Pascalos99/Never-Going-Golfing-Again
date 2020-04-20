@@ -480,9 +480,7 @@ public class CrazyPutting  implements ApplicationListener {
                 if (velocity < VELOCITY_CUTTOFF){
                     p.getBall().is_moving = false;
                     p.getBall().velocity=new Vector2d(0,0);
-                }
-
-                else {
+                } else {
                     p.getBall().y = (49.99 / WORLD_SCALING - BALL_RADIUS);
                     p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
                 }
@@ -517,8 +515,11 @@ public class CrazyPutting  implements ApplicationListener {
 
         if(!currentPlayer.getBall().is_moving ){
             if(currentPlayer.getBall().isTouchingFlag(course)){
-                System.out.println(currentPlayer+ "reached flag in "+currentPlayer.getshots());
-                players.remove(currentPlayer);
+                Player past = currentPlayer;
+                gameScreen.winners.add(past);
+                nextPlayer();
+                System.out.println(currentPlayer+ "reached flag in "+past.getshots());
+                players.remove(past);
             }
 
             if (lastShotVelocity != SHOT_VELOCITY) {
@@ -548,13 +549,10 @@ public class CrazyPutting  implements ApplicationListener {
                 currentPlayer.newShot();
                 shotMade=false;
                 System.out.println(currentPlayer+ " has attempted "+currentPlayer.getshots()+" shots");
-
-                if(players.indexOf(currentPlayer)==players.size()-1 )  {
-                    currentPlayer=players.get(0);
-                }
-
-                else {
-                    currentPlayer = players.get(players.indexOf(currentPlayer)+1);
+                if(players.size()==0){
+                    gameScreen.endGame=true;
+                }else{
+                    nextPlayer();
                 }
 
             }
@@ -592,4 +590,12 @@ public class CrazyPutting  implements ApplicationListener {
     public Player getCurrentPlayer(){
         return currentPlayer;
     }
+    public void nextPlayer(){
+        if(players.indexOf(currentPlayer)==players.size()-1 )  {
+            currentPlayer=players.get(0);
+        }else {
+            currentPlayer = players.get(players.indexOf(currentPlayer)+1);
+        }
+    }
+
 }

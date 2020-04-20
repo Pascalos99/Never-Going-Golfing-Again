@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.util.ArrayList;
+
 public class GameScreen implements Screen {
 
     private Menu parent;
@@ -28,12 +30,15 @@ public class GameScreen implements Screen {
     public TextField inputVelocity;
     CrazyPutting game;
     public boolean allowNextTurn=true;
+    public boolean endGame=false;
     private final String inAction= "W & S to zoom in/out\nUP & DOWN to increase/decrease\nLEFT & RIGHT rotate camera";
     private final String inWater="R is your only option";
+    public ArrayList<Player> winners;
 
     public  GameScreen(Menu menu, GameInfo gameInfo) {
         parent = menu;
         gameAspects=gameInfo;
+        winners= new ArrayList<>();
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         //table
@@ -89,8 +94,21 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        if(!endGame) {
+            game.render();
+        }else{
+            Table winList = new Table();
+            winList.setFillParent(true);
+            winList.center();
+            stage.addActor(winList);
+            for(int i=0;i<winners.size();i++){
+                winList.add(new Label(winners.get(i).toString()+" "+ winners.get(i).getshots(), Variables.MENU_SKIN));
+                winList.row();
+            }
+        }
 
-        game.render();
+
+
         if(!game.getCurrentPlayer().getBall().isOnWater(course)){
             currentAction.setText(inAction);
         }else{
