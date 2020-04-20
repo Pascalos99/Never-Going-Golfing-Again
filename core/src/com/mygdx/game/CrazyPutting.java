@@ -456,8 +456,7 @@ public class CrazyPutting  implements ApplicationListener {
 
 
         if(!currentPlayer.getBall().is_moving ){
-
-            if(currentPlayer.getBall().isTouchingFlag(course)){
+            if(currentPlayer.getBall().isTouchingFlag()){
                 Player past = currentPlayer;
                 gameScreen.winners.add(past);
                 nextPlayer();

@@ -110,7 +110,7 @@ public class GameScreen implements Screen {
 
 
 
-        if(!game.getCurrentPlayer().getBall().isOnWater(course)){
+        if(!game.getCurrentPlayer().getBall().isOnWater()){
             currentAction.setText(inAction);
         }else{
             currentAction.setText(inWater);
