@@ -91,7 +91,7 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         game.render();
-        if(!game.getCurrentPlayer().getBall().isOnWater(course)){
+        if(!game.getCurrentPlayer().getBall().isOnWater()){
             currentAction.setText(inAction);
         }else{
             currentAction.setText(inWater);

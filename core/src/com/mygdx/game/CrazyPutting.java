@@ -68,7 +68,7 @@ public class CrazyPutting  implements ApplicationListener {
         players = new ArrayList<Player>(gameAspects.players);
         currentPlayer=players.get(0);
         if (SHOT_VELOCITY > gameAspects.maxVelocity) SHOT_VELOCITY = gameAspects.maxVelocity;
-
+        WORLD = c;
     }
 
     @Override
@@ -108,7 +108,7 @@ public class CrazyPutting  implements ApplicationListener {
         waterInstance = buildWater();
         wallInstance = buildWalls();
 
-        world_physics = new PuttingCoursePhysics(course);
+        world_physics = new PuttingCoursePhysics();
         previous_time = System.currentTimeMillis() / 1000.0;
 
         for(Player p : GAME_ASPECTS.players){  //TODO implement with game loop
@@ -368,26 +368,26 @@ public class CrazyPutting  implements ApplicationListener {
 
         previous_time = world_physics.frameStep(previous_time);
 
-        Vector3d real_pos = currentPlayer.getBall().getPosition(course);
+        Vector3d real_pos = currentPlayer.getBall().getPosition();
         float ballX = (float) real_pos.get_x();
         float ballY = (float) real_pos.get_y();
         float ballZ = (float) real_pos.get_z();
         Vector3 currentBallPos = new Vector3(ballX, ballY, ballZ);
 
-        CAMERA.position.set(currentPlayer.getCameraPosition(course));
+        CAMERA.position.set(currentPlayer.getCameraPosition());
         CAMERA.up.set(Vector3.Y);
         CAMERA.lookAt(currentBallPos);
         CAMERA.update();
 
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        if (currentPlayer.requestedTurnRight()) {
             yaw += -Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+        if (currentPlayer.requestedTurnLeft()) {
             yaw += Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
         }
 
-        if(Gdx.input.isKeyPressed(Input.Keys.SPACE) &&penaltyServed ) {
+        if(currentPlayer.requestedHit() && penaltyServed ) {
             gameScreen.allowNextTurn=true;
             SHOT_VELOCITY=gameScreen.getInputVelocity();
             shotMade=true;
@@ -396,7 +396,7 @@ public class CrazyPutting  implements ApplicationListener {
             if (!currentPlayer.getBall().is_moving) currentPlayer.getBall().hit(new Vector2d(CAMERA.direction.x, CAMERA.direction.z), SHOT_VELOCITY * standard_factor);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+        if (currentPlayer.requestedZoomIn()) {
 
             if (view_zoom > 1f) {
                 view_zoom -= 0.5f;
@@ -408,7 +408,7 @@ public class CrazyPutting  implements ApplicationListener {
 
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+        if (currentPlayer.requestedZoomOut()) {
 
             if (view_zoom < 50f) {
                 view_zoom += 0.5f;
@@ -420,76 +420,16 @@ public class CrazyPutting  implements ApplicationListener {
 
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        if (currentPlayer.requestedIncreaseHitVelocity()) {
             add_shot_velocity(SHOT_VELOCITY_INCREASE());
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        if (currentPlayer.requestedDecreaseHitVelocity()) {
             add_shot_velocity(-SHOT_VELOCITY_INCREASE());
         }
 
-        double f = VELOCITY_FACTOR_FROM_BOUNCING_AGAINST_WALL;
-
         for(Player p : GAME_ASPECTS.players) {
-            double velocity = p.getBall().velocity.get_length();
-
-            if (p.getBall().x < BALL_RADIUS) {
-
-                if (velocity < VELOCITY_CUTTOFF){
-                    p.getBall().is_moving = false;
-                    p.getBall().velocity=new Vector2d(0,0);
-                }
-
-                else {
-                    p.getBall().x = (BALL_RADIUS + 0.001 / WORLD_SCALING);
-                    p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
-                }
-
-            }
-
-            if (p.getBall().x > (50 / WORLD_SCALING - BALL_RADIUS)) {
-
-                if (velocity < VELOCITY_CUTTOFF){
-                    p.getBall().is_moving = false;
-                    p.getBall().velocity=new Vector2d(0,0);
-                }
-
-                else {
-                    p.getBall().x = (49.99 / WORLD_SCALING - BALL_RADIUS);
-                    p.getBall().velocity = (new Vector2d(-p.getBall().velocity.get_x(), p.getBall().velocity.get_y()));
-                }
-
-            }
-
-            if (p.getBall().y < BALL_RADIUS) {
-
-                if (velocity < VELOCITY_CUTTOFF){
-                    p.getBall().is_moving = false;
-                    p.getBall().velocity=new Vector2d(0,0);
-                }
-
-                else {
-                    p.getBall().y = (BALL_RADIUS + 0.001 / WORLD_SCALING);
-                    p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
-                }
-
-            }
-
-            if (p.getBall().y > (50 / WORLD_SCALING - BALL_RADIUS)) {
-
-                if (velocity < VELOCITY_CUTTOFF){
-                    p.getBall().is_moving = false;
-                    p.getBall().velocity=new Vector2d(0,0);
-                }
-
-                else {
-                    p.getBall().y = (49.99 / WORLD_SCALING - BALL_RADIUS);
-                    p.getBall().velocity = (new Vector2d(p.getBall().velocity.get_x(), -p.getBall().velocity.get_y()));
-                }
-
-            }
-
-            modelBatch.render(p.getBall().getModel(course), environment);
+            modelBatch.render(p.getBall().getModel(), environment);
         }
 
         modelBatch.begin(CAMERA);
@@ -501,11 +441,11 @@ public class CrazyPutting  implements ApplicationListener {
         modelBatch.render(wallInstance, environment);
         modelBatch.end();
 
-        if(currentPlayer.getBall().isOnWater(course)){
+        if(currentPlayer.getBall().isOnWater()){
             gameScreen.allowNextTurn=false;
             penaltyServed=false;
             currentPlayer.getBall().is_moving = false;
-            if(Gdx.input.isKeyPressed(Input.Keys.R)){
+            if(currentPlayer.requestedReset()){
                 currentPlayer.newShot();
                 currentPlayer.newShot();
                 currentPlayer.getBall().velocity=(new Vector2d(0, 0));
@@ -516,7 +456,7 @@ public class CrazyPutting  implements ApplicationListener {
 
 
         if(!currentPlayer.getBall().is_moving ){
-            if(currentPlayer.getBall().isTouchingFlag(course)){
+            if(currentPlayer.getBall().isTouchingFlag()){
                 System.out.println(currentPlayer+ "reached flag in "+currentPlayer.getshots());
                 players.remove(currentPlayer);
             }
