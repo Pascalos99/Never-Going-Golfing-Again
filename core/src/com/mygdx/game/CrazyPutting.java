@@ -464,7 +464,7 @@ public class CrazyPutting  implements ApplicationListener {
                 Player past = currentPlayer;
                 gameScreen.winners.add(past);
                 nextPlayer();
-                System.out.println(currentPlayer+ "reached flag in "+past.getshots());
+                System.out.println(past+ "reached flag in "+past.getshots());
                 players.remove(past);
             }
 
@@ -536,6 +536,7 @@ public class CrazyPutting  implements ApplicationListener {
     public Player getCurrentPlayer(){
         return currentPlayer;
     }
+
     public void nextPlayer(){
         if(players.indexOf(currentPlayer)==players.size()-1 )  {
             currentPlayer=players.get(0);
