@@ -44,6 +44,7 @@ public class CrazyPutting  implements ApplicationListener {
     private ModelInstance [] terrainInstance;
     private ModelInstance waterInstance;
     private ModelInstance wallInstance;
+    private ModelInstance flagPoleInstance;
     private ArrayList<Vector3> borderPoints1= new ArrayList<Vector3>();
     private ArrayList<Vector3> borderPoints2= new ArrayList<Vector3>();
     private ArrayList<Vector3> borderPoints3= new ArrayList<Vector3>();
@@ -103,6 +104,13 @@ public class CrazyPutting  implements ApplicationListener {
         ModelBuilder modelBuilder = new ModelBuilder();
 
         float side =(float) ((2*GAME_ASPECTS.getTolerance())/Math.pow(3,.5));
+
+        Model pole = modelBuilder.createBox((float) 0.25, 14, (float) 0.15, new Material(ColorAttribute.createDiffuse(Color.PURPLE)),
+                Usage.Position | Usage.Normal);
+        flagPoleInstance = new ModelInstance(pole, (float) 30, (float) course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y()), (float) 30);
+
+
+
 
         terrainInstance = buildTerrain();
         waterInstance = buildWater();
@@ -436,7 +444,7 @@ public class CrazyPutting  implements ApplicationListener {
 
         for (int i = 0; i < 25; i++)
             modelBatch.render(terrainInstance[i], environment);
-
+        modelBatch.render(flagPoleInstance, environment);
         modelBatch.render(waterInstance, environment);
         modelBatch.render(wallInstance, environment);
         modelBatch.end();
