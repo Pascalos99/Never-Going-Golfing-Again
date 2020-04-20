@@ -72,6 +72,7 @@ public final class Variables {
 	public static final float WORLD_SCALING = (float)(1/(2f*Math.PI/ 50));
 	public static final float BALL_RADIUS = 0.05f / WORLD_SCALING;
 	public static PuttingCourse WORLD;
+	public static final float FLAGPOLE_HEIGHT = 5;
 
 	/*** Will make sure the ball does not move during the 'shoot' step */
 	public static boolean HOLD_BALL_IN_PLACE = false;
