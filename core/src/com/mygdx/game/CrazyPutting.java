@@ -104,7 +104,7 @@ public class CrazyPutting  implements ApplicationListener {
 
         ModelBuilder modelBuilder = new ModelBuilder();
 
-        float side =(float) ((2*GAME_ASPECTS.getTolerance())/Math.pow(3,.5));
+        float side =(float) (2*GAME_ASPECTS.getTolerance())*WORLD_SCALING;
         Model pole = modelBuilder.createBox( 0.1f, FLAGPOLE_HEIGHT, 0.1f, new Material(ColorAttribute.createDiffuse(Color.PURPLE)),
                 Usage.Position | Usage.Normal);
         flagPoleInstance = new ModelInstance(pole,(float) course.get_flag_position().get_x() * WORLD_SCALING, (float) course.getHeightAt(course.get_flag_position().get_x(), course.get_flag_position().get_y()), (float) course.get_flag_position().get_y() * WORLD_SCALING);
@@ -112,8 +112,8 @@ public class CrazyPutting  implements ApplicationListener {
         Model poleRange = modelBuilder.createCylinder( side, FLAGPOLE_HEIGHT, side, 40, new Material(ColorAttribute.createDiffuse(new Color(1, 0.4f, 1, 1f)), new BlendingAttribute(0.3f)),
                 Usage.Position | Usage.Normal);
 
-        flagPoleInstance = new ModelInstance(pole, (float) 30, (float) course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y()), (float) 30);
-        flagRangeInstance = new ModelInstance(poleRange, (float) 30, (float) course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y()), (float) 30);
+        flagPoleInstance = new ModelInstance(pole, (float) course.get_flag_position().get_x()*WORLD_SCALING, (float) course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y()), (float) (course.get_flag_position().get_y()*WORLD_SCALING));
+        flagRangeInstance = new ModelInstance(poleRange,  (float) course.get_flag_position().get_x()*WORLD_SCALING, (float) course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y()), (float) course.get_flag_position().get_y()*WORLD_SCALING);
         terrainInstance = buildTerrain();
         waterInstance = buildWater();
         wallInstance = buildWalls();
@@ -472,7 +472,7 @@ public class CrazyPutting  implements ApplicationListener {
                 Player past = currentPlayer;
                 gameScreen.winners.add(past);
                 nextPlayer();
-                System.out.println(currentPlayer+ "reached flag in "+past.getshots());
+                System.out.println(past+ " reached flag in "+past.getshots());
                 players.remove(past);
             }
 
@@ -544,6 +544,7 @@ public class CrazyPutting  implements ApplicationListener {
     public Player getCurrentPlayer(){
         return currentPlayer;
     }
+
     public void nextPlayer(){
         if(players.indexOf(currentPlayer)==players.size()-1 )  {
             currentPlayer=players.get(0);
