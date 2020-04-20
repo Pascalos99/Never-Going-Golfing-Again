@@ -105,12 +105,9 @@ public class CrazyPutting  implements ApplicationListener {
 
         float side =(float) ((2*GAME_ASPECTS.getTolerance())/Math.pow(3,.5));
 
-        Model pole = modelBuilder.createBox((float) 0.25, 14, (float) 0.15, new Material(ColorAttribute.createDiffuse(Color.PURPLE)),
+        Model pole = modelBuilder.createBox( side, 14, (float) 0.15, new Material(ColorAttribute.createDiffuse(Color.PURPLE)),
                 Usage.Position | Usage.Normal);
-        flagPoleInstance = new ModelInstance(pole, (float) 30, (float) course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y()), (float) 30);
-
-
-
+        flagPoleInstance = new ModelInstance(pole,(float) course.get_flag_position().get_x() * WORLD_SCALING, (float) course.getHeightAt(course.get_flag_position().get_x(), course.get_flag_position().get_y()), (float) course.get_flag_position().get_y() * WORLD_SCALING);
 
         terrainInstance = buildTerrain();
         waterInstance = buildWater();
