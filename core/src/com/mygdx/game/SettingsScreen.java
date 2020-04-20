@@ -125,12 +125,12 @@ public class SettingsScreen implements Screen {
 
         startX = new TextField("1", MENU_SKIN);
         Label sX =new Label("Start X: ", MENU_SKIN);
-        startY = new TextField("1", MENU_SKIN);
+        startY = new TextField("2", MENU_SKIN);
         Label sY =new Label("Start Y: ", MENU_SKIN);
 
-        goalX = new TextField("0", MENU_SKIN);
+        goalX = new TextField("8", MENU_SKIN);
         Label gX =new Label("Goal X: ", MENU_SKIN);
-        goalY = new TextField("10", MENU_SKIN);
+        goalY = new TextField("1", MENU_SKIN);
         Label gY =new Label("Goal Y: ", MENU_SKIN);
 
         height = new TextField("0.6*sin(2x+y) + 0.6*cos(2y+y) + 2.5 - 0.2*(x-3)^2 - 0.2*(y-3)^2", MENU_SKIN);
