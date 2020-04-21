@@ -5,7 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
 import static com.mygdx.game.Variables.*;
 
-public class Player {
+public abstract class Player {
     private String name;
     private int id;
     private int shots;
@@ -13,17 +13,11 @@ public class Player {
     private Ball ball;
     private Vector3 cameraPosition=new Vector3(-5f,5f,-5f);
 
-
     public Player(String name,int id, String color){
         this.name = name;
         this.id=id;
         this.ballColor=color;
         shots=0;
-    }
-
-
-    public int Vector3(){
-        return shots;
     }
 
     public int getshots(){
@@ -77,36 +71,108 @@ public class Player {
         return ballColor;
     }
 
-    public boolean requestedHit(){
-        return Gdx.input.isKeyPressed(Input.Keys.SPACE);
+    public abstract boolean requestedHit();
+
+    public abstract boolean requestedTurnRight();
+
+    public abstract boolean requestedTurnLeft();
+
+    public abstract boolean requestedZoomIn();
+
+    public abstract boolean requestedZoomOut();
+
+    public abstract boolean requestedIncreaseHitVelocity();
+
+    public abstract boolean requestedDecreaseHitVelocity();
+
+    public abstract boolean requestedReset();
+
+    static class Human extends Player {
+
+        public Human(String name, int id, String color) {
+            super(name, id, color);
+        }
+
+        public boolean requestedHit(){
+            return Gdx.input.isKeyPressed(Input.Keys.SPACE);
+        }
+
+        public boolean requestedTurnRight(){
+            return Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+        }
+
+        public boolean requestedTurnLeft(){
+            return Gdx.input.isKeyPressed(Input.Keys.LEFT);
+        }
+
+        public boolean requestedZoomIn(){
+            return Gdx.input.isKeyPressed(Input.Keys.W);
+        }
+
+        public boolean requestedZoomOut(){
+            return Gdx.input.isKeyPressed(Input.Keys.S);
+        }
+
+        public boolean requestedIncreaseHitVelocity(){
+            return Gdx.input.isKeyPressed(Input.Keys.UP);
+        }
+
+        public boolean requestedDecreaseHitVelocity(){
+            return Gdx.input.isKeyPressed(Input.Keys.DOWN);
+        }
+
+        public boolean requestedReset(){
+            return Gdx.input.isKeyPressed(Input.Keys.R);
+        }
     }
 
-    public boolean requestedTurnRight(){
-        return Gdx.input.isKeyPressed(Input.Keys.RIGHT);
-    }
+    static class Bot extends Player {
 
-    public boolean requestedTurnLeft(){
-        return Gdx.input.isKeyPressed(Input.Keys.LEFT);
-    }
+        private AI_controller bot;
 
-    public boolean requestedZoomIn(){
-        return Gdx.input.isKeyPressed(Input.Keys.W);
-    }
+        public Bot(String name, int id, String color, AI_controller bot) {
+            super(name, id, color);
+            this.bot = bot;
+        }
 
-    public boolean requestedZoomOut(){
-        return Gdx.input.isKeyPressed(Input.Keys.S);
-    }
+        public String getBotName() {
+            return bot.toString();
+        }
+        public AI_controller getAI() {
+            return bot;
+        }
 
-    public boolean requestedIncreaseHitVelocity(){
-        return Gdx.input.isKeyPressed(Input.Keys.UP);
-    }
+        public boolean requestedHit(){
+            return bot.requestedHit();
+        }
 
-    public boolean requestedDecreaseHitVelocity(){
-        return Gdx.input.isKeyPressed(Input.Keys.DOWN);
-    }
+        public boolean requestedTurnRight(){
+            return bot.requestedTurnRight();
+        }
 
-    public boolean requestedReset(){
-        return Gdx.input.isKeyPressed(Input.Keys.R);
+        public boolean requestedTurnLeft(){
+            return bot.requestedTurnLeft();
+        }
+
+        public boolean requestedZoomIn(){
+            return bot.requestedZoomIn();
+        }
+
+        public boolean requestedZoomOut(){
+            return bot.requestedZoomOut();
+        }
+
+        public boolean requestedIncreaseHitVelocity(){
+            return bot.requestedIncreaseHitVelocity();
+        }
+
+        public boolean requestedDecreaseHitVelocity(){
+            return bot.requestedDecreaseHitVelocity();
+        }
+
+        public boolean requestedReset(){
+            return bot.requestedReset();
+        }
     }
 
 }
