@@ -470,11 +470,10 @@ public class CrazyPutting  implements ApplicationListener {
 
         if(!currentPlayer.getBall().is_moving ){
             if(currentPlayer.getBall().isTouchingFlag()){
-                Player past = currentPlayer;
-                gameScreen.winners.add(past);
-                nextPlayer();
-                System.out.println(past+ " reached flag in "+past.getshots());
-                players.remove(past);
+                Player pastPlayer = currentPlayer;
+                gameScreen.winners.add(pastPlayer);
+                System.out.println(pastPlayer+ " reached flag in "+pastPlayer.getshots());
+                players.remove(pastPlayer);
             }
 
             if (lastShotVelocity != SHOT_VELOCITY) {
@@ -498,19 +497,22 @@ public class CrazyPutting  implements ApplicationListener {
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
             modelBatch.render(arrowInstance, environment);
             modelBatch.end();
-
-            if (shotMade && gameScreen.allowNextTurn) {
-                currentPlayer.getBall().recordPastPos();
+            //check if the game should be over
+            if(players.size()==0){
+                //otherwise the last players last shot is not counted
                 currentPlayer.newShot();
-                shotMade=false;
-                System.out.println(currentPlayer+ " has attempted "+currentPlayer.getshots()+" shots");
-                if(players.size()==0){
-                    gameScreen.endGame=true;
-                }else{
+                gameScreen.endGame=true;
+            }else{
+                if (shotMade && gameScreen.allowNextTurn ) {
+                    currentPlayer.getBall().recordPastPos();
+                    currentPlayer.newShot();
+                    shotMade=false;
+                    System.out.println(currentPlayer+ " has attempted "+currentPlayer.getshots()+" shots");
                     nextPlayer();
-                }
 
+                }
             }
+
 
         }
 
