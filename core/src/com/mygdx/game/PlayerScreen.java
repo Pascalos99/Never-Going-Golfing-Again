@@ -1,8 +1,9 @@
 package com.mygdx.game;
 import static com.mygdx.game.Variables.MENU_SKIN;
+import static com.mygdx.game.Variables.BALL_COLORS;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -11,7 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+
+
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class PlayerScreen implements Screen {
     private Menu parent;
@@ -75,7 +80,7 @@ public class PlayerScreen implements Screen {
                 String ballColor=null;
                for(int i=0;i<playerTable.getCells().size;i++){
                    if(playerTable.getCells().get(i).getActor().getClass().equals(dummy.getClass())){
-                       id = (Integer.parseInt(String.valueOf(((Label)(playerTable.getCells().get(i).getActor())).getText())));
+                       id = (Integer.parseInt(((Label)(playerTable.getCells().get(i).getActor())).getText().toString().replaceAll(" ","")));
                    }else if(playerTable.getCells().get(i).getActor().getClass().equals(color_select.getClass())){
                        ballColor=((SelectBox<String>)(playerTable.getCells().get(i).getActor())).getSelected();
                    }else{
@@ -103,8 +108,8 @@ public class PlayerScreen implements Screen {
 
     private void enterPlayer() {
         if (playerNumber <= 8){
-            Label id = new Label("" + playerNumber, MENU_SKIN);
-            TextField name = new TextField(" ", MENU_SKIN);
+            Label id = new Label(playerNumber+" ", MENU_SKIN);
+            TextField name = new TextField(pickName(), MENU_SKIN);
             playerTable.add(id);
             playerTable.add(name);
             playerTable.add(addColorSelect());
@@ -113,13 +118,29 @@ public class PlayerScreen implements Screen {
         }
 
     }
+    private int next_color_selected =  BALL_COLORS.length-1;
     private SelectBox addColorSelect(){
-        SelectBox<String> color_select = new SelectBox<String>(MENU_SKIN);
-        Array<String> items = new Array<String>();
-        for (int i=0; i < Variables.BALL_COLORS.length; i++)
-            items.add(Variables.BALL_COLORS[i].name);
+        SelectBox<String> color_select = new SelectBox<>(MENU_SKIN);
+        Array<String> items = new Array<>();
+        for (int i=0; i < BALL_COLORS.length; i++)
+            items.add(BALL_COLORS[i].name);
         color_select.setItems(items);
+        color_select.setSelectedIndex(next_color_selected++);
+        if (next_color_selected >= BALL_COLORS.length) next_color_selected = 0;
         return color_select;
+    }
+
+    private String pickName() {
+        String name = "Player "+(playerNumber-1);
+        HashSet<String> available_names = new HashSet<>(Arrays.asList(Variables.PLAYER_NAMES));
+        for (int i=0; i < playerNumber-1; i++) {
+            String playername = ((TextField) playerTable.getCells().get(i*3 + 1).getActor()).getText();
+            available_names.remove(playername); }
+        if (available_names.size() > 0) {
+            int i = 0, item = (int)(Math.random() * available_names.size());
+            for (String select : available_names) if (i++==item) name = select;
+        }
+        return name;
     }
 
     @Override

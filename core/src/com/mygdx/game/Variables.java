@@ -61,10 +61,16 @@ public final class Variables {
 			new SettingsScreen.ColorSelection("Yellow", Color.YELLOW),
 			new SettingsScreen.ColorSelection("Pink", Color.PINK),
 			new SettingsScreen.ColorSelection("Blue", Color.BLUE),
+			new SettingsScreen.ColorSelection("Cyan", Color.CYAN),
 			new SettingsScreen.ColorSelection("Purple", Color.PURPLE),
 			new SettingsScreen.ColorSelection("Black", Color.BLACK),
 			new SettingsScreen.ColorSelection("White", Color.WHITE)
 	};
+
+		// Default player names
+	public static String[] PLAYER_NAMES = {
+			"Lightning", "Blitz", "DBQO", "Some Player", "Putting Crazy", "Lord Putter", "Harry Potter", "Pheonix"
+		};
 
 	//CRAZY PUTTING
 	public static PerspectiveCamera CAMERA;
