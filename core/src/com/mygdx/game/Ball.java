@@ -37,12 +37,6 @@ public class Ball implements TopDownPhysicsObject {
         if(is_moving) {
             velocity = verlet(new Vector2d(x, y), velocity, delta);
 
-            /*
-            System.out.println("Velocity = " + velocity.toString());
-            System.out.println("Delta = " + delta);
-            System.out.println("------------------");
-            */
-
             Function2d h = WORLD.get_height();
             Vector2d gradient = h.gradient(new Vector2d(x, y));
 
@@ -184,7 +178,7 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     public void hit(Vector2d direction, double speed){
-        addVelocity(new Vector2d(direction.get_x() * speed * SPEED_CORRECTION, direction.get_y() * speed * SPEED_CORRECTION));
+        addVelocity(correctHitVector(direction, speed));
         hit_count += 1;
     }
 
@@ -205,7 +199,7 @@ public class Ball implements TopDownPhysicsObject {
     private Vector2d f(Vector2d pos, Vector2d vel){
         Function2d h = WORLD.get_height();
         double gravity = WORLD.get_gravity();
-        double friction = WORLD.get_friction_coefficient() * FRICTION_CORRECTION;
+        double friction = getCorrectedFriction();
 
         if(isOnWater()){
             friction = 6d;
@@ -267,6 +261,17 @@ public class Ball implements TopDownPhysicsObject {
         );
         Vector2d acc = new Vector2d((k1.get_x() + k2.get_x())*h/2d, (k1.get_y() + k2.get_y())*h/2d);
         return new Vector2d(vel.get_x() + acc.get_x(), vel.get_y() + acc.get_y());
+    }
+
+    public double getCorrectedFriction(){
+        // This is a provisional function, it will later need x, y coodinates
+        // to work with variable friction, but the idea and use style will remain.
+
+        return WORLD.get_friction_coefficient() * FRICTION_CORRECTION;
+    }
+
+    public Vector2d correctHitVector(Vector2d direction, double speed){
+        return new Vector2d(direction.get_x() * speed * SPEED_CORRECTION, direction.get_y() * speed * SPEED_CORRECTION);
     }
 
 }

@@ -405,7 +405,11 @@ public class CrazyPutting  implements ApplicationListener {
             shotMade=true;
             double standard_factor = Math.sqrt(3)/Math.sqrt(2);
 
-            if (!currentPlayer.getBall().is_moving) currentPlayer.getBall().hit(new Vector2d(CAMERA.direction.x, CAMERA.direction.z), SHOT_VELOCITY * standard_factor);
+            if (!currentPlayer.getBall().is_moving)
+                currentPlayer.getBall().hit(
+                        (new Vector2d(CAMERA.direction.x, CAMERA.direction.z)).normalized(),
+                        SHOT_VELOCITY * standard_factor
+                );
         }
 
         if (currentPlayer.requestedZoomIn()) {

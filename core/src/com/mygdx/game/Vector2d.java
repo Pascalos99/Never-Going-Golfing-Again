@@ -58,8 +58,13 @@ public class Vector2d {
 
 		return new Vector2d(_x, _y);
 	}
+
 	public double distance(Vector2d o) {
 		return Math.sqrt((o.x - x)*(o.x - x) + (o.y - y)*(o.y - y));
+	}
+
+	public Vector2d normalized(){
+		return new Vector2d(get_x() / get_length(), get_y() / get_length());
 	}
 
 }
