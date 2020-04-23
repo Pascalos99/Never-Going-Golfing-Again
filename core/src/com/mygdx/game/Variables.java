@@ -80,10 +80,6 @@ public final class Variables {
 	public static PuttingCourse WORLD;
 	public static final float FLAGPOLE_HEIGHT = 5;
 
-	/*** Will make sure the ball does not move during the 'shoot' step */
-	public static boolean HOLD_BALL_IN_PLACE = false;
-	public static boolean BALL_NOT_MOVING_AT_START = false;
-
 	//main menu
 	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("glassy-ui.json"));
 
@@ -98,4 +94,15 @@ public final class Variables {
 	public static double pitch = Math.PI * (2/9d);
 	public static double yaw = Math.PI * 0.75;
 	public static double view_zoom = 7;
+
+	// AI
+	/** @return the current shot angle in radians on the range [-pi, pi] where an angle of 0 rad is when the ball is being shot in the
+	 * 		x-axis only. Rotation goes up with clockwise rotation on the map (this is equal to counter-clockwise in a cartesian coordinate system)
+	 * 		and switches abruptly from pi to -pi at the negative x-axis direction. */
+	public static double getShotAngle() {
+		Vector2d dir = new Vector2d(CAMERA.direction.x, CAMERA.direction.z).normalize();
+		return Math.atan2(dir.get_y()/*sin*/, dir.get_x()/*cos*/);
+	}
+	public static double AI_SHOT_ANGLE_BOUND = 0.01;
+	public static AI_controller[] AVAILABLE_BOTS = {new BasicAI()};
 }

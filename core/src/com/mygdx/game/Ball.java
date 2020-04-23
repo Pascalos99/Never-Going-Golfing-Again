@@ -191,8 +191,7 @@ public class Ball implements TopDownPhysicsObject {
         Vector2d flag = WORLD.get_flag_position();
         Vector2d ballPos = new Vector2d(x,y);
         double _r = WORLD.get_hole_tolerance();
-        if (Math.sqrt(((x - flag.get_x()) * (x - flag.get_x()) + (y - flag.get_y()) * (y - flag.get_y()))) < _r + r) {
-       // if(flag.distance(ballPos)<_r){
+        if(flag.distance(ballPos) < _r) {
           return true;
         }
 

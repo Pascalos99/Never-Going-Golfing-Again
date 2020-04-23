@@ -144,6 +144,8 @@ public class CrazyPutting  implements ApplicationListener {
             world_physics.addBody(ball_obj);
         }
 
+        currentPlayer.notifyStartOfTurn();
+
         arrow = modelBuilder.createBox((float)((2 * SHOT_VELOCITY) / MAX_SHOT_VELOCITY), 0.05f, 0.05f,
                 new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
                 Usage.Position | Usage.Normal
@@ -502,6 +504,7 @@ public class CrazyPutting  implements ApplicationListener {
                 //otherwise the last players last shot is not counted
                 currentPlayer.newShot();
                 gameScreen.endGame=true;
+                currentPlayer.notifyStartOfTurn();
             }else{
                 if (shotMade && gameScreen.allowNextTurn ) {
                     currentPlayer.getBall().recordPastPos();
@@ -509,7 +512,6 @@ public class CrazyPutting  implements ApplicationListener {
                     shotMade=false;
                     System.out.println(currentPlayer+ " has attempted "+currentPlayer.getshots()+" shots");
                     nextPlayer();
-
                 }
             }
 
@@ -554,6 +556,7 @@ public class CrazyPutting  implements ApplicationListener {
         }else {
             currentPlayer = players.get(players.indexOf(currentPlayer)+1);
         }
+        currentPlayer.notifyStartOfTurn();
     }
 
 }

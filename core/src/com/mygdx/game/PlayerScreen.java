@@ -1,6 +1,4 @@
 package com.mygdx.game;
-import static com.mygdx.game.Variables.MENU_SKIN;
-import static com.mygdx.game.Variables.BALL_COLORS;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -17,6 +15,8 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+
+import static com.mygdx.game.Variables.*;
 
 public class PlayerScreen implements Screen {
     private Menu parent;
@@ -86,7 +86,7 @@ public class PlayerScreen implements Screen {
                    }else{
                        name = ((TextField)(playerTable.getCells().get(i).getActor())).getText();
                    }
-                   if((id!=-1)&&(!name.equals("")) &&(ballColor!=null)&&(!players.contains(new Player.Human(name,id,ballColor)))){
+                   if((id!=-1)&&(!name.equals("")) &&(ballColor!=null)){
                        players.add(new Player.Human(name,id,ballColor));
                         id=-1;
                         name="";

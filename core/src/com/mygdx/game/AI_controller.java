@@ -1,21 +1,17 @@
 package com.mygdx.game;
 
+import static com.mygdx.game.Variables.GAME_ASPECTS;
+
 public interface AI_controller {
 
-    public abstract boolean requestedHit();
+    String getTypeName();
 
-    public abstract boolean requestedTurnRight();
+    void calculate(Player player);
 
-    public abstract boolean requestedTurnLeft();
+    /** @return the desired shot angle in radians    */
+    double getShotAngle();
 
-    public abstract boolean requestedZoomIn();
-
-    public abstract boolean requestedZoomOut();
-
-    public abstract boolean requestedIncreaseHitVelocity();
-
-    public abstract boolean requestedDecreaseHitVelocity();
-
-    public abstract boolean requestedReset();
+    /** @return the desired shot velocity in m/s    */
+    double getShotVelocity();
 
 }
