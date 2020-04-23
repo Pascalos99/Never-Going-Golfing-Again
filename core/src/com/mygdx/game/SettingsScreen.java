@@ -120,7 +120,7 @@ public class SettingsScreen implements Screen {
 
         vMax = new TextField(""+MAX_SHOT_VELOCITY, MENU_SKIN);
         Label vm =new Label("Maximum Velocity (m/s): ", MENU_SKIN);
-        tolerance = new TextField("0.02", MENU_SKIN);
+        tolerance = new TextField("0.5", MENU_SKIN);
         Label t =new Label("Hole tolerance: ", MENU_SKIN);
 
         startX = new TextField("1", MENU_SKIN);
@@ -128,9 +128,9 @@ public class SettingsScreen implements Screen {
         startY = new TextField("2", MENU_SKIN);
         Label sY =new Label("Start Y: ", MENU_SKIN);
 
-        goalX = new TextField("2", MENU_SKIN);
+        goalX = new TextField("5", MENU_SKIN);
         Label gX =new Label("Goal X: ", MENU_SKIN);
-        goalY = new TextField("2", MENU_SKIN);
+        goalY = new TextField("5", MENU_SKIN);
         Label gY =new Label("Goal Y: ", MENU_SKIN);
 
         height = new TextField("1", MENU_SKIN);
