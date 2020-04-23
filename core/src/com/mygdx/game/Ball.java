@@ -35,7 +35,7 @@ public class Ball implements TopDownPhysicsObject {
     public void step(double delta, List<TopDownPhysicsObject> ents) {
 
         if(is_moving) {
-            velocity = RungeKutta(new Vector2d(x, y), velocity, delta);
+            velocity = verlet(new Vector2d(x, y), velocity, delta);
 
             System.out.println("Velocity = " + velocity.toString());
             System.out.println("Delta = " + delta);
@@ -61,7 +61,7 @@ public class Ball implements TopDownPhysicsObject {
 
                 else {
                     x = (BALL_RADIUS + 0.001 / WORLD_SCALING);
-                    velocity = (new Vector2d(-velocity.get_x(), velocity.get_y()));
+                    velocity = (new Vector2d(-velocity.get_x()/2d, velocity.get_y()));
                 }
 
             }
@@ -75,7 +75,7 @@ public class Ball implements TopDownPhysicsObject {
 
                 else {
                     x = (49.99 / WORLD_SCALING - BALL_RADIUS);
-                    velocity = (new Vector2d(-velocity.get_x(), velocity.get_y()));
+                    velocity = (new Vector2d(-velocity.get_x()/2d, velocity.get_y()));
                 }
 
             }
@@ -89,7 +89,7 @@ public class Ball implements TopDownPhysicsObject {
 
                 else {
                     y = (BALL_RADIUS + 0.001 / WORLD_SCALING);
-                    velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()));
+                    velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
                 }
 
             }
@@ -103,7 +103,7 @@ public class Ball implements TopDownPhysicsObject {
 
                 else {
                     y = (49.99 / WORLD_SCALING - BALL_RADIUS);
-                    velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()));
+                    velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
                 }
 
             }
@@ -257,8 +257,14 @@ public class Ball implements TopDownPhysicsObject {
         );
     }
 
-    private Vector2d Verlet(Vector2d vel, Vector2d acceleration, double delta){
-        return  null;
+    private Vector2d verlet(Vector2d pos, Vector2d vel, double h){
+        Vector2d k1 = f(pos, vel);
+        Vector2d k2 = f(
+                new Vector2d(pos.get_x() + h, pos.get_y() + h),
+                vel
+        );
+        Vector2d acc = new Vector2d((k1.get_x() + k2.get_x())*h/2d, (k1.get_y() + k2.get_y())*h/2d);
+        return new Vector2d(vel.get_x() + acc.get_x(), vel.get_y() + acc.get_y());
     }
 
 }
