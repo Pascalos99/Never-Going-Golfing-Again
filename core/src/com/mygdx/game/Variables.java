@@ -69,7 +69,7 @@ public final class Variables {
 
 		// Default player names
 	public static String[] PLAYER_NAMES = {
-			"Lightning", "Blitz", "DBQO", "Some Player", "Putting Crazy", "Lord Putter", "Harry Potter", "Pheonix"
+			"Lightning", "Blitz", "DQBO", "Some Player", "Putting Crazy", "Lord Putter", "Harry Potter", "Pheonix"
 		};
 
 	//CRAZY PUTTING
