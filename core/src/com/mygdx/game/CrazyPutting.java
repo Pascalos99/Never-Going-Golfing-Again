@@ -67,7 +67,7 @@ public class CrazyPutting  implements ApplicationListener {
         this.gameScreen=p;
         GAME_ASPECTS = gameAspects;
         this.course=c;
-        players = new ArrayList<Player>(gameAspects.players);
+        players = new ArrayList<>(gameAspects.players);
         currentPlayer=players.get(0);
         if (SHOT_VELOCITY > gameAspects.maxVelocity) SHOT_VELOCITY = gameAspects.maxVelocity;
         WORLD = c;
@@ -439,7 +439,8 @@ public class CrazyPutting  implements ApplicationListener {
         }
 
         for(Player p : GAME_ASPECTS.players) {
-            modelBatch.render(p.getBall().getModel(), environment);
+            if (p.getshots() > 0 || p == currentPlayer)
+                modelBatch.render(p.getBall().getModel(), environment);
         }
 
         modelBatch.begin(CAMERA);
