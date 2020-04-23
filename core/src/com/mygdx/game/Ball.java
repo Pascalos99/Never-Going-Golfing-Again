@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 
 import java.util.List;
+import java.util.Vector;
 
 import static com.mygdx.game.Variables.*;
 
@@ -18,8 +19,6 @@ public class Ball implements TopDownPhysicsObject {
     public boolean is_moving = false;
     public Player owner;
     private int hit_count;
-
-    private double slide_x, slide_y, slide_h;
 
     Ball(double radius, double x_pos, double y_pos, ModelInstance model, Player owner) {
         x = x_pos;
@@ -36,40 +35,22 @@ public class Ball implements TopDownPhysicsObject {
     public void step(double delta, List<TopDownPhysicsObject> ents) {
 
         if(is_moving) {
+            velocity = verlet(new Vector2d(x, y), velocity, delta);
+
+            System.out.println("Velocity = " + velocity.toString());
+            System.out.println("Delta = " + delta);
+            System.out.println("------------------");
+
             Function2d h = WORLD.get_height();
-            double gravity = WORLD.get_gravity();
-            double friction = WORLD.get_friction_coefficient() * 8;
-
-            if(isOnWater()){
-                friction = 6d;
-            }
-
             Vector2d gradient = h.gradient(new Vector2d(x, y));
-            double half_x = -mass * gravity * gradient.get_x();
-            double half_y = -mass * gravity * gradient.get_y();
-
-            if (velocity.get_length() > 0) {
-                half_x -= mass * gravity * friction * velocity.get_x() / velocity.get_length();
-                half_y -= mass * gravity * friction * velocity.get_y() / velocity.get_length();
-            }
-
-            Vector2d acceleration = new Vector2d(half_x, half_y);
-
-            double velocity_x = velocity.get_x() + acceleration.get_x();
-            double velocity_y = velocity.get_y() + acceleration.get_y();
-            velocity = new Vector2d(velocity_x, velocity_y);
 
             if (velocity.get_length() < VELOCITY_CUTTOFF && gradient.get_length() < GRADIENT_CUTTOFF) {
                 velocity = new Vector2d(0, 0);
                 is_moving = false;
             }
 
-            slide_x = velocity_x * delta;
-            slide_y = velocity_y * delta;
-            slide_h = h.evaluate(x + slide_x, y + slide_y) - h.evaluate(x, y);
-
-            x += slide_x;
-            y += slide_y;
+            x += velocity.get_x();
+            y += velocity.get_y();
 
             if (x < BALL_RADIUS) {
 
@@ -80,7 +61,7 @@ public class Ball implements TopDownPhysicsObject {
 
                 else {
                     x = (BALL_RADIUS + 0.001 / WORLD_SCALING);
-                    velocity = (new Vector2d(-velocity.get_x(), velocity.get_y()));
+                    velocity = (new Vector2d(-velocity.get_x()/2d, velocity.get_y()));
                 }
 
             }
@@ -94,7 +75,7 @@ public class Ball implements TopDownPhysicsObject {
 
                 else {
                     x = (49.99 / WORLD_SCALING - BALL_RADIUS);
-                    velocity = (new Vector2d(-velocity.get_x(), velocity.get_y()));
+                    velocity = (new Vector2d(-velocity.get_x()/2d, velocity.get_y()));
                 }
 
             }
@@ -108,7 +89,7 @@ public class Ball implements TopDownPhysicsObject {
 
                 else {
                     y = (BALL_RADIUS + 0.001 / WORLD_SCALING);
-                    velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()));
+                    velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
                 }
 
             }
@@ -122,17 +103,11 @@ public class Ball implements TopDownPhysicsObject {
 
                 else {
                     y = (49.99 / WORLD_SCALING - BALL_RADIUS);
-                    velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()));
+                    velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
                 }
 
             }
 
-        }
-
-        else{
-            slide_x = 0;
-            slide_y = 0;
-            slide_h = 0;
         }
 
     }
@@ -207,7 +182,7 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     public void hit(Vector2d direction, double speed){
-        addVelocity(new Vector2d(direction.get_x() * speed, direction.get_y() * speed));
+        addVelocity(new Vector2d(direction.get_x() * speed * SPEED_CORRECTION, direction.get_y() * speed * SPEED_CORRECTION));
         hit_count += 1;
     }
 
@@ -223,6 +198,73 @@ public class Ball implements TopDownPhysicsObject {
     public void resetToPast(){
         x=pastX;
         y=pastY;
+    }
+
+    private Vector2d f(Vector2d pos, Vector2d vel){
+        Function2d h = WORLD.get_height();
+        double gravity = WORLD.get_gravity();
+        double friction = WORLD.get_friction_coefficient() * FRICTION_CORRECTION;
+
+        if(isOnWater()){
+            friction = 6d;
+        }
+
+        Vector2d gradient = h.gradient(pos);
+        double half_x = -mass * gravity * gradient.get_x();
+        double half_y = -mass * gravity * gradient.get_y();
+
+        if (vel.get_length() > 0) {
+            half_x -= mass * gravity * friction * vel.get_x() / vel.get_length();
+            half_y -= mass * gravity * friction * vel.get_y() / vel.get_length();
+        }
+
+        Vector2d acceleration = new Vector2d(half_x, half_y);
+        return acceleration;
+    }
+
+    private Vector2d euler(Vector2d pos, Vector2d vel, double h){
+        Vector2d acc = f(pos, vel);
+
+        double vel_x = vel.get_x() + h * acc.get_x();
+        double vel_y = vel.get_y() + h * acc.get_y();
+
+        return new Vector2d(vel_x, vel_y);
+    }
+
+    private Vector2d RungeKutta(Vector2d pos, Vector2d vel, double h){
+        Vector2d k1 = f(pos, vel);
+        Vector2d k2 = f(
+                new Vector2d(pos.get_x() + h/2d, pos.get_y() + h/2d),
+                new Vector2d(vel.get_x() + (h/2d) * k1.get_x(), vel.get_y() + (h/2d) * k1.get_y())
+        );
+        Vector2d k3 = f(
+                new Vector2d(pos.get_x() + h/2d, pos.get_y() + h/2d),
+                new Vector2d(vel.get_x() + (h/2d) * k2.get_x(), vel.get_y() + (h/2d) * k2.get_y())
+        );
+        Vector2d k4 = f(
+                new Vector2d(pos.get_x() + h, pos.get_y() + h),
+                new Vector2d(vel.get_x() + h * k3.get_x(), vel.get_y() + h * k3.get_y())
+        );
+
+        Vector2d G = new Vector2d(
+                (k1.get_x() + 2*k2.get_x() + 2*k3.get_x() + k4.get_x()) / 6d,
+                (k1.get_y() + 2*k2.get_y() + 2*k3.get_y() + k4.get_y()) / 6d
+        );
+
+        return new Vector2d(
+               vel.get_x() + h*G.get_x(),
+               vel.get_y() + h*G.get_y()
+        );
+    }
+
+    private Vector2d verlet(Vector2d pos, Vector2d vel, double h){
+        Vector2d k1 = f(pos, vel);
+        Vector2d k2 = f(
+                new Vector2d(pos.get_x() + h, pos.get_y() + h),
+                vel
+        );
+        Vector2d acc = new Vector2d((k1.get_x() + k2.get_x())*h/2d, (k1.get_y() + k2.get_y())*h/2d);
+        return new Vector2d(vel.get_x() + acc.get_x(), vel.get_y() + acc.get_y());
     }
 
 }
