@@ -88,6 +88,7 @@ public class PlayerScreen implements Screen {
                    }
                    if((id!=-1)&&(!name.equals("")) &&(ballColor!=null)){
                        players.add(new Player.Bot(name,id,ballColor, AVAILABLE_BOTS[0]));
+                       //players.add(new Player.Human(name,id,ballColor));
                         id=-1;
                         name="";
                         ballColor=null;
