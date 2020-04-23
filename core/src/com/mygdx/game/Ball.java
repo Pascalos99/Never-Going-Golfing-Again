@@ -37,9 +37,11 @@ public class Ball implements TopDownPhysicsObject {
         if(is_moving) {
             velocity = verlet(new Vector2d(x, y), velocity, delta);
 
+            /*
             System.out.println("Velocity = " + velocity.toString());
             System.out.println("Delta = " + delta);
             System.out.println("------------------");
+            */
 
             Function2d h = WORLD.get_height();
             Vector2d gradient = h.gradient(new Vector2d(x, y));

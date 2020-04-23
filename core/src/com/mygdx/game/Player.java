@@ -176,15 +176,22 @@ public abstract class Player {
         }
 
         public boolean requestedTurnRight(){
-            if (Math.abs(getShotAngle()) - Math.abs(desired_shot_angle) > 0) return false;
-            if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
-            else return false;
+            if (!turnRight(getShotAngle(), desired_shot_angle)) return false;
+            else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
+            return false;
         }
 
         public boolean requestedTurnLeft(){
-            if (Math.abs(getShotAngle()) - Math.abs(desired_shot_angle) < 0) return false;
-            if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
-            else return false;
+            if (turnRight(getShotAngle(), desired_shot_angle)) return false;
+            else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
+            return false;
+        }
+
+        private static boolean turnRight(double current_angle, double target_angle) {
+            double diff = target_angle - current_angle;
+            while (diff < 0) diff += Math.PI * 2;
+            if (diff > Math.PI) return false;
+            return true;
         }
 
         public boolean requestedZoomIn(){
