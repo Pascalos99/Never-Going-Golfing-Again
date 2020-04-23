@@ -87,7 +87,7 @@ public class PlayerScreen implements Screen {
                        name = ((TextField)(playerTable.getCells().get(i).getActor())).getText();
                    }
                    if((id!=-1)&&(!name.equals("")) &&(ballColor!=null)){
-                       players.add(new Player.Human(name,id,ballColor));
+                       players.add(new Player.Bot(name,id,ballColor, AVAILABLE_BOTS[0]));
                         id=-1;
                         name="";
                         ballColor=null;
