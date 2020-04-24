@@ -91,6 +91,7 @@ public class PlayerScreen implements Screen {
                        name = ((TextField)(playerTable.getCells().get(i).getActor())).getText();
                    }
 
+
                    if((id!=-1)&&(!name.equals("")) &&(ballColor!=null) && (!playerType.equals(""))&&
                            (players.contains(new Player.Human(name,id,ballColor))||players.contains(new Player.bot(name,id,ballColor)))){
                        if(playerType.equals(BOT_TYPE[0])){

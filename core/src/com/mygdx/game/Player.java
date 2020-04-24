@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
 import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.Variables.SHOT_VELOCITY_INCREASE;
 
 public abstract class Player {
     private String name;
@@ -19,6 +20,8 @@ public abstract class Player {
         this.ballColor=color;
         shots=0;
     }
+
+    public abstract void notifyStartOfTurn();
 
     public int getshots(){
         return shots;
@@ -93,6 +96,8 @@ public abstract class Player {
             super(name, id, color);
         }
 
+        public void notifyStartOfTurn() {}
+
         public boolean requestedHit(){
             return Gdx.input.isKeyPressed(Input.Keys.SPACE);
         }
@@ -128,7 +133,13 @@ public abstract class Player {
 
     static class Bot extends Player {
 
+        private double velocity_inching_bound = SHOT_VELOCITY_INCREASE() * 2;
+
         private AI_controller bot;
+        private double desired_shot_velocity;
+        private double desired_shot_angle;
+        private boolean adjusted_speed;
+        private boolean turn_over;
 
         public Bot(String name, int id, String color, AI_controller bot) {
             super(name, id, color);
@@ -136,42 +147,83 @@ public abstract class Player {
         }
 
         public String getBotName() {
-            return bot.toString();
+            return bot.getTypeName();
         }
         public AI_controller getAI() {
             return bot;
         }
 
+        public void notifyStartOfTurn() {
+            bot.calculate(this);
+            adjusted_speed = false;
+            desired_shot_velocity = bot.getShotVelocity();
+            if (desired_shot_velocity > GAME_ASPECTS.maxVelocity) desired_shot_velocity = GAME_ASPECTS.maxVelocity;
+            if (desired_shot_velocity < 0) desired_shot_velocity = 0;
+            desired_shot_angle = bot.getShotAngle();
+            while (desired_shot_angle > Math.PI) desired_shot_angle -= Math.PI * 2;
+            while (desired_shot_angle < -Math.PI) desired_shot_angle += Math.PI * 2;
+            turn_over = false;
+        }
+
         public boolean requestedHit(){
-            return bot.requestedHit();
+            if (turn_over) return false;
+            if (Math.abs(getShotAngle() - desired_shot_angle) < AI_SHOT_ANGLE_BOUND)
+                if (adjusted_speed) {
+                    turn_over = true;
+                    return true;
+                }
+            return false;
         }
 
         public boolean requestedTurnRight(){
-            return bot.requestedTurnRight();
+            if (!turnRight(getShotAngle(), desired_shot_angle)) return false;
+            else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
+            return false;
         }
 
         public boolean requestedTurnLeft(){
-            return bot.requestedTurnLeft();
+            if (turnRight(getShotAngle(), desired_shot_angle)) return false;
+            else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
+            return false;
+        }
+
+        private static boolean turnRight(double current_angle, double target_angle) {
+            double diff = target_angle - current_angle;
+            while (diff < 0) diff += Math.PI * 2;
+            if (diff > Math.PI) return false;
+            return true;
         }
 
         public boolean requestedZoomIn(){
-            return bot.requestedZoomIn();
+            return false;
         }
 
         public boolean requestedZoomOut(){
-            return bot.requestedZoomOut();
+            return false;
         }
 
         public boolean requestedIncreaseHitVelocity(){
-            return bot.requestedIncreaseHitVelocity();
+            if (SHOT_VELOCITY > desired_shot_velocity) return false;
+            if (Math.abs(SHOT_VELOCITY - desired_shot_velocity) > velocity_inching_bound) return true;
+            SHOT_VELOCITY = desired_shot_velocity;
+            adjusted_speed = true;
+            return false;
         }
 
         public boolean requestedDecreaseHitVelocity(){
-            return bot.requestedDecreaseHitVelocity();
+            if (SHOT_VELOCITY < desired_shot_velocity) return false;
+            if (Math.abs(SHOT_VELOCITY - desired_shot_velocity) > velocity_inching_bound) return true;
+            SHOT_VELOCITY = desired_shot_velocity;
+            adjusted_speed = true;
+            return false;
         }
 
         public boolean requestedReset(){
-            return bot.requestedReset();
+            if (getBall().isOnWater()) {
+                turn_over = false;
+                return true;
+            }
+            return false;
         }
     }
 
