@@ -102,7 +102,7 @@ public class GameScreen implements Screen {
             winList.center();
             stage.addActor(winList);
             for(int i=0;i<winners.size();i++){
-                winList.add(new Label(winners.get(i).toString()+" "+ winners.get(i).getshots(), Variables.MENU_SKIN));
+                winList.add(new Label(winners.get(i).toString()+" "+ winners.get(i).getshots()+"pts", Variables.MENU_SKIN));
                 winList.row();
             }
         }
