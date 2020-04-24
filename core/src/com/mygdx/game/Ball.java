@@ -1,10 +1,8 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.math.Vector3;
 
 import java.util.List;
-import java.util.Vector;
 
 import static com.mygdx.game.Variables.*;
 
@@ -42,7 +40,11 @@ public class Ball implements TopDownPhysicsObject {
             double test_x = x;
             double test_y = y;
 
-            velocity = verlet(new Vector2d(x, y), velocity, delta);
+            switch (CURRENT_PHYSICS_SETTING) {
+                case Euler : velocity = euler(new Vector2d(x, y), velocity, delta); break;
+                case Runge_Kutta: velocity = runge_kutta(new Vector2d(x, y), velocity, delta); break;
+                default : velocity = verlet(new Vector2d(x, y), velocity, delta); break;
+            }
 
             Function2d h = WORLD.get_height();
             Vector2d gradient = h.gradient(new Vector2d(x, y));
@@ -240,7 +242,7 @@ public class Ball implements TopDownPhysicsObject {
         return new Vector2d(vel_x, vel_y);
     }
 
-    private Vector2d RungeKutta(Vector2d pos, Vector2d vel, double h){
+    private Vector2d runge_kutta(Vector2d pos, Vector2d vel, double h){
         Vector2d k1 = f(pos, vel);
         Vector2d k2 = f(
                 new Vector2d(pos.get_x() + h/2d, pos.get_y() + h/2d),

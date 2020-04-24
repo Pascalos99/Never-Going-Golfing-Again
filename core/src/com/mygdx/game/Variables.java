@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+import static com.mygdx.game.PhysicsSetting.*;
+
 public final class Variables {
 	// MATERIAL SETTINGS
 	public static final double 	SAND_FRICTION = 0.178;
@@ -100,6 +102,8 @@ public final class Variables {
 	public static double SPEED_CORRECTION = 1d / 50d; // in m/s
 	public static double FRICTION_CORRECTION = 10d;
 	public static double VELOCITY_CUTTOFF = 0.1d * SPEED_CORRECTION; // in m/s
+
+	public static PhysicsSetting CURRENT_PHYSICS_SETTING = Runge_Kutta;
 
 	// AI
 	/** @return the current shot angle in radians on the range [-pi, pi] where an angle of 0 rad is when the ball is being shot in the
