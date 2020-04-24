@@ -83,9 +83,8 @@ public class AI_SimpleLearner implements AI_controller {
     }
 
     private void nextAngleMod(Player player) {
-        int current = angle_adjustment.get(player);
-        if (current > angle_modifiers.length) current = 0;
-        else current++;
+        int current = angle_adjustment.get(player) + 1;
+        if (current >= angle_modifiers.length) current = 0;
         angle_adjustment.put(player, current);
     }
 
