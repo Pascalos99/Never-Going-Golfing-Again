@@ -1,17 +1,17 @@
 package com.mygdx.game;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.mygdx.game.Variables.WORLD;
+import static java.lang.Math.PI;
 
 public class AI_SimpleLearner implements AI_controller {
 
     public AI_SimpleLearner() {
-        VMODs = new LinkedList<>();
-        resetVMODs();
+        VMODs = new HashMap<>();
+        last_distance_to_flag = new HashMap<>();
+        best_distance_to_flag = new HashMap<>();
+        angle_adjustment = new HashMap<>();
     }
 
     @Override
@@ -21,50 +21,81 @@ public class AI_SimpleLearner implements AI_controller {
 
     @Override
     public void calculate(Player player) {
+        current_player = player;
+        if (!has_seen_player(player)) setup(player);
         Vector2d currentPos = new Vector2d(player.getBall().x, player.getBall().y);
         Vector2d toFlag = WORLD.flag_position.subtract(currentPos);
         angle = Math.atan2(toFlag.get_y(), toFlag.get_x());
         double distance_to_flag = toFlag.get_length();
 
-        if (best_distance_to_flag - distance_to_flag < delta_distance_bound)
-            VMODs.remove(Integer.valueOf(velocity_index));
-        else
-            resetVMODs();
-        velocity_index = getTrial();
+        if (best_distance_to_flag.get(player) - distance_to_flag < delta_distance_bound)
+            VMODs.get(player).remove(Integer.valueOf(velocity_index));
+        else {
+            resetVMODs(player);
+            angle_adjustment.put(player, 0);
+        }
+        velocity_index = getTrial(player);
 
-        last_distance_to_flag = distance_to_flag;
-        if (last_distance_to_flag < best_distance_to_flag) best_distance_to_flag = last_distance_to_flag;
+        last_distance_to_flag.put(player, distance_to_flag);
+        if (last_distance_to_flag.get(player) < best_distance_to_flag.get(player))
+            best_distance_to_flag.put(player, last_distance_to_flag.get(player));
     }
 
-    private static double[] velocity_modifiers = {0.125, 0.25, 0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 1.0, 1.1, 1.5, 2.0, 3.0, 4.0, 5.0};
+    private static double epi = PI/8;
+    private static double[] velocity_modifiers = {0.7, 0.9, 1.5, 2.5};
+    private static double[] angle_modifiers = {0, epi, -epi, 1.5*epi, -1.5*epi};
     public static double delta_distance_bound = 0.5;
 
     private double angle;
     private int velocity_index;
-    private List<Integer> VMODs;
-    private double last_distance_to_flag = Double.MAX_VALUE;
-    private double best_distance_to_flag = Double.MAX_VALUE;
+    private Player current_player;
 
-    private void resetVMODs() {
-        VMODs.clear();
-        for (int i=0; i < velocity_modifiers.length; i++) VMODs.add(i);
-        System.out.println("reset VMODs gives: "+VMODs);
+    private Map<Player, List<Integer>> VMODs;
+    private Map<Player, Double> last_distance_to_flag;
+    private Map<Player, Double> best_distance_to_flag;
+    private Map<Player, Integer> angle_adjustment;
+
+    private boolean has_seen_player(Player player) {
+        return VMODs.containsKey(player);
     }
 
-    private int getTrial() {
-        if (VMODs.size() <= 0) resetVMODs();
-        int select = VMODs.get(VMODs.size() / 2);
+    private void setup(Player player) {
+        VMODs.put(player, new LinkedList<>());
+        last_distance_to_flag.put(player, Double.MAX_VALUE);
+        best_distance_to_flag.put(player, Double.MAX_VALUE);
+        angle_adjustment.put(player, 0);
+        resetVMODs(player);
+    }
+
+    private void resetVMODs(Player player) {
+        VMODs.get(player).clear();
+        for (int i=0; i < velocity_modifiers.length; i++) VMODs.get(player).add(i);
+    }
+
+    private int getTrial(Player player) {
+        if (VMODs.get(player).size() <= 0) {
+            nextAngleMod(player);
+            resetVMODs(player);
+        }
+        int select = VMODs.get(player).get(VMODs.get(player).size() / 2);
         System.out.println("selected "+velocity_modifiers[select]);
         return select;
     }
 
+    private void nextAngleMod(Player player) {
+        int current = angle_adjustment.get(player);
+        if (current > angle_modifiers.length) current = 0;
+        else current++;
+        angle_adjustment.put(player, current);
+    }
+
     @Override
     public double getShotAngle() {
-        return angle;
+        return angle + angle_modifiers[angle_adjustment.get(current_player)];
     }
 
     @Override
     public double getShotVelocity() {
-        return velocity_modifiers[velocity_index] * last_distance_to_flag;
+        return velocity_modifiers[velocity_index] * last_distance_to_flag.get(current_player);
     }
 }
