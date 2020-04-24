@@ -112,4 +112,7 @@ public final class Variables {
 	public static double AI_SHOT_ANGLE_BOUND = 0.01;
 	public static AI_controller[] AVAILABLE_BOTS = {new BasicAI()};
 
+	public static int TURN_STATE_START = 0;
+	public static int TURN_STATE_WAIT = 1;
+	public static int TURN_STATE_END = 2;
 }

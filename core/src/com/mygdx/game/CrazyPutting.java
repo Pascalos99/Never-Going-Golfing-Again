@@ -56,9 +56,7 @@ public class CrazyPutting  implements ApplicationListener {
     private double previous_time;
     private List<Player> players;
     private Player currentPlayer;
-    private boolean shotMade =false;
     private GameScreen gameScreen;
-    private boolean penaltyServed =true;
 
     public CrazyPutting( PuttingCourse c, GameInfo gameAspects,GameScreen p){
         this.gameScreen=p;
@@ -118,7 +116,7 @@ public class CrazyPutting  implements ApplicationListener {
         world_physics = new PuttingCoursePhysics();
         previous_time = System.currentTimeMillis() / 1000.0;
 
-        for(Player p : GAME_ASPECTS.players){  //TODO implement with game loop
+        for(Player p : GAME_ASPECTS.players){
             Vector2d start = GAME_ASPECTS.getStart();
             double x = start.get_x();
             double y = start.get_y();
@@ -152,8 +150,6 @@ public class CrazyPutting  implements ApplicationListener {
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
     }
-
-    //TODO move these to a different class
 
     @Override
     public void dispose() {
@@ -191,11 +187,11 @@ public class CrazyPutting  implements ApplicationListener {
             yaw += Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
         }
 
-        if(currentPlayer.requestedHit() &&penaltyServed ) {
-            gameScreen.allowNextTurn=true;
-            if (currentPlayer instanceof Player.Human) SHOT_VELOCITY=gameScreen.getInputVelocity();
-            shotMade=true;
+        if(currentPlayer.requestedHit() && currentPlayer.getBall().turn_state == TURN_STATE_START) {
             double standard_factor = Math.sqrt(3)/Math.sqrt(2);
+
+            if (currentPlayer instanceof Player.Human)
+                SHOT_VELOCITY=gameScreen.getInputVelocity();
 
             if (!currentPlayer.getBall().is_moving)
                 currentPlayer.getBall().hit(
@@ -237,7 +233,7 @@ public class CrazyPutting  implements ApplicationListener {
         }
 
         for(Player p : GAME_ASPECTS.players) {
-            if (p.getshots() > 0 || p == currentPlayer)
+            if (p.getBall().hit_count > 0 || p == currentPlayer)
                 modelBatch.render(p.getBall().getModel(), environment);
         }
 
@@ -245,6 +241,7 @@ public class CrazyPutting  implements ApplicationListener {
 
         for (int i = 0; i < 25; i++)
             modelBatch.render(terrainInstance[i], environment);
+
         modelBatch.render(flagPoleInstance, environment);
         modelBatch.render(flagRangeInstance, environment);
 
@@ -252,26 +249,44 @@ public class CrazyPutting  implements ApplicationListener {
         modelBatch.render(wallInstance, environment);
         modelBatch.end();
 
-        if(currentPlayer.getBall().isOnWater()){
-            gameScreen.allowNextTurn=false;
-            penaltyServed=false;
-            currentPlayer.getBall().is_moving = false;
-            if(currentPlayer.requestedReset()){
-                currentPlayer.newShot();
-                currentPlayer.newShot();
-                currentPlayer.getBall().velocity=(new Vector2d(0, 0));
-                currentPlayer.getBall().resetToPast();
-                penaltyServed=true;
-            }
-        }
+        if(!currentPlayer.getBall().is_moving){
 
-
-        if(!currentPlayer.getBall().is_moving ){
             if(currentPlayer.getBall().isTouchingFlag()){
-                Player pastPlayer = currentPlayer;
-                gameScreen.winners.add(pastPlayer);
-                System.out.println(pastPlayer+ " reached flag in "+pastPlayer.getshots());
-                players.remove(pastPlayer);
+                Player next_player = getNextPlayer();
+                gameScreen.winners.add(currentPlayer);
+                System.out.println(currentPlayer + " reached flag after " + currentPlayer.getBall().hit_count + " shots.");
+                players.remove(currentPlayer);
+
+                currentPlayer.getBall().turn_state = TURN_STATE_END;
+
+                if(players.isEmpty()){
+                    gameScreen.endGame=true;
+                }
+
+                else{
+                    currentPlayer = next_player;
+                    currentPlayer.getBall().turn_state = TURN_STATE_START;
+                    currentPlayer.notifyStartOfTurn();
+                }
+
+            }
+
+            else if(currentPlayer.getBall().isStuck()){
+
+                if(currentPlayer.requestedReset()){
+                    currentPlayer.getBall().rewind();
+                    currentPlayer.getBall().hit_count += 2;
+                    currentPlayer.getBall().turn_state = TURN_STATE_START;
+                    currentPlayer.notifyStartOfTurn();
+                }
+
+            }
+
+            else if(currentPlayer.getBall().turn_state == TURN_STATE_WAIT){
+                currentPlayer.getBall().turn_state = TURN_STATE_END;
+                currentPlayer = getNextPlayer();
+                currentPlayer.getBall().turn_state = TURN_STATE_START;
+                currentPlayer.notifyStartOfTurn();
             }
 
             if (lastShotVelocity != SHOT_VELOCITY) {
@@ -295,21 +310,6 @@ public class CrazyPutting  implements ApplicationListener {
             Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
             modelBatch.render(arrowInstance, environment);
             modelBatch.end();
-            //check if the game should be over
-            if(players.size()==0){
-                //otherwise the last players last shot is not counted
-                currentPlayer.newShot();
-                gameScreen.endGame=true;
-                currentPlayer.notifyStartOfTurn();
-            }else{
-                if (shotMade && gameScreen.allowNextTurn ) {
-                    currentPlayer.getBall().recordPastPos();
-                    currentPlayer.newShot();
-                    shotMade=false;
-                    System.out.println(currentPlayer+ " has attempted "+currentPlayer.getshots()+" shots");
-                    nextPlayer();
-                }
-            }
         }
 
         if(CAMERA.position.y<0){
@@ -344,22 +344,13 @@ public class CrazyPutting  implements ApplicationListener {
         return currentPlayer;
     }
 
-    public void nextPlayer(){
-        if(players.indexOf(currentPlayer)==players.size()-1 )  {
-            currentPlayer=players.get(0);
-        }else {
-            currentPlayer = players.get(players.indexOf(currentPlayer)+1);
-        }
-        currentPlayer.notifyStartOfTurn();
-    }
-
-    public void getNextPlayer(){
+    public Player getNextPlayer(){
 
         if(players.indexOf(currentPlayer) == players.size() - 1)
-            currentPlayer = players.get(0);
+            return players.get(0);
 
         else
-            currentPlayer = players.get(players.indexOf(currentPlayer) + 1);
+            return players.get(players.indexOf(currentPlayer) + 1);
 
     }
 

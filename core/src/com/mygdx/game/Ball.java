@@ -16,7 +16,8 @@ public class Ball implements TopDownPhysicsObject {
     private ModelInstance model;
     public boolean is_moving = false;
     public Player owner;
-    private int hit_count;
+    public int hit_count;
+    public int turn_state;
 
     public double pastX,pastY;
 
@@ -34,6 +35,7 @@ public class Ball implements TopDownPhysicsObject {
         init_y = y;
         old_x = x;
         old_y = y;
+        turn_state = 0;
     }
 
     public void step(double delta, List<TopDownPhysicsObject> ents) {
@@ -51,6 +53,11 @@ public class Ball implements TopDownPhysicsObject {
 
             x += velocity.get_x();
             y += velocity.get_y();
+
+            if(isStuck()) {
+                is_moving = false;
+                velocity = new Vector2d(0, 0);
+            }
 
             if (x < BALL_RADIUS) {
 
@@ -166,15 +173,20 @@ public class Ball implements TopDownPhysicsObject {
         return false;
     }
 
+    public boolean isStuck(){
+
+        if(isOnWater())
+            return true;
+
+        return false;
+    }
+
     public void hit(Vector2d direction, double speed){
         addVelocity(correctHitVector(direction, speed));
         hit_count += 1;
         old_x = x;
         old_y = y;
-    }
-
-    public int getHits(){
-        return hit_count;
+        turn_state = TURN_STATE_WAIT;
     }
 
     public void recordPastPos(){
