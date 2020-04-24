@@ -102,7 +102,7 @@ public class GameScreen implements Screen {
             winList.center();
             stage.addActor(winList);
             for(int i=0;i<winners.size();i++){
-                winList.add(new Label(winners.get(i).toString()+" "+ winners.get(i).getshots(), Variables.MENU_SKIN));
+                winList.add(new Label(winners.get(i).toString()+" "+ winners.get(i).getBall().hit_count, Variables.MENU_SKIN));
                 winList.row();
             }
         }
@@ -116,7 +116,7 @@ public class GameScreen implements Screen {
             currentAction.setText(inWater);
         }
         currentPlayerLabel.setText("CurrentPlayer : "+game.getCurrentPlayer().getName());
-        currentPlayerShotNum.setText("Attempts: "+game.getCurrentPlayer().getshots());
+        currentPlayerShotNum.setText("Attempts: "+game.getCurrentPlayer().getBall().hit_count);
         stage.act(delta);
         stage.draw();
         if(Gdx.input.isKeyPressed(Input.Keys.U)){
