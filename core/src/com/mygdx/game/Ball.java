@@ -10,15 +10,15 @@ import static com.mygdx.game.Variables.*;
 
 public class Ball implements TopDownPhysicsObject {
     public Vector2d velocity;
-    public double x, y, old_x, old_y, real_x, real_y, old_h, real_h;
+    public double x, y, old_x, old_y, init_x, init_y;
     public double r;
     public double mass = 0.005;
-
     private ModelInstance model;
-    public double pastX,pastY;
     public boolean is_moving = false;
     public Player owner;
     private int hit_count;
+
+    public double pastX,pastY;
 
     Ball(double radius, double x_pos, double y_pos, ModelInstance model, Player owner) {
         x = x_pos;
@@ -30,6 +30,10 @@ public class Ball implements TopDownPhysicsObject {
         hit_count = 0;
         this.model = model;
         this.owner = owner;
+        init_x = x;
+        init_y = y;
+        old_x = x;
+        old_y = y;
     }
 
     public void step(double delta, List<TopDownPhysicsObject> ents) {
@@ -133,23 +137,8 @@ public class Ball implements TopDownPhysicsObject {
 
     @Override
     public ModelInstance getModel() {
-        old_x = real_x;
-        old_y = real_y;
-        old_h = real_h;
-
         Vector3d real_pos = getPosition();
-        real_x = real_pos.get_x();
-        real_h = real_pos.get_y();
-        real_y = real_pos.get_z();
-
-        model.transform.setTranslation((float) real_x, (float) real_h, (float) real_y);
-
-        Vector3 vector = new Vector3(
-                (float) (real_x - old_x),
-                (float) (real_h - old_h),
-                (float) (real_y - old_y)
-        ).add(owner.getCameraPosition());
-        owner.setCameraPosition(vector);
+        model.transform.setTranslation((float) real_pos.get_x(), (float) real_pos.get_y(), (float) real_pos.get_z());
         return model;
     }
 
@@ -180,6 +169,8 @@ public class Ball implements TopDownPhysicsObject {
     public void hit(Vector2d direction, double speed){
         addVelocity(correctHitVector(direction, speed));
         hit_count += 1;
+        old_x = x;
+        old_y = y;
     }
 
     public int getHits(){
@@ -194,6 +185,16 @@ public class Ball implements TopDownPhysicsObject {
     public void resetToPast(){
         x=pastX;
         y=pastY;
+    }
+
+    public void rewind(){
+        x = old_x;
+        y = old_y;
+    }
+
+    public void restart(){
+        x = init_x;
+        y = init_y;
     }
 
     private Vector2d f(Vector2d pos, Vector2d vel){
