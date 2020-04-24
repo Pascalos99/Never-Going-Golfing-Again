@@ -24,6 +24,7 @@ public class PlayerScreen implements Screen {
     private static int playerNumber=1;
     private ArrayList<Player> players =new ArrayList<Player>();
     private Table playerTable;
+    private static String humanPlayer = "None";
 
     public PlayerScreen(Menu menu){
         parent=menu;
@@ -32,8 +33,7 @@ public class PlayerScreen implements Screen {
         Table buttons = new Table();
         Table overall= new Table();
         playerTable = new Table();
-      //  addColorSelect();
-       // addPlayerTypeSelect();
+        addColorSelect();
        // buttons.setDebug(true);
         overall.setFillParent(true);
         //overall.setDebug(true);
@@ -74,39 +74,62 @@ public class PlayerScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 //TODO: if anyone can figure out a better way to turn the table to players, go for it
-                Label dummy = new Label("AA" , MENU_SKIN);
-                int id=-1;
-                String name="";
-                String playerType="";
-                SelectBox<String> color_select=new SelectBox<String>(MENU_SKIN);
-                String ballColor=null;
-               for(int i=0;i<playerTable.getCells().size;i++){
-                   if(playerTable.getCells().get(i).getActor().getClass().equals(dummy.getClass())){
-                       id = (Integer.parseInt(((Label)(playerTable.getCells().get(i).getActor())).getText().toString().replaceAll(" ","")));
-                   }else if(playerTable.getCells().get(i).getActor().getClass().equals(color_select.getClass()) &&ballColor.equals("")){
-                       ballColor=((SelectBox<String>)(playerTable.getCells().get(i).getActor())).getSelected();
-                   }else if((playerTable.getCells().get(i).getActor().getClass().equals(color_select.getClass()))){
-                       playerType=((SelectBox<String>)(playerTable.getCells().get(i).getActor())).getSelected();
-                   }else{
-                       name = ((TextField)(playerTable.getCells().get(i).getActor())).getText();
-                   }
+                Label dummy = new Label("AA", MENU_SKIN);
+                int id = -1;
+                String name = "";
+                String playerType = "";
+                SelectBox<String> color_select = new SelectBox<String>(MENU_SKIN);
+                String ballColor = null;
 
+                /*for(int i=0;i<playerTable.getRows();i++){
+                    int correctedIndex =i*(playerTable.getColumns()-1);
+                    id=(Integer.parseInt(((Label)(playerTable.getCells().get(correctedIndex).getActor())).getText().toString().replaceAll(" ","")));
+                    name = ((TextField)(playerTable.getCells().get(correctedIndex+1).getActor())).getText();
+                    ballColor =((SelectBox<String>) (playerTable.getCells().get(i).getActor())).getSelected();
+                    playerType = ((SelectBox<String>) (playerTable.getCells().get(i).getActor())).getSelected();
 
-                   if((id!=-1)&&(!name.equals("")) &&(ballColor!=null) && (!playerType.equals(""))&&
-                           (players.contains(new Player.Human(name,id,ballColor))||players.contains(new Player.bot(name,id,ballColor)))){
-                       if(playerType.equals(BOT_TYPE[0])){
-                            players.add(new Player.Human(name,id,ballColor));
-                        } else if(playerType.equals(BOT_TYPE[1])){
-                           players.add(new Player.Bot(name,id,ballColor));
-                       }
-                       id = -1;
-                       name = "";
-                       ballColor = null;
-                       playerType="";
-                   }
-               }
-                System.out.println(players.toString());
-                parent.changeScreen(Menu.GAME_SELECT);
+                    if(playerType.equals(humanPlayer)){
+                        players.add(new Player.Human(name,id,ballColor));
+                    } else if(playerType.equals(AVAILABLE_BOTS[0].getTypeName())){
+                        players.add(new Player.Bot(name,id,ballColor,AVAILABLE_BOTS[0]));
+                    }
+                }
+              */
+                try {
+                    for (int i = 0; i < playerTable.getCells().size; i++) {
+                        if (playerTable.getCells().get(i).getActor().getClass().equals(dummy.getClass())) {
+                            id = (Integer.parseInt(((Label) (playerTable.getCells().get(i).getActor())).getText().toString().replaceAll(" ", "")));
+                        } else if (playerTable.getCells().get(i).getActor().getClass().equals(color_select.getClass())) {
+                            if (ballColor == null) {
+                                ballColor = ((SelectBox<String>) (playerTable.getCells().get(i).getActor())).getSelected();
+                                System.out.print("C");
+                            } else {
+                                playerType = ((SelectBox<String>) (playerTable.getCells().get(i).getActor())).getSelected();
+                                System.out.print("T");
+                            }
+                        } else {
+                            name = ((TextField) (playerTable.getCells().get(i).getActor())).getText();
+                        }
+                        if ((id != -1) && (!name.equals("")) && (ballColor != null) && (!playerType.equals(""))) {
+                            if (playerType.equals(humanPlayer)) {
+                                players.add(new Player.Human(name, id, ballColor));
+                            } else if (playerType.equals(AVAILABLE_BOTS[0].getTypeName())) {
+                                players.add(new Player.Bot(name, id, ballColor, AVAILABLE_BOTS[0]));
+                            }
+                            System.out.print(players.get(id - 1));
+                            id = -1;
+                            name = "";
+                            ballColor = null;
+                            playerType = "";
+                        }
+                    }
+                    System.out.println(players.toString());
+                    parent.changeScreen(Menu.GAME_SELECT);
+
+                }catch(StackOverflowError e){
+                    e.printStackTrace();
+                }
+
             }
         });
 
@@ -143,11 +166,15 @@ public class PlayerScreen implements Screen {
     }
 
     private SelectBox addPlayerTypeSelect(){
+        System.out.println("AA");
         SelectBox<String> playerTypeSelect = new SelectBox<>(MENU_SKIN);
         Array<String> items = new Array<>();
-        for (int i=0; i < BOT_TYPE.length; i++)
-            items.add(BOT_TYPE[i]);
+        items.add(humanPlayer);
+        for (int i=0; i < AVAILABLE_BOTS.length; i++)
+            items.add(AVAILABLE_BOTS[i].getTypeName());
         playerTypeSelect.setItems(items);
+
+       // playerTypeSelect.setSelectedIndex(0);
 
         return playerTypeSelect;
     }
@@ -156,7 +183,7 @@ public class PlayerScreen implements Screen {
         String name = "Player "+(playerNumber-1);
         HashSet<String> available_names = new HashSet<>(Arrays.asList(Variables.PLAYER_NAMES));
         for (int i=0; i < playerNumber-1; i++) {
-            String playername = ((TextField) playerTable.getCells().get(i*3 + 1).getActor()).getText();
+            String playername = ((TextField) playerTable.getCells().get(i*playerTable.getColumns() + 1).getActor()).getText();
             available_names.remove(playername); }
         if (available_names.size() > 0) {
             int i = 0, item = (int)(Math.random() * available_names.size());

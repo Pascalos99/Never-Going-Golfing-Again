@@ -67,9 +67,7 @@ public final class Variables {
 			new SettingsScreen.ColorSelection("White", Color.WHITE)
 	};
 
-	public static String[] BOT_TYPE = {
-			"None", "Basic","Deterministic"
-	};
+
 
 
 		// Default player names
