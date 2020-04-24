@@ -195,11 +195,11 @@ public abstract class Player {
         }
 
         public boolean requestedZoomIn(){
-            return false;
+            return Gdx.input.isKeyPressed(Input.Keys.W);
         }
 
         public boolean requestedZoomOut(){
-            return false;
+            return Gdx.input.isKeyPressed(Input.Keys.S);
         }
 
         public boolean requestedIncreaseHitVelocity(){
