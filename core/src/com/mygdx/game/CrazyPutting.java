@@ -196,7 +196,7 @@ public class CrazyPutting  implements ApplicationListener {
 
             if (!currentPlayer.getBall().is_moving)
                 currentPlayer.getBall().hit(
-                        (new Vector2d(CAMERA.direction.x, CAMERA.direction.z)).normalized(),
+                        (new Vector2d(CAMERA.direction.x, CAMERA.direction.z)).normalize(),
                         SHOT_VELOCITY * standard_factor
                 );
         }

@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
 import static com.mygdx.game.Variables.*;
-import static com.mygdx.game.Variables.SHOT_VELOCITY_INCREASE;
 
 public abstract class Player {
     private String name;
