@@ -401,7 +401,7 @@ public class CrazyPutting  implements ApplicationListener {
 
         if(currentPlayer.requestedHit() &&penaltyServed ) {
             gameScreen.allowNextTurn=true;
-            SHOT_VELOCITY=gameScreen.getInputVelocity();
+            if (currentPlayer instanceof Player.Human) SHOT_VELOCITY=gameScreen.getInputVelocity();
             shotMade=true;
             double standard_factor = Math.sqrt(3)/Math.sqrt(2);
 

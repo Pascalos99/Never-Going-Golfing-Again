@@ -110,4 +110,6 @@ public final class Variables {
 		return Math.atan2(dir.get_y()/*sin*/, dir.get_x()/*cos*/);
 	}
 	public static double AI_SHOT_ANGLE_BOUND = 0.01;
-	public static AI_controller[] AVAILABLE_BOTS = {new BasicAI()};}
+	public static AI_controller[] AVAILABLE_BOTS = {new BasicAI()};
+
+}
