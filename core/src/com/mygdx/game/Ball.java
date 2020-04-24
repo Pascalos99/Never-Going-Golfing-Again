@@ -155,8 +155,8 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     @Override
-    public void rewindTime() {
-
+    public TopDownPhysicsObject dupe() {
+        return new Ball(r, x, y, null, null);
     }
 
     @Override

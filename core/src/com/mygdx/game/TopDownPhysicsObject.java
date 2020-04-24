@@ -7,6 +7,6 @@ public interface TopDownPhysicsObject {
     public Vector3d getPosition();
     public double getOrientation();
     public ModelInstance getModel();
-    public void rewindTime();
+    public TopDownPhysicsObject dupe();
 
 }

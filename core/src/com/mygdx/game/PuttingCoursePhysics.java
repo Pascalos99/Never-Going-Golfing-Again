@@ -51,8 +51,17 @@ public class PuttingCoursePhysics implements PhysicsEngine {
     }
 
     @Override
-    public void rewindTime() {
+    public PhysicsEngine dupe() {
+        PuttingCoursePhysics w = new PuttingCoursePhysics();
 
+        for(TopDownPhysicsObject obj : ents) {
+
+            if(!(obj instanceof Ball))
+                w.addBody(obj.dupe());
+
+        }
+
+        return w;
     }
 
     private void addDelta(double delta){

@@ -115,4 +115,6 @@ public final class Variables {
 	public static int TURN_STATE_START = 0;
 	public static int TURN_STATE_WAIT = 1;
 	public static int TURN_STATE_END = 2;
+
+	public  static CrazyPutting GAME = null;
 }

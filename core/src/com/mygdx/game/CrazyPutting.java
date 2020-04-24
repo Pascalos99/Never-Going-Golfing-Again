@@ -66,6 +66,7 @@ public class CrazyPutting  implements ApplicationListener {
         currentPlayer=players.get(0);
         if (SHOT_VELOCITY > gameAspects.maxVelocity) SHOT_VELOCITY = gameAspects.maxVelocity;
         WORLD = c;
+        GAME = this;
     }
 
     @Override
@@ -356,9 +357,22 @@ public class CrazyPutting  implements ApplicationListener {
     }
 
     public PuttingCoursePhysics isolate(Player p){
-        Ball ball = new Ball(p.getBall().r, p.getBall().x, p.getBall().y, null, null);
-        PuttingCoursePhysics world = new PuttingCoursePhysics();
+        Ball ball = (Ball) p.getBall().dupe();
+        PuttingCoursePhysics world = (PuttingCoursePhysics) world_physics.dupe();
+        world.addBody(ball);
         return world;
+    }
+
+    public static Ball findIsolatedBall(PuttingCoursePhysics world){
+
+        for(TopDownPhysicsObject obj : world.getBodies()){
+
+            if(obj instanceof Ball)
+                return (Ball)obj;
+
+        }
+
+        return null;
     }
 
 }
