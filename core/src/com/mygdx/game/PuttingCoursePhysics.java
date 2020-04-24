@@ -10,6 +10,9 @@ public class PuttingCoursePhysics implements PhysicsEngine {
     protected List<TopDownPhysicsObject> ents;
     protected List<Double> deltas;
 
+    protected boolean use_fixed_delta;
+    protected double fixed_delta;
+
     private static int DELTA_ARRAY_SIZE_LIMIT = 5;
 
     PuttingCoursePhysics(){
@@ -23,6 +26,9 @@ public class PuttingCoursePhysics implements PhysicsEngine {
         double delta = current_time - previous_time;
         addDelta(delta);
         double _delta = getDelta();
+
+        if(use_fixed_delta)
+            _delta = fixed_delta;
 
         for(TopDownPhysicsObject obj : ents){
 
@@ -62,6 +68,12 @@ public class PuttingCoursePhysics implements PhysicsEngine {
         }
 
         return w;
+    }
+
+    @Override
+    public void useFixedDelta(boolean flag, double delta) {
+        use_fixed_delta = flag;
+        fixed_delta = delta;
     }
 
     private void addDelta(double delta){
