@@ -155,6 +155,11 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     @Override
+    public void rewindTime() {
+
+    }
+
+    @Override
     public double getOrientation() {
         return 0;
     }

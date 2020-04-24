@@ -318,6 +318,7 @@ public class CrazyPutting  implements ApplicationListener {
             batch.end();
         }
 
+        isolate(currentPlayer);
     }
 
     public void add_shot_velocity(double amount) {
@@ -352,6 +353,12 @@ public class CrazyPutting  implements ApplicationListener {
         else
             return players.get(players.indexOf(currentPlayer) + 1);
 
+    }
+
+    public PuttingCoursePhysics isolate(Player p){
+        Ball ball = new Ball(p.getBall().r, p.getBall().x, p.getBall().y, null, null);
+        PuttingCoursePhysics world = new PuttingCoursePhysics();
+        return world;
     }
 
 }
