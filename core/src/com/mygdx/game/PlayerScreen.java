@@ -1,6 +1,4 @@
 package com.mygdx.game;
-import static com.mygdx.game.Variables.MENU_SKIN;
-import static com.mygdx.game.Variables.BALL_COLORS;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -18,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import static com.mygdx.game.Variables.*;
+
 public class PlayerScreen implements Screen {
     private Menu parent;
     private Stage stage;
@@ -32,7 +32,8 @@ public class PlayerScreen implements Screen {
         Table buttons = new Table();
         Table overall= new Table();
         playerTable = new Table();
-        addColorSelect();
+      //  addColorSelect();
+       // addPlayerTypeSelect();
        // buttons.setDebug(true);
         overall.setFillParent(true);
         //overall.setDebug(true);
@@ -76,21 +77,31 @@ public class PlayerScreen implements Screen {
                 Label dummy = new Label("AA" , MENU_SKIN);
                 int id=-1;
                 String name="";
+                String playerType="";
                 SelectBox<String> color_select=new SelectBox<String>(MENU_SKIN);
                 String ballColor=null;
                for(int i=0;i<playerTable.getCells().size;i++){
                    if(playerTable.getCells().get(i).getActor().getClass().equals(dummy.getClass())){
                        id = (Integer.parseInt(((Label)(playerTable.getCells().get(i).getActor())).getText().toString().replaceAll(" ","")));
-                   }else if(playerTable.getCells().get(i).getActor().getClass().equals(color_select.getClass())){
+                   }else if(playerTable.getCells().get(i).getActor().getClass().equals(color_select.getClass()) &&ballColor.equals("")){
                        ballColor=((SelectBox<String>)(playerTable.getCells().get(i).getActor())).getSelected();
+                   }else if((playerTable.getCells().get(i).getActor().getClass().equals(color_select.getClass()))){
+                       playerType=((SelectBox<String>)(playerTable.getCells().get(i).getActor())).getSelected();
                    }else{
                        name = ((TextField)(playerTable.getCells().get(i).getActor())).getText();
                    }
-                   if((id!=-1)&&(!name.equals("")) &&(ballColor!=null)&&(!players.contains(new Player.Human(name,id,ballColor)))){
-                       players.add(new Player.Human(name,id,ballColor));
-                        id=-1;
-                        name="";
-                        ballColor=null;
+
+                   if((id!=-1)&&(!name.equals("")) &&(ballColor!=null) && (!playerType.equals(""))&&
+                           (players.contains(new Player.Human(name,id,ballColor))||players.contains(new Player.bot(name,id,ballColor)))){
+                       if(playerType.equals(BOT_TYPE[0])){
+                            players.add(new Player.Human(name,id,ballColor));
+                        } else if(playerType.equals(BOT_TYPE[1])){
+                           players.add(new Player.Bot(name,id,ballColor));
+                       }
+                       id = -1;
+                       name = "";
+                       ballColor = null;
+                       playerType="";
                    }
                }
                 System.out.println(players.toString());
@@ -112,6 +123,7 @@ public class PlayerScreen implements Screen {
             playerTable.add(id);
             playerTable.add(name);
             playerTable.add(addColorSelect());
+            playerTable.add(addPlayerTypeSelect());
             playerTable.row().pad(0, 0, 5, 0);
             ++playerNumber;
         }
@@ -127,6 +139,16 @@ public class PlayerScreen implements Screen {
         color_select.setSelectedIndex(next_color_selected++);
         if (next_color_selected >= BALL_COLORS.length) next_color_selected = 0;
         return color_select;
+    }
+
+    private SelectBox addPlayerTypeSelect(){
+        SelectBox<String> playerTypeSelect = new SelectBox<>(MENU_SKIN);
+        Array<String> items = new Array<>();
+        for (int i=0; i < BOT_TYPE.length; i++)
+            items.add(BOT_TYPE[i]);
+        playerTypeSelect.setItems(items);
+
+        return playerTypeSelect;
     }
 
     private String pickName() {
