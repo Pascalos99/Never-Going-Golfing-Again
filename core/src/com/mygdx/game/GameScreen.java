@@ -96,7 +96,7 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if(!endGame) {
             game.render();
-        }else{
+        } else {
             Table winList = new Table();
             winList.setFillParent(true);
             winList.center();

@@ -1,9 +1,8 @@
 package com.mygdx.game;
 
-import static com.mygdx.game.Variables.FRICTION_CORRECTION;
 import static com.mygdx.game.Variables.WORLD;
 
-public class BasicAI implements AI_controller {
+public class AI_Basic implements AI_controller {
 
     public String getTypeName() {
         return "Basic Bot";
