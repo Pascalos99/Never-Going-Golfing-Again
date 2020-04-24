@@ -355,4 +355,14 @@ public class CrazyPutting  implements ApplicationListener {
         currentPlayer.notifyStartOfTurn();
     }
 
+    public void getNextPlayer(){
+
+        if(players.indexOf(currentPlayer) == players.size() - 1)
+            currentPlayer = players.get(0);
+
+        else
+            currentPlayer = players.get(players.indexOf(currentPlayer) + 1);
+
+    }
+
 }
