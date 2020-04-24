@@ -9,7 +9,6 @@ package com.mygdx.game;
  *  5. go to Variables.java and add an instance of your bot to array AVAILABLE_BOTS,
  *      if you want to add multiple different instances of your bot to this list, make sure they will all return a
  *      <b>different</b> value for getTypeName(), otherwise only the first instance will be used at all times.
- *
  */
 public interface AI_controller {
 
