@@ -95,41 +95,33 @@ public class PlayerScreen implements Screen {
                     }
                 }
               */
-                try {
-                    for (int i = 0; i < playerTable.getCells().size; i++) {
-                        if (playerTable.getCells().get(i).getActor().getClass().equals(dummy.getClass())) {
-                            id = (Integer.parseInt(((Label) (playerTable.getCells().get(i).getActor())).getText().toString().replaceAll(" ", "")));
-                        } else if (playerTable.getCells().get(i).getActor().getClass().equals(color_select.getClass())) {
-                            if (ballColor == null) {
-                                ballColor = ((SelectBox<String>) (playerTable.getCells().get(i).getActor())).getSelected();
-                                System.out.print("C");
-                            } else {
-                                playerType = ((SelectBox<String>) (playerTable.getCells().get(i).getActor())).getSelected();
-                                System.out.print("T");
-                            }
+
+                for (int i = 0; i < playerTable.getCells().size; i++) {
+                    if (playerTable.getCells().get(i).getActor().getClass().equals(dummy.getClass())) {
+                        id = (Integer.parseInt(((Label) (playerTable.getCells().get(i).getActor())).getText().toString().replaceAll(" ", "")));
+                    } else if (playerTable.getCells().get(i).getActor().getClass().equals(color_select.getClass())) {
+                        if (ballColor == null) {
+                            ballColor = ((SelectBox<String>) (playerTable.getCells().get(i).getActor())).getSelected();
                         } else {
-                            name = ((TextField) (playerTable.getCells().get(i).getActor())).getText();
+                            playerType = ((SelectBox<String>) (playerTable.getCells().get(i).getActor())).getSelected();
                         }
-                        if ((id != -1) && (!name.equals("")) && (ballColor != null) && (!playerType.equals(""))) {
-                            if (playerType.equals(humanPlayer)) {
-                                players.add(new Player.Human(name, id, ballColor));
-                            } else if (playerType.equals(AVAILABLE_BOTS[0].getTypeName())) {
-                                players.add(new Player.Bot(name, id, ballColor, AVAILABLE_BOTS[0]));
-                            }
-                            System.out.print(players.get(id - 1));
-                            id = -1;
-                            name = "";
-                            ballColor = null;
-                            playerType = "";
-                        }
+                    } else {
+                        name = ((TextField) (playerTable.getCells().get(i).getActor())).getText();
                     }
-                    System.out.println(players.toString());
-                    parent.changeScreen(Menu.GAME_SELECT);
-
-                }catch(StackOverflowError e){
-                    e.printStackTrace();
+                    if ((id != -1) && (!name.equals("")) && (ballColor != null) && (!playerType.equals(""))) {
+                        if (playerType.equals(humanPlayer)) {
+                            players.add(new Player.Human(name, id, ballColor));
+                        } else if (playerType.equals(AVAILABLE_BOTS[0].getTypeName())) {
+                            players.add(new Player.Bot(name, id, ballColor, AVAILABLE_BOTS[0]));
+                        }
+                        id = -1;
+                        name = "";
+                        ballColor = null;
+                        playerType = "";
+                    }
                 }
-
+                System.out.println(players.toString());
+                parent.changeScreen(Menu.GAME_SELECT);
             }
         });
 

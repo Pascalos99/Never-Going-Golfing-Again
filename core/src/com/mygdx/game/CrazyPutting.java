@@ -518,8 +518,6 @@ public class CrazyPutting  implements ApplicationListener {
                     nextPlayer();
                 }
             }
-
-
         }
 
         if(CAMERA.position.y<0){
