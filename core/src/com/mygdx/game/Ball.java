@@ -287,4 +287,17 @@ public class Ball implements TopDownPhysicsObject {
         return new Vector2d(direction.get_x() * speed * SPEED_CORRECTION, direction.get_y() * speed * SPEED_CORRECTION);
     }
 
+    public Ball simulateHit(Vector2d direction, double speed){
+        PuttingCoursePhysics phy = GAME.isolate(owner);
+        phy.useFixedDelta(true, 0.5);
+
+        Ball ball = CrazyPutting.findIsolatedBall(phy);
+        ball.hit(direction, speed);
+
+        while (ball.is_moving)
+            phy.frameStep(0);
+
+        return ball;
+    }
+
 }

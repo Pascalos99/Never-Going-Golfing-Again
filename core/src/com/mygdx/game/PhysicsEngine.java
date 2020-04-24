@@ -9,5 +9,6 @@ public interface PhysicsEngine {
     public void addBody(TopDownPhysicsObject obj);
     public void destroyBody(TopDownPhysicsObject obj);
     public PhysicsEngine dupe();
+    public void useFixedDelta(boolean flag, double delta);
 
 }

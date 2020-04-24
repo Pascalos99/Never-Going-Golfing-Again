@@ -23,10 +23,6 @@ public abstract class Player {
 
     public abstract void notifyStartOfTurn();
 
-    public int getshots(){
-        return shots;
-    }
-
     public void newShot(){
         ++shots;
     }
