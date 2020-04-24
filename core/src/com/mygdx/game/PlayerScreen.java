@@ -111,8 +111,12 @@ public class PlayerScreen implements Screen {
                     if ((id != -1) && (!name.equals("")) && (ballColor != null) && (!playerType.equals(""))) {
                         if (playerType.equals(humanPlayer)) {
                             players.add(new Player.Human(name, id, ballColor));
-                        } else if (playerType.equals(AVAILABLE_BOTS[0].getTypeName())) {
-                            players.add(new Player.Bot(name, id, ballColor, AVAILABLE_BOTS[0]));
+                        } else {
+                            for (int k=0; k < AVAILABLE_BOTS.length; k++)
+                                if (playerType.equals(AVAILABLE_BOTS[k].getTypeName())) {
+                                    players.add(new Player.Bot(name, id, ballColor, AVAILABLE_BOTS[k]));
+                                    break;
+                                }
                         }
                         id = -1;
                         name = "";
