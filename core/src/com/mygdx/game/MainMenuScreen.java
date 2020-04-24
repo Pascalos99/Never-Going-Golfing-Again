@@ -6,10 +6,16 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
+import static com.mygdx.game.Variables.AVAILABLE_BOTS;
+import static com.mygdx.game.Variables.MENU_SKIN;
 
 public class MainMenuScreen implements Screen {
     private Menu parent;
@@ -21,15 +27,25 @@ public class MainMenuScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         Table table = new Table();
+        Table phys = new Table();
         table.setFillParent(true);
         //  table.setDebug(true);
         stage.addActor(table);
-
+        SelectBox<String> physicsSelect = new SelectBox<>(MENU_SKIN);
+        Array<String> items = new Array<>();
+        for (int i=0; i < PhysicsSetting.values().length; i++)
+            items.add(PhysicsSetting.values()[i].name());
+        physicsSelect.setItems(items);
         TextButton chosePlayers = new TextButton("Add Players", Variables.MENU_SKIN);
 
         TextButton exit = new TextButton("Exit", Variables.MENU_SKIN);
 
         int margine = 10;
+        phys.row().pad(0, 0, 0, margine);
+        phys.add(new Label("Select Physics", MENU_SKIN));
+
+        phys.add(physicsSelect);
+        table.add(phys);
         table.row().pad(margine, 0, 0, 0);
         table.add(chosePlayers);
         table.row().pad(0, 0, margine, 0);
@@ -39,6 +55,7 @@ public class MainMenuScreen implements Screen {
         chosePlayers.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                //TODO:get the selected physics
                 parent.changeScreen(Menu.PLAYER_SELECT);
             }
 
