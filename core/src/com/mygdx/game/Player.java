@@ -176,15 +176,35 @@ public abstract class Player {
         }
 
         public boolean requestedTurnRight(){
-            if (!turnRight(getShotAngle(), desired_shot_angle)) return false;
-            else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
-            return false;
+
+            if(getBall().turn_state == TURN_STATE_WAIT){
+                return Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+            }
+
+            else {
+
+                if (!turnRight(getShotAngle(), desired_shot_angle)) return false;
+                else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
+
+                return false;
+            }
+
         }
 
         public boolean requestedTurnLeft(){
-            if (turnRight(getShotAngle(), desired_shot_angle)) return false;
-            else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
-            return false;
+
+            if(getBall().turn_state == TURN_STATE_WAIT){
+                return Gdx.input.isKeyPressed(Input.Keys.LEFT);
+            }
+
+            else {
+
+                if (turnRight(getShotAngle(), desired_shot_angle)) return false;
+                else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
+
+                return false;
+            }
+
         }
 
         private static boolean turnRight(double current_angle, double target_angle) {
@@ -195,11 +215,11 @@ public abstract class Player {
         }
 
         public boolean requestedZoomIn(){
-            return false;
+            return Gdx.input.isKeyPressed(Input.Keys.W);
         }
 
         public boolean requestedZoomOut(){
-            return false;
+            return Gdx.input.isKeyPressed(Input.Keys.S);
         }
 
         public boolean requestedIncreaseHitVelocity(){

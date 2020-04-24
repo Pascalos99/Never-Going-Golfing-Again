@@ -38,7 +38,7 @@ public class CrazyPutting  implements ApplicationListener {
     private double lastShotVelocity = SHOT_VELOCITY;
     private PuttingCourse course;
     private float cameraRotationSpeed = 1.4f;//100;
-    private float cameraZoomSpeed = 0.7f;
+    private float cameraZoomSpeed = 0.5f;
 
     private ModelInstance arrowInstance;
     private ModelInstance [] terrainInstance;
@@ -203,7 +203,7 @@ public class CrazyPutting  implements ApplicationListener {
         if (currentPlayer.requestedZoomIn()) {
 
             if (view_zoom > 1f) {
-                view_zoom -= 0.5f;
+                view_zoom -= cameraZoomSpeed;
             }
 
             else{
@@ -215,7 +215,7 @@ public class CrazyPutting  implements ApplicationListener {
         if (currentPlayer.requestedZoomOut()) {
 
             if (view_zoom < 50f) {
-                view_zoom += 0.5f;
+                view_zoom += cameraZoomSpeed;
             }
 
             else{

@@ -19,13 +19,11 @@ public class Ball implements TopDownPhysicsObject {
     public int hit_count;
     public int turn_state;
 
-    public double pastX,pastY;
+    private static double MIN_MOVE = 0.001;
 
     Ball(double radius, double x_pos, double y_pos, ModelInstance model, Player owner) {
         x = x_pos;
         y = y_pos;
-        pastX=x;
-        pastY=y;
         r = radius;
         velocity = new Vector2d(0, 0);
         hit_count = 0;
@@ -41,6 +39,9 @@ public class Ball implements TopDownPhysicsObject {
     public void step(double delta, List<TopDownPhysicsObject> ents) {
 
         if(is_moving) {
+            double test_x = x;
+            double test_y = y;
+
             velocity = verlet(new Vector2d(x, y), velocity, delta);
 
             Function2d h = WORLD.get_height();
@@ -53,11 +54,6 @@ public class Ball implements TopDownPhysicsObject {
 
             x += velocity.get_x();
             y += velocity.get_y();
-
-            if(isStuck()) {
-                is_moving = false;
-                velocity = new Vector2d(0, 0);
-            }
 
             if (x < BALL_RADIUS) {
 
@@ -113,6 +109,15 @@ public class Ball implements TopDownPhysicsObject {
                     velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
                 }
 
+            }
+
+            if(isStuck()) {
+                is_moving = false;
+                velocity = new Vector2d(0, 0);
+            }
+
+            else if(Math.abs(test_x - x) < MIN_MOVE && Math.abs(test_y - y) < MIN_MOVE){
+                is_moving = false;
             }
 
         }
@@ -187,16 +192,6 @@ public class Ball implements TopDownPhysicsObject {
         old_x = x;
         old_y = y;
         turn_state = TURN_STATE_WAIT;
-    }
-
-    public void recordPastPos(){
-        pastX=x;
-        pastY=y;
-    }
-
-    public void resetToPast(){
-        x=pastX;
-        y=pastY;
     }
 
     public void rewind(){
