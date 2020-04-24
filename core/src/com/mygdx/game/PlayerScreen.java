@@ -166,7 +166,6 @@ public class PlayerScreen implements Screen {
     }
 
     private SelectBox addPlayerTypeSelect(){
-        System.out.println("AA");
         SelectBox<String> playerTypeSelect = new SelectBox<>(MENU_SKIN);
         Array<String> items = new Array<>();
         items.add(humanPlayer);
