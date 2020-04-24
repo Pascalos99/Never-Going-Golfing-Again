@@ -96,13 +96,13 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if(!endGame) {
             game.render();
-        }else{
+        } else {
             Table winList = new Table();
             winList.setFillParent(true);
             winList.center();
             stage.addActor(winList);
             for(int i=0;i<winners.size();i++){
-                winList.add(new Label(winners.get(i).toString()+" "+ winners.get(i).getBall().hit_count, Variables.MENU_SKIN));
+                winList.add(new Label(winners.get(i).toString()+" "+ winners.get(i).getBall().hit_count+"pts", Variables.MENU_SKIN));
                 winList.row();
             }
         }
