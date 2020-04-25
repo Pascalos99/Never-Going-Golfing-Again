@@ -177,10 +177,8 @@ public abstract class Player {
             }
 
             else {
-
                 if (!turnRight(getShotAngle(), desired_shot_angle)) return false;
                 else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
-
                 return false;
             }
 
@@ -193,10 +191,8 @@ public abstract class Player {
             }
 
             else {
-
                 if (turnRight(getShotAngle(), desired_shot_angle)) return false;
                 else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
-
                 return false;
             }
 
