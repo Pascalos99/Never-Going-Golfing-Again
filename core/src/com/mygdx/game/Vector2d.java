@@ -41,6 +41,8 @@ public class Vector2d {
 
 	public Vector2d div(Vector2d v) { return new Vector2d(get_x() / v.get_x(), get_y() / v.get_y()); }
 
+	public Vector2d abs() { return new Vector2d(Math.abs(get_x()), Math.abs(get_y())); }
+
 	public Vector2d normalize() {
 		double len = get_length();
 		return new Vector2d(x / len, y / len);
