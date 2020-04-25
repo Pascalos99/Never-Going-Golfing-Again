@@ -201,7 +201,6 @@ public class Ball implements TopDownPhysicsObject {
 
         if(isOnWater())
             return true;
-
         return false;
     }
 
@@ -216,11 +215,6 @@ public class Ball implements TopDownPhysicsObject {
     public void rewind(){
         x = old_x;
         y = old_y;
-    }
-
-    public void restart(){
-        x = init_x;
-        y = init_y;
     }
 
     private Vector2d f(Vector2d pos, Vector2d vel){
@@ -254,6 +248,16 @@ public class Ball implements TopDownPhysicsObject {
         return new Vector2d(vel_x, vel_y);
     }
 
+    private Vector2d verlet(Vector2d pos, Vector2d vel, double h){
+        Vector2d k1 = f(pos, vel);
+        Vector2d k2 = f(
+                new Vector2d(pos.get_x() + h, pos.get_y() + h),
+                vel
+        );
+        Vector2d acc = new Vector2d((k1.get_x() + k2.get_x())*h/2d, (k1.get_y() + k2.get_y())*h/2d);
+        return new Vector2d(vel.get_x() + acc.get_x(), vel.get_y() + acc.get_y());
+    }
+
     private Vector2d runge_kutta(Vector2d pos, Vector2d vel, double h){
         Vector2d k1 = f(pos, vel);
         Vector2d k2 = f(
@@ -278,16 +282,6 @@ public class Ball implements TopDownPhysicsObject {
                vel.get_x() + h*G.get_x(),
                vel.get_y() + h*G.get_y()
         );
-    }
-
-    private Vector2d verlet(Vector2d pos, Vector2d vel, double h){
-        Vector2d k1 = f(pos, vel);
-        Vector2d k2 = f(
-                new Vector2d(pos.get_x() + h, pos.get_y() + h),
-                vel
-        );
-        Vector2d acc = new Vector2d((k1.get_x() + k2.get_x())*h/2d, (k1.get_y() + k2.get_y())*h/2d);
-        return new Vector2d(vel.get_x() + acc.get_x(), vel.get_y() + acc.get_y());
     }
 
     public double getCorrectedFriction(){
