@@ -42,8 +42,8 @@ public class Ball implements TopDownPhysicsObject {
 
             switch (CURRENT_PHYSICS_SETTING) {
                 case Euler : velocity = euler(new Vector2d(x, y), velocity, delta); break;
+                case Verlet : velocity = verlet(new Vector2d(x, y), velocity, delta); break;
                 case Runge_Kutta: velocity = runge_kutta(new Vector2d(x, y), velocity, delta); break;
-                default : velocity = verlet(new Vector2d(x, y), velocity, delta); break;
             }
 
             Function2d h = WORLD.get_height();
