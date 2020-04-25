@@ -17,7 +17,13 @@ public class Ball implements TopDownPhysicsObject {
     public int hit_count;
     public int turn_state;
 
-    private static double MIN_MOVE = 0.001;
+    private double height_velocity;
+    private int flight_state;
+    private double height;
+
+    private static int LAUNCH = 0;
+    private static int FALL = 1;
+    private static int ROLL = 2;
 
     Ball(double radius, double x_pos, double y_pos, ModelInstance model, Player owner) {
         x = x_pos;
@@ -32,83 +38,74 @@ public class Ball implements TopDownPhysicsObject {
         old_x = x;
         old_y = y;
         turn_state = 0;
+
+        flight_state = ROLL;
+        height_velocity = 0;
     }
 
     public void step(double delta, List<TopDownPhysicsObject> ents) {
 
         if(is_moving) {
+            Function2d h = WORLD.get_height();
+            Vector2d gradient = h.gradient(new Vector2d(x, y));
             double test_x = x;
             double test_y = y;
 
-            switch (CURRENT_PHYSICS_SETTING) {
-                case Euler : velocity = euler(new Vector2d(x, y), velocity, delta); break;
-                case Verlet : velocity = verlet(new Vector2d(x, y), velocity, delta); break;
-                case Runge_Kutta: velocity = runge_kutta(new Vector2d(x, y), velocity, delta); break;
-            }
+            if(flight_state == ROLL) {
+                switch (CURRENT_PHYSICS_SETTING) {
+                    case Euler:
+                        velocity = euler(new Vector2d(x, y), velocity, delta);
+                        break;
+                    case Verlet:
+                        velocity = verlet(new Vector2d(x, y), velocity, delta);
+                        break;
+                    case Runge_Kutta:
+                        velocity = runge_kutta(new Vector2d(x, y), velocity, delta);
+                        break;
+                }
 
-            Function2d h = WORLD.get_height();
-            Vector2d gradient = h.gradient(new Vector2d(x, y));
+                x += velocity.get_x();
+                y += velocity.get_y();
+                boolean fence_check = ballVsFenceCollision();
+                height = h.evaluate(x, y);
 
-            if (velocity.get_length() < VELOCITY_CUTTOFF && gradient.get_length() < GRADIENT_CUTTOFF) {
-                velocity = new Vector2d(0, 0);
-                is_moving = false;
-            }
+                double height_difference = h.evaluate(x, y) - h.evaluate(test_x, test_y);
+                height_velocity = height_difference + delta * (-mass * getCorrectedGravity());
 
-            x += velocity.get_x();
-            y += velocity.get_y();
-
-            if (x < BALL_RADIUS) {
-
-                if (velocity.get_length() < VELOCITY_CUTTOFF){
+                if(fence_check && velocity.get_length() < VELOCITY_CUTTOFF){
                     is_moving = false;
                     velocity = new Vector2d(0,0);
                 }
 
-                else {
-                    x = (BALL_RADIUS + 0.001 / WORLD_SCALING);
-                    velocity = (new Vector2d(-velocity.get_x()/2d, velocity.get_y()));
+                else if(velocity.get_length() < VELOCITY_CUTTOFF && gradient.get_length() < GRADIENT_CUTTOFF){
+                    is_moving = false;
+                    velocity = new Vector2d(0, 0);
                 }
+
+                if(height_velocity > 0 && gradientTest(h, new Vector2d(test_x, test_y), new Vector2d(x, y)) && velocity.get_length() > 0d)
+                    flight_state = LAUNCH;
 
             }
 
-            if (x > (50 / WORLD_SCALING - BALL_RADIUS)) {
+            else if(flight_state == LAUNCH){
+                double vel_x = velocity.get_x();
+                double vel_y = velocity.get_y();
 
-                if (velocity.get_length() < VELOCITY_CUTTOFF){
-                    is_moving = false;
-                    velocity = new Vector2d(0,0);
-                }
+                vel_x = vel_x + delta * (-vel_x * AIR_FRICTION);
+                vel_y = vel_y + delta * (-vel_y * AIR_FRICTION);
+                velocity = new Vector2d(vel_x, vel_y);
 
-                else {
-                    x = (49.99 / WORLD_SCALING - BALL_RADIUS);
-                    velocity = (new Vector2d(-velocity.get_x()/2d, velocity.get_y()));
-                }
+                x += velocity.get_x();
+                y += velocity.get_y();
+                ballVsFenceCollision();
 
-            }
+                height_velocity = height_velocity + delta * (-mass * getCorrectedGravity());
+                height += height_velocity;
 
-            if (y < BALL_RADIUS) {
-
-                if (velocity.get_length() < VELOCITY_CUTTOFF){
-                    is_moving = false;
-                    velocity = new Vector2d(0,0);
-                }
-
-                else {
-                    y = (BALL_RADIUS + 0.001 / WORLD_SCALING);
-                    velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
-                }
-
-            }
-
-            if (y > (50 / WORLD_SCALING - BALL_RADIUS)) {
-
-                if (velocity.get_length() < VELOCITY_CUTTOFF){
-                    is_moving = false;
-                    velocity = new Vector2d(0,0);
-                }
-
-                else {
-                    y = (49.99 / WORLD_SCALING - BALL_RADIUS);
-                    velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
+                if(height <= h.evaluate(x, y)){
+                    height = h.evaluate(x, y);
+                    flight_state = ROLL;
+                    height_velocity = 0;
                 }
 
             }
@@ -130,14 +127,58 @@ public class Ball implements TopDownPhysicsObject {
 
             }
 
-            if(Math.abs(test_x - x) < MIN_MOVE && Math.abs(test_y - y) < MIN_MOVE){
-                is_moving = false;
-            }
-
         }
 
     }
 
+    private boolean ballVsFenceCollision(){
+        boolean r = false;
+
+        if (x < BALL_RADIUS) {
+            r = true;
+
+            x = (BALL_RADIUS + 0.001 / WORLD_SCALING);
+            velocity = (new Vector2d(-velocity.get_x()/2d, velocity.get_y()));
+        }
+
+        if (x > (50 / WORLD_SCALING - BALL_RADIUS)) {
+            r = true;
+
+            x = (49.99 / WORLD_SCALING - BALL_RADIUS);
+            velocity = (new Vector2d(-velocity.get_x()/2d, velocity.get_y()));
+        }
+
+        if (y < BALL_RADIUS) {
+            r = true;
+
+            y = (BALL_RADIUS + 0.001 / WORLD_SCALING);
+            velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
+        }
+
+        if (y > (50 / WORLD_SCALING - BALL_RADIUS)) {
+            r = true;
+
+            y = (49.99 / WORLD_SCALING - BALL_RADIUS);
+            velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
+        }
+
+        return r;
+    }
+
+    private  boolean gradientTest(Function2d height_f, Vector2d old, Vector2d xy){
+        Vector2d initial_gradient = height_f.gradient(old);
+        Vector2d final_gradient = height_f.gradient(xy);
+
+        Vector2d difference = xy.sub(old);
+        double dx = difference.get_x() / Math.abs(difference.get_x());
+        double dy = difference.get_y() / Math.abs(difference.get_y());
+        Vector2d direction = new Vector2d(dx, dy);
+
+        boolean c1 = initial_gradient.get_x() * direction.get_x() > final_gradient.get_x() * direction.get_x();
+        boolean c2 = initial_gradient.get_y() * direction.get_y() > final_gradient.get_y() * direction.get_y();
+
+        return c1 || c2;
+    }
 
     public void addVelocity(Vector2d v) {
         is_moving = true;
@@ -154,11 +195,16 @@ public class Ball implements TopDownPhysicsObject {
 
     @Override
     public Vector3d getPosition() {
-        return new Vector3d(
+        Vector3d vec = new Vector3d(
                 toWorldScale(x),
                 WORLD.get_height().evaluate(x, y) + BALL_RADIUS * WORLD_SCALING,
-        toWorldScale(y)
+                toWorldScale(y)
         );
+
+        if(flight_state == LAUNCH)
+            vec = new Vector3d(vec.get_x(), height, vec.get_z());
+
+        return vec;
     }
 
     @Override
@@ -191,7 +237,7 @@ public class Ball implements TopDownPhysicsObject {
 
     public boolean isOnWater() {
 
-        if (WORLD.getHeightAt(x, y) <= 0)
+        if (WORLD.getHeightAt(x, y) <= 0 && flight_state == ROLL)
             return true;
 
         return false;
@@ -234,6 +280,8 @@ public class Ball implements TopDownPhysicsObject {
             half_x -= mass * gravity * friction * vel.get_x() / vel.get_length();
             half_y -= mass * gravity * friction * vel.get_y() / vel.get_length();
         }
+
+
 
         Vector2d acceleration = new Vector2d(half_x, half_y);
         return acceleration;
@@ -289,6 +337,10 @@ public class Ball implements TopDownPhysicsObject {
         // to work with variable friction, but the idea and use style will remain.
 
         return WORLD.get_friction_coefficient() * FRICTION_CORRECTION;
+    }
+
+    public double getCorrectedGravity(){
+        return WORLD.get_gravity() * GRAVITY_CORRECTION;
     }
 
     public Vector2d correctHitVector(Vector2d direction, double speed){

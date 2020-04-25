@@ -100,8 +100,10 @@ public final class Variables {
 	public static double view_zoom = 7;
 
 	public static double SPEED_CORRECTION = 1d / 50d; // in m/s
-	public static double FRICTION_CORRECTION = 10d;
+	public static double FRICTION_CORRECTION = 40d;
 	public static double VELOCITY_CUTTOFF = 0.1d * SPEED_CORRECTION; // in m/s
+	public static double GRAVITY_CORRECTION = 20d;
+	public static double MIN_MOVE = 0.0007d;
 
 	public static PhysicsSetting CURRENT_PHYSICS_SETTING = Runge_Kutta;
 
@@ -121,4 +123,6 @@ public final class Variables {
 	public static int TURN_STATE_END = 2;
 
 	public  static CrazyPutting GAME = null;
+
+	public static double AIR_FRICTION = 0.5d;
 }

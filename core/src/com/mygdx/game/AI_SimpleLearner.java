@@ -24,7 +24,7 @@ public class AI_SimpleLearner implements AI_controller {
         current_player = player;
         if (!has_seen_player(player)) setup(player);
         Vector2d currentPos = new Vector2d(player.getBall().x, player.getBall().y);
-        Vector2d toFlag = WORLD.flag_position.subtract(currentPos);
+        Vector2d toFlag = WORLD.flag_position.sub(currentPos);
         angle = Math.atan2(toFlag.get_y(), toFlag.get_x());
         double distance_to_flag = toFlag.get_length();
 

@@ -35,17 +35,19 @@ public class Vector2d {
 		return new Vector2d(x + dx, y + dy);
 	}
 
-	public Vector2d subtract(Vector2d v) { return add(-v.get_x(), -v.get_y()); }
+	public Vector2d sub(Vector2d v) { return add(-v.get_x(), -v.get_y()); }
+
+	public Vector2d mul(Vector2d v) { return new Vector2d(get_x() * v.get_x(), get_y() * v.get_y()); }
+
+	public Vector2d div(Vector2d v) { return new Vector2d(get_x() / v.get_x(), get_y() / v.get_y()); }
 
 	public Vector2d normalize() {
 		double len = get_length();
 		return new Vector2d(x / len, y / len);
 	}
 
-	public double dotProduct(Vector2d o) {
-		double result =  x * o.x + y * o.y;
-		System.out.format("the dot product of %s and %s is %.3f\n", this, o, result);
-		return result;
+	public double dot(Vector2d o) {
+		return x * o.x + y * o.y;
 	}
 
 	public String toString() {

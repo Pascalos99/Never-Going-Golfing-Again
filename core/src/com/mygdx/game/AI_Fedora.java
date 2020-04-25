@@ -1,9 +1,5 @@
 package com.mygdx.game;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-
 import static com.mygdx.game.Variables.*;
 
 public class AI_Fedora implements AI_controller {
@@ -54,7 +50,7 @@ public class AI_Fedora implements AI_controller {
             for(double speed = 0.24d; speed < GAME_ASPECTS.maxVelocity; speed += 0.24d){
                 old_pos = new Vector2d(player.getBall().x, player.getBall().y);
                 Ball ball = player.getBall().simulateHit(direction, speed);
-                Vector2d to_flag = WORLD.flag_position.subtract(new Vector2d(ball.x, ball.y));
+                Vector2d to_flag = WORLD.flag_position.sub(new Vector2d(ball.x, ball.y));
 
                 if(!ball.isStuck()){
 
