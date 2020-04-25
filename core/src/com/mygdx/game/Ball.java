@@ -348,14 +348,23 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     public Ball simulateHit(Vector2d direction, double speed){
+        return simulateHit(direction, speed, 2000);
+    }
+
+    public Ball simulateHit(Vector2d direction, double speed, int ticks){
         PuttingCoursePhysics phy = GAME.isolate(owner);
-        phy.useFixedDelta(true, 0.01);
+        phy.useFixedDelta(true, 0.1);
 
         Ball ball = CrazyPutting.findIsolatedBall(phy);
         ball.hit(direction, speed);
 
-        while (ball.is_moving)
+        for(int i = 0; i < ticks; i++){
             phy.frameStep(0);
+
+            if(!ball.is_moving)
+                break;
+
+        }
 
         return ball;
     }
