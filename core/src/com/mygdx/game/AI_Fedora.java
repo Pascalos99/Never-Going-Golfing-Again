@@ -11,6 +11,9 @@ public class AI_Fedora implements AI_controller {
     private double TURN_STEP = (360d * Math.PI / 180d) / (double)TOTAL_STEPS;
     private  double shot_angle, shot_speed;
 
+    private Vector2d old_pos;
+    private double angle_offset = 0.0;
+
     @Override
     public String getTypeName() {
         return "Fedora Bot";
@@ -18,6 +21,14 @@ public class AI_Fedora implements AI_controller {
 
     @Override
     public void calculate(Player player) {
+        boolean rechoose = rewinded(player.getBall());
+
+        if(rechoose)
+            angle_offset += 0.1;
+
+        else
+            angle_offset = 0.0;
+
         double x = player.getBall().x;
         double y = player.getBall().y;
         double fx = GAME_ASPECTS.goalX;
@@ -28,15 +39,17 @@ public class AI_Fedora implements AI_controller {
         Vector2d[] vecs = new Vector2d[TOTAL_STEPS];
 
         for(int i = 0; i < vecs.length; i++){
-            vecs[i] = relative.rotate(TURN_STEP * i).normalize();
+            vecs[i] = relative.rotate((TURN_STEP * i) + angle_offset).normalize();
         }
 
         Vector2d best_direction = null, old_to_flag = null;
         double best_speed = 0d;
 
-        for(Vector2d direction : vecs){
+        for(int i = 0; i < vecs.length; i++){
+            Vector2d direction = vecs[i];
 
             for(double speed = 0.24d; speed < GAME_ASPECTS.maxVelocity; speed += 0.24d){
+                old_pos = new Vector2d(player.getBall().x, player.getBall().y);
                 Ball ball = player.getBall().simulateHit(direction, speed);
                 Vector2d to_flag = WORLD.flag_position.subtract(new Vector2d(ball.x, ball.y));
 
@@ -72,6 +85,21 @@ public class AI_Fedora implements AI_controller {
     @Override
     public double getShotVelocity() {
         return shot_speed;
+    }
+
+    private boolean rewinded(Ball ball){
+
+        if(old_pos == null)
+            return false;
+
+        else{
+
+            if(old_pos.get_x() == ball.x && old_pos.get_y() == ball.y)
+                return true;
+
+        }
+
+        return false;
     }
 
 }

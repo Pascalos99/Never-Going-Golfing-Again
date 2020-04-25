@@ -115,6 +115,7 @@ public class CrazyPutting  implements ApplicationListener {
         wallInstance = TerrainBuilder.buildWalls();
 
         world_physics = new PuttingCoursePhysics();
+        //world_physics.useFixedDelta(true, 0.01);
         previous_time = System.currentTimeMillis() / 1000.0;
 
         for(Player p : GAME_ASPECTS.players){
