@@ -104,7 +104,7 @@ public final class Variables {
 	public static double VELOCITY_CUTTOFF = 0.1d * SPEED_CORRECTION; // in m/s
 	public static double GRAVITY_CORRECTION = 30d;
 
-	public static PhysicsSetting CURRENT_PHYSICS_SETTING = Runge_Kutta;
+	public static PhysicsSetting CURRENT_PHYSICS_SETTING = Verlet;
 
 	// AI
 	/** @return the current shot angle in radians on the range [-pi, pi] where an angle of 0 rad is when the ball is being shot in the
