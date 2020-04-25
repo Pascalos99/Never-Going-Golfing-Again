@@ -11,6 +11,7 @@ import java.util.Scanner;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.AbstractMap.SimpleEntry;
+import static com.mygdx.game.Variables.*;
 
 class FunctionParser {
     public static boolean DEBUG = true;
@@ -92,10 +93,8 @@ class FunctionParser {
         List<String> patterns = new ArrayList<String>();
         patterns.add("c*o*s*");
         patterns.add("s*i*n*");
-        /*
-         * patterns.add("tan"); patterns.add("atan"); patterns.add("asin");
-         * patterns.add("acos");
-         */
+        patterns.add("s*c*a*l*e");
+
         patterns.sort(Comparator.comparing(String::length).reversed());
 
         for (String p : patterns) {
@@ -224,6 +223,10 @@ class FunctionParser {
                 else if (token.equals("cos")) {
                     a = new CosAtom(a);
                 }
+
+                /*else if (token.equals("scale")) {
+                    a = new ConstantAtom(WORLD_SCALING);
+                }*/
 
                 else {
                     throw new ArithmeticException("Unknown function ( " + token + " ).");

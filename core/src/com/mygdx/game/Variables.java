@@ -27,11 +27,11 @@ public final class Variables {
 	public static final String	START_TEXTURE = ".\\textures\\Start.png";
 
 	// MAP GENERATION SETTINGS
-		// World-border settings
+	// World-border settings
 	public static final Function2d	OUT_OF_BOUNDS_FRICTION = Function2d.getConstant(100000);
 	public static final	Function2d 	OUT_OF_BOUNDS_HEIGHT = new AtomFunction2d("-sin(y/8 - x/8)/8 - cos(x/8 + y/4)/8 - 2");
 
-		// Settings for path generation
+	// Settings for path generation
 	public static final int 	NUM_FLAG_POS_TRIES = 2000;
 	public static final double 	START_PLATFORM_RADIUS = 3;
 	public static final double 	FLAG_PLATFORM_RADIUS = 3;
@@ -40,13 +40,13 @@ public final class Variables {
 	public static final double	PATH_BUMPINESS = 0.2; // a value of 0 is completely smooth, anything above 1 is incredibly noisy (affects height)
 	public static final double	PATH_ROUGHNESS = 0.4; // a value of 0 is completely smooth, anything above 1 is incredibly noisy (affects friction)
 
-		// Value ranges for fractal generation
+	// Value ranges for fractal generation
 	public static final double 	MINIMUM_HEIGHT = -1;
 	public static final double 	MAXIMUM_HEIGHT = 3;
 	public static final double 	MINIMUM_FRICTION = 0.065;
 	public static final double 	MAXIMUM_FRICTION = 0.196;
 
-		// Settings for valid flag and start positions
+	// Settings for valid flag and start positions
 	public static final double	MINIMUM_START_HEIGHT = 0.5; // inclusive
 	public static final double	MAXIMUM_START_HEIGHT = 1.5; // exclusive
 	public static final double	MINIMUM_FLAG_HEIGHT = 0.5; // inclusive
@@ -57,7 +57,7 @@ public final class Variables {
 	public static final double	MINIMUM_FLAG_FRICTION = 0.0933; // inclusive
 	public static final double	MAXIMUM_FLAG_FRICTION = 0.169; // exclusive
 
-		// Ball color
+	// Ball color
 	public static SettingsScreen.ColorSelection[] BALL_COLORS = {
 			new SettingsScreen.ColorSelection("Red", Color.RED),
 			new SettingsScreen.ColorSelection("Yellow", Color.YELLOW),
@@ -72,7 +72,7 @@ public final class Variables {
 
 
 
-		// Default player names
+	// Default player names
 	public static String[] PLAYER_NAMES = {
 			"Lightning", "Blitz", "DQBO", "Some Player", "Putting Crazy", "Lord Putter", "Harry Potter", "Pheonix"
 		};
@@ -93,18 +93,16 @@ public final class Variables {
 	public static double MAX_SHOT_VELOCITY = 6d;
 	public static double SHOT_VELOCITY = MAX_SHOT_VELOCITY/2d;
 	public static double SHOT_VELOCITY_INCREASE() { return 0.01 * MAX_SHOT_VELOCITY; }
-	public static double VELOCITY_FACTOR_FROM_BOUNCING_AGAINST_WALL = 0.9;
 
 	public static double pitch = Math.PI * (2/9d);
 	public static double yaw = Math.PI * 0.75;
 	public static double view_zoom = 7;
 
 	public static double SPEED_CORRECTION = 1d / 50d; // in m/s
-	public static double FRICTION_CORRECTION = 30d; //40
+	public static double AIR_FRICTION = 0.5d;
 	public static double VELOCITY_CUTTOFF = 0.1d * SPEED_CORRECTION; // in m/s
-	public static double GRAVITY_CORRECTION = 30d;
 
-	public static PhysicsSetting CURRENT_PHYSICS_SETTING = Verlet;
+	public static PhysicsSetting CURRENT_PHYSICS_SETTING = Runge_Kutta;
 
 	// AI
 	/** @return the current shot angle in radians on the range [-pi, pi] where an angle of 0 rad is when the ball is being shot in the
@@ -121,9 +119,6 @@ public final class Variables {
 	public static int TURN_STATE_WAIT = 1;
 	public static int TURN_STATE_END = 2;
 
-	public  static CrazyPutting GAME = null;
-
-	public static double AIR_FRICTION = 0.5d;
-
+	public static CrazyPutting GAME = null;
 	public static boolean ALLOW_FLIGHT = true;
 }

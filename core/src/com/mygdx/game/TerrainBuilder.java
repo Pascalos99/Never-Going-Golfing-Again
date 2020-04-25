@@ -136,6 +136,7 @@ public class TerrainBuilder {
         ModelBuilder modelBuilder = new ModelBuilder();
         MeshPartBuilder builder;
         AtomFunction2d func = new AtomFunction2d(FunctionParser.parse("sin(x)+cos(y)"));
+        double y_scalar = WORLD_SCALING;
 
         try{
             func = new AtomFunction2d(FunctionParser.parse(GAME_ASPECTS.getHeightFunction()));
@@ -159,10 +160,10 @@ public class TerrainBuilder {
 
                     for (int k = 0; k < gridDepth; k++) {
 
-                        pos1 = new Vector3(i*resolution, (float) func.evaluate((i+(a*gridWidth)) * gw, (k+(b*gridDepth)) * gd), k*resolution);
-                        pos2 = new Vector3(i*resolution, (float) func.evaluate((i+(a*gridWidth)) * gw, (k+1+(b*gridDepth)) * gd), (k + 1)*resolution);
-                        pos3 = new Vector3((i + 1)*resolution, (float) func.evaluate((i+1+(a*gridWidth)) * gw, (k+1+(b*gridDepth)) * gd), (k + 1)*resolution);
-                        pos4 = new Vector3((i + 1)*resolution, (float) func.evaluate((i+1+(a*gridWidth)) * gw, (k+(b*gridDepth)) * gd), k*resolution);
+                        pos1 = new Vector3(i*resolution, (float) (func.evaluate((i+(a*gridWidth)) * gw, (k+(b*gridDepth)) * gd) * y_scalar), k*resolution);
+                        pos2 = new Vector3(i*resolution, (float) (func.evaluate((i+(a*gridWidth)) * gw, (k+1+(b*gridDepth)) * gd) * y_scalar), (k + 1)*resolution);
+                        pos3 = new Vector3((i + 1)*resolution, (float) (func.evaluate((i+1+(a*gridWidth)) * gw, (k+1+(b*gridDepth)) * gd) * y_scalar), (k + 1)*resolution);
+                        pos4 = new Vector3((i + 1)*resolution, (float) (func.evaluate((i+1+(a*gridWidth)) * gw, (k+(b*gridDepth)) * gd) * y_scalar), k*resolution);
 
                         if(i==0&&a==0){
                             borderPoints1.add(new Vector3(pos1.x+a*10,pos1.y,pos1.z+b*10));

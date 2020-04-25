@@ -22,7 +22,6 @@ public class Ball implements TopDownPhysicsObject {
     private double height;
 
     private static int LAUNCH = 0;
-    private static int FALL = 1;
     private static int ROLL = 2;
 
     Ball(double radius, double x_pos, double y_pos, ModelInstance model, Player owner) {
@@ -70,7 +69,7 @@ public class Ball implements TopDownPhysicsObject {
                 height = h.evaluate(x, y);
 
                 double height_difference = h.evaluate(x, y) - h.evaluate(test_x, test_y);
-                height_velocity = height_difference + delta * (-mass * getCorrectedGravity());
+                height_velocity = height_difference + delta * (-mass * flightGravity());
 
                 if(fence_check && velocity.get_length() < VELOCITY_CUTTOFF){
                     is_moving = false;
@@ -100,7 +99,7 @@ public class Ball implements TopDownPhysicsObject {
                 y += velocity.get_y();
                 ballVsFenceCollision();
 
-                height_velocity = height_velocity + delta * (-mass * getCorrectedGravity());
+                height_velocity = height_velocity + delta * (-mass * flightGravity());
                 height += height_velocity;
 
                 if(height <= h.evaluate(x, y)){
@@ -115,16 +114,16 @@ public class Ball implements TopDownPhysicsObject {
             Vector2d end = new Vector2d(x, y);
             int steps = 3;
 
-            for(int i = 0; i <= steps; i++){
-                Vector2d xy = interpolate(start, end, steps, i);
-                x = xy.get_x();
-                y = xy.get_y();
+            for (int i = 0; i <= steps; i++) {
+                    Vector2d xy = interpolate(start, end, steps, i);
+                    x = xy.get_x();
+                    y = xy.get_y();
 
-                if(isStuck()) {
-                    is_moving = false;
-                    velocity = new Vector2d(0, 0);
-                    break;
-                }
+                    if (isStuck()) {
+                        is_moving = false;
+                        velocity = new Vector2d(0, 0);
+                        break;
+                    }
 
             }
 
@@ -202,12 +201,12 @@ public class Ball implements TopDownPhysicsObject {
     public Vector3d getPosition() {
         Vector3d vec = new Vector3d(
                 toWorldScale(x),
-                WORLD.get_height().evaluate(x, y) + BALL_RADIUS * WORLD_SCALING,
+                toWorldScale(WORLD.get_height().evaluate(x, y) + BALL_RADIUS),
                 toWorldScale(y)
         );
 
         if(flight_state == LAUNCH)
-            vec = new Vector3d(vec.get_x(), height, vec.get_z());
+            vec = new Vector3d(vec.get_x(), toWorldScale(height), vec.get_z());
 
         return vec;
     }
@@ -271,7 +270,7 @@ public class Ball implements TopDownPhysicsObject {
     private Vector2d f(Vector2d pos, Vector2d vel){
         Function2d h = WORLD.get_height();
         double gravity = WORLD.get_gravity();
-        double friction = getCorrectedFriction();
+        double friction = WORLD.get_friction_coefficient();
 
         if(isOnWater()){
             friction = 6d;
@@ -337,28 +336,21 @@ public class Ball implements TopDownPhysicsObject {
         );
     }
 
-    public double getCorrectedFriction(){
-        // This is a provisional function, it will later need x, y coodinates
-        // to work with variable friction, but the idea and use style will remain.
-
-        return WORLD.get_friction_coefficient() * FRICTION_CORRECTION;
+    public double flightGravity(){
+        return WORLD.get_gravity() * 8d;
     }
 
-    public double getCorrectedGravity(){
-        return WORLD.get_gravity() * GRAVITY_CORRECTION;
-    }
-
-    public Vector2d correctHitVector(Vector2d direction, double speed){
+    public static Vector2d correctHitVector(Vector2d direction, double speed){
         return new Vector2d(direction.get_x() * speed * SPEED_CORRECTION, direction.get_y() * speed * SPEED_CORRECTION);
     }
 
     public Ball simulateHit(Vector2d direction, double speed){
-        return simulateHit(direction, speed, 2000);
+        return simulateHit(direction, speed, 2000, 0.01);
     }
 
-    public Ball simulateHit(Vector2d direction, double speed, int ticks){
+    public Ball simulateHit(Vector2d direction, double speed, int ticks, double h){
         PuttingCoursePhysics phy = GAME.isolate(owner);
-        phy.useFixedDelta(true, 0.1);
+        phy.useFixedDelta(true, h);
 
         Ball ball = CrazyPutting.findIsolatedBall(phy);
         ball.hit(direction, speed);
