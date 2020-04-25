@@ -4,8 +4,12 @@ import static com.mygdx.game.Variables.WORLD;
 
 public class AI_Basic implements AI_controller {
 
-    public String getTypeName() {
+    public String getName() {
         return "Basic Bot";
+    }
+
+    public String getDescription() {
+        return "Point and shoot based AI";
     }
 
     public void calculate(Player player) {

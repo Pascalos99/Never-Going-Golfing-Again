@@ -14,8 +14,12 @@ public class AI_Fedora implements AI_controller {
     private double angle_offset = 0.0;
 
     @Override
-    public String getTypeName() {
+    public String getName() {
         return "Fedora Bot";
+    }
+
+    public String getDescription() {
+        return "Route sampling based AI";
     }
 
     @Override
@@ -24,7 +28,6 @@ public class AI_Fedora implements AI_controller {
 
         if(rechoose)
             angle_offset += 0.1;
-
         else
             angle_offset = 0.0;
 

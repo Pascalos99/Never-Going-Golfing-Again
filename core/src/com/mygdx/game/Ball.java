@@ -132,6 +132,10 @@ public class Ball implements TopDownPhysicsObject {
 
     }
 
+    public int getFlight_state() {
+        return flight_state;
+    }
+
     private boolean ballVsFenceCollision(){
         boolean r = false;
 

@@ -13,7 +13,10 @@ package com.mygdx.game;
 public interface AI_controller {
 
     /** this string has to be UNIQUE for each class that implements AI_controller */
-    String getTypeName();
+    String getName();
+
+    /** Accurately describes this AI in one or two sentences */
+    String getDescription();
 
     /** Gets ran at the start of your turn ONCE, the player parameter is the current player the bot is controlling during
      * its turn.<br> It can be used to get information on the ball

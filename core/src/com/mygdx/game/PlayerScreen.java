@@ -4,10 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 
@@ -25,6 +28,8 @@ public class PlayerScreen implements Screen {
     private ArrayList<Player> players =new ArrayList<Player>();
     private Table playerTable;
     private static String humanPlayer = "None";
+    private Label bot_description;
+    private ClickListener hover_listener;
 
     public PlayerScreen(Menu menu){
         parent=menu;
@@ -33,10 +38,13 @@ public class PlayerScreen implements Screen {
         Table buttons = new Table();
         Table overall= new Table();
         playerTable = new Table();
+        bot_description = new Label("", MENU_SKIN);
         addColorSelect();
        // buttons.setDebug(true);
         overall.setFillParent(true);
         //overall.setDebug(true);
+        overall.add(bot_description).pad(0,0,20,0);
+        overall.row().pad(0,0,10,0);
         overall.add(playerTable);
         overall.row().pad(0, 0, 10, 0);
         overall.add(buttons);
@@ -113,7 +121,7 @@ public class PlayerScreen implements Screen {
                             players.add(new Player.Human(name, id, ballColor));
                         } else {
                             for (int k=0; k < AVAILABLE_BOTS.length; k++)
-                                if (playerType.equals(AVAILABLE_BOTS[k].getTypeName())) {
+                                if (playerType.equals(AVAILABLE_BOTS[k].getName())) {
                                     players.add(new Player.Bot(name, id, ballColor, AVAILABLE_BOTS[k]));
                                     break;
                                 }
@@ -128,8 +136,6 @@ public class PlayerScreen implements Screen {
                 parent.changeScreen(Menu.GAME_SELECT);
             }
         });
-
-
 
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
@@ -146,9 +152,43 @@ public class PlayerScreen implements Screen {
             playerTable.add(addPlayerTypeSelect());
             playerTable.row().pad(0, 0, 5, 0);
             ++playerNumber;
+            addHoverListener();
         }
-
     }
+
+    private void addHoverListener() {
+        if (hover_listener==null) {
+            hover_listener = new ClickListener() {
+                Timer timer;
+                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                    if (timer != null) timer.clear();
+                    int index = 0;
+                    for (int i=0; i < playerTable.getCells().size; i++)
+                        if (playerTable.getCells().get(i).getActor().equals(event.getTarget())) {
+                            index = i;
+                            break; }
+                    String botSetting = ((SelectBox<String>)playerTable.getCells().get((index / playerTable.getColumns()) * playerTable.getColumns() + 3).getActor()).getSelected();
+                    String result = "";
+                    if (botSetting.equals("None")) result = "A normal human player";
+                    else
+                        for (int i=0; i < AVAILABLE_BOTS.length; i++)
+                            if (AVAILABLE_BOTS[i].getName().equals(botSetting)) {
+                                result = AVAILABLE_BOTS[i].getDescription(); break; }
+                    bot_description.setText(result);
+                }
+                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                    if (timer==null) timer = new Timer();
+                    Timer.Task task = new Timer.Task() {
+                      public void run() {
+                          bot_description.setText("");
+                      }
+                    }; timer.scheduleTask(task, 0.5f);
+                }
+            };
+        }
+        for (Cell cell : playerTable.getCells()) cell.getActor().addListener(hover_listener);
+    }
+
     private int next_color_selected =  BALL_COLORS.length-1;
     private SelectBox addColorSelect(){
         SelectBox<String> color_select = new SelectBox<>(MENU_SKIN);
@@ -166,7 +206,7 @@ public class PlayerScreen implements Screen {
         Array<String> items = new Array<>();
         items.add(humanPlayer);
         for (int i=0; i < AVAILABLE_BOTS.length; i++)
-            items.add(AVAILABLE_BOTS[i].getTypeName());
+            items.add(AVAILABLE_BOTS[i].getName());
         playerTypeSelect.setItems(items);
 
        // playerTypeSelect.setSelectedIndex(0);
