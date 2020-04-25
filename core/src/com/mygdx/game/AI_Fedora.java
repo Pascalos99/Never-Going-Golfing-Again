@@ -11,6 +11,9 @@ public class AI_Fedora implements AI_controller {
     private double TURN_STEP = (360d * Math.PI / 180d) / (double)TOTAL_STEPS;
     private  double shot_angle, shot_speed;
 
+    private static class Fedora {}
+    public Fedora the_fedora;
+
     private Vector2d old_pos;
     private double angle_offset = 0.0;
 
