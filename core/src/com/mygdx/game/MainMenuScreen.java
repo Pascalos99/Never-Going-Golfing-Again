@@ -32,6 +32,7 @@ public class MainMenuScreen implements Screen {
         stage.addActor(table);
         SelectBox<PhysicsSetting> physicsSelect = new SelectBox<>(MENU_SKIN);
         physicsSelect.setItems(PhysicsSetting.values());
+        physicsSelect.setSelected(PhysicsSetting.Verlet);
         TextButton chosePlayers = new TextButton("Add Players", Variables.MENU_SKIN);
 
         TextButton exit = new TextButton("Exit", Variables.MENU_SKIN);
