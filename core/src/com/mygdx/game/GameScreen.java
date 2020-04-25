@@ -94,7 +94,7 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        if(!endGame) {
+        if(!endGame ) {
             game.render();
         } else {
             Table winList = new Table();
@@ -104,6 +104,14 @@ public class GameScreen implements Screen {
             for(int i=0;i<winners.size();i++){
                 winList.add(new Label(winners.get(i).toString()+" "+ winners.get(i).getBall().hit_count+"pts", Variables.MENU_SKIN));
                 winList.row();
+            }
+            if(!gameAspects.players.isEmpty()){
+                for(int i=0;i<gameAspects.players.size();i++) {
+                    if (!winners.contains(gameAspects.players.get(i))){
+                        winList.add(new Label(gameAspects.players.get(i).toString() + " " + gameAspects.players.get(i).getBall().hit_count + "pts", Variables.MENU_SKIN));
+                        winList.row();
+                    }
+                }
             }
         }
 
