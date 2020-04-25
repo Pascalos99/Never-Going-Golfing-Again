@@ -14,8 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import static com.mygdx.game.Variables.AVAILABLE_BOTS;
-import static com.mygdx.game.Variables.MENU_SKIN;
+import static com.mygdx.game.Variables.*;
 
 public class MainMenuScreen implements Screen {
     private Menu parent;
@@ -31,11 +30,8 @@ public class MainMenuScreen implements Screen {
         table.setFillParent(true);
         //  table.setDebug(true);
         stage.addActor(table);
-        SelectBox<String> physicsSelect = new SelectBox<>(MENU_SKIN);
-        Array<String> items = new Array<>();
-        for (int i=0; i < PhysicsSetting.values().length; i++)
-            items.add(PhysicsSetting.values()[i].name());
-        physicsSelect.setItems(items);
+        SelectBox<PhysicsSetting> physicsSelect = new SelectBox<>(MENU_SKIN);
+        physicsSelect.setItems(PhysicsSetting.values());
         TextButton chosePlayers = new TextButton("Add Players", Variables.MENU_SKIN);
 
         TextButton exit = new TextButton("Exit", Variables.MENU_SKIN);
@@ -55,7 +51,7 @@ public class MainMenuScreen implements Screen {
         chosePlayers.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                //TODO:get the selected physics
+                CURRENT_PHYSICS_SETTING = ((SelectBox<PhysicsSetting>)phys.getCells().get(1).getActor()).getSelected();
                 parent.changeScreen(Menu.PLAYER_SELECT);
             }
 
