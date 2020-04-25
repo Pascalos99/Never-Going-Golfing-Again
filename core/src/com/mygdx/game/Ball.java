@@ -113,12 +113,24 @@ public class Ball implements TopDownPhysicsObject {
 
             }
 
-            if(isStuck()) {
-                is_moving = false;
-                velocity = new Vector2d(0, 0);
+            Vector2d start = new Vector2d(test_x, test_y);
+            Vector2d end = new Vector2d(x, y);
+            int steps = 3;
+
+            for(int i = 0; i <= steps; i++){
+                Vector2d xy = interpolate(start, end, steps, i);
+                x = xy.get_x();
+                y = xy.get_y();
+
+                if(isStuck()) {
+                    is_moving = false;
+                    velocity = new Vector2d(0, 0);
+                    break;
+                }
+
             }
 
-            else if(Math.abs(test_x - x) < MIN_MOVE && Math.abs(test_y - y) < MIN_MOVE){
+            if(Math.abs(test_x - x) < MIN_MOVE && Math.abs(test_y - y) < MIN_MOVE){
                 is_moving = false;
             }
 
@@ -300,6 +312,17 @@ public class Ball implements TopDownPhysicsObject {
             phy.frameStep(0);
 
         return ball;
+    }
+
+    private static Vector2d interpolate(Vector2d start, Vector2d end, int steps, int step){
+        double t = (1d / (double)steps) * ((double)step);
+
+        Vector2d xy = new Vector2d(
+                start.get_x() + (end.get_x() - start.get_x()) * t,
+                start.get_y() + (end.get_y() - start.get_y()) * t
+        );
+
+        return xy;
     }
 
 }
