@@ -119,5 +119,6 @@ public final class Variables {
 	public static int TURN_STATE_WAIT = 1;
 	public static int TURN_STATE_END = 2;
 
-	public  static CrazyPutting GAME = null;
+	public static CrazyPutting GAME = null;
+	public static boolean ALLOW_FLIGHT = true;
 }
