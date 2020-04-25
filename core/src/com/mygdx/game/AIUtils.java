@@ -7,11 +7,11 @@ import java.util.List;
 
 public final class AIUtils {
 
-    double linearInterpolate(double a, double b, double t){
+    static double linearInterpolate(double a, double b, double t){
         return a + (b - a) * t;
     }
 
-    Vector2d findLowestGradient(Function2d h){
+    static Vector2d findLowestGradient(Function2d h){
         Vector2d xy = null;
         double total_gradient = 0;
         int steps = 1000;
@@ -52,7 +52,7 @@ public final class AIUtils {
         return h.gradient(xy);
     }
 
-    double unfoldDistance(Vector2d a, Vector2d b, Function2d h, int steps){ // Computes real distance from A to B
+    static double unfoldDistance(Vector2d a, Vector2d b, Function2d h, int steps){ // Computes real distance from A to B
         double distance = 0d;
         Vector2d prev = a;
 
@@ -73,7 +73,7 @@ public final class AIUtils {
         return  distance;
     }
 
-    List<Vector2d> getPointsWithGradient(Function2d h, Vector2d gradient, double tolerance){
+    static List<Vector2d> getPointsWithGradient(Function2d h, Vector2d gradient, double tolerance){
         double total_gradient = gradient.abs().get_x() + gradient.abs().get_y();
         int steps = 1000;
         List<Vector2d> points = new ArrayList<Vector2d>();
