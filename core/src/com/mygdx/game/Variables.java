@@ -113,7 +113,7 @@ public final class Variables {
 		Vector2d dir = new Vector2d(CAMERA.direction.x, CAMERA.direction.z).normalize();
 		return Math.atan2(dir.get_y()/*sin*/, dir.get_x()/*cos*/);
 	}
-	public static double AI_SHOT_ANGLE_BOUND = 0.01;
+	public static double AI_SHOT_ANGLE_BOUND = 0.03;
 	public static AI_controller[] AVAILABLE_BOTS = {new AI_Basic(), new AI_SimpleLearner(), new AI_Fedora()};
 
 	public static int TURN_STATE_START = 0;
