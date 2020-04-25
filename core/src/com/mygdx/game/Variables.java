@@ -124,4 +124,6 @@ public final class Variables {
 	public  static CrazyPutting GAME = null;
 
 	public static double AIR_FRICTION = 0.5d;
+
+	public static boolean ALLOW_FLIGHT = true;
 }

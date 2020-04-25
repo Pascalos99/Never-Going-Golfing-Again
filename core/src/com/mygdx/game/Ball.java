@@ -82,8 +82,9 @@ public class Ball implements TopDownPhysicsObject {
                     velocity = new Vector2d(0, 0);
                 }
 
-                if(height_velocity > 0 && gradientTest(h, new Vector2d(test_x, test_y), new Vector2d(x, y)) && velocity.get_length() > 0d)
-                    flight_state = LAUNCH;
+                if (ALLOW_FLIGHT)
+                    if(height_velocity > 0 && gradientTest(h, new Vector2d(test_x, test_y), new Vector2d(x, y)) && velocity.get_length() > 0d)
+                        flight_state = LAUNCH;
 
             }
 
