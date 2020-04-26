@@ -116,7 +116,7 @@ public class CrazyPutting  implements ApplicationListener {
         poleInstance = new ModelInstance(pole,(float) course.get_flag_position().get_x() * WORLD_SCALING, (float) course.getHeightAt(course.get_flag_position().get_x(), course.get_flag_position().get_y()), (float) course.get_flag_position().get_y() * WORLD_SCALING);
         flagInstance = new ModelInstance(flag,(float) course.get_flag_position().get_x() * WORLD_SCALING, (float) course.getHeightAt(course.get_flag_position().get_x(), course.get_flag_position().get_y()), (float) course.get_flag_position().get_y() * WORLD_SCALING);
 
-        Model poleRange = modelBuilder.createCylinder( side, FLAGPOLE_HEIGHT, side, 40, new Material(ColorAttribute.createDiffuse(new Color(1, 0.4f, 1, 1f)), new BlendingAttribute(0.3f)),
+        Model poleRange = modelBuilder.createCylinder( side, FLAGPOLE_HEIGHT, side, 100, new Material(ColorAttribute.createDiffuse(new Color(1, 0.4f, 1, 1f)), new BlendingAttribute(0.3f)),
                 Usage.Position | Usage.Normal);
 
         flagPoleInstance = new ModelInstance(pole, (float) course.get_flag_position().get_x()*WORLD_SCALING, (float) course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y()), (float) (course.get_flag_position().get_y()*WORLD_SCALING));
