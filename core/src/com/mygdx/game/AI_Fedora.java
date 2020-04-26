@@ -26,7 +26,7 @@ public class AI_Fedora implements AI_controller {
     }
 
     @Override
-    public void calculate(Player player) {
+    public boolean calculate(Player player) {
 
         if(points == null){
             double error = fluctuation(WORLD.get_height(), 100);
@@ -85,6 +85,8 @@ public class AI_Fedora implements AI_controller {
         Vector2d direction = selection.sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
         shot_angle = Math.atan2(direction.get_y(), direction.get_x());
         shot_speed = speed;
+
+        return true;
     }
 
     @Override

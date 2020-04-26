@@ -21,7 +21,7 @@ public interface AI_controller {
     /** Gets ran at the start of your turn ONCE, the player parameter is the current player the bot is controlling during
      * its turn.<br> It can be used to get information on the ball
      *   (current position for instance would be new Vector2d(player.getBall().x, player.getBall().y) ) */
-    void calculate(Player player);
+    boolean calculate(Player player);
 
     /** @return the desired shot angle in radians (positive x is 2k rad, negative x is 2k + pi rad,
      *      positive y is 2k + pi/2 rad and negative y is 2k - pi/2 rad; here k is any member of Z,
