@@ -80,7 +80,7 @@ public final class Variables {
 	public static final float WORLD_SCALING = (float)(1d/(2d*Math.PI/ 50d));
 	public static final float BALL_RADIUS = 0.05f / WORLD_SCALING;
 	public static PuttingCourse WORLD;
-	public static final float FLAGPOLE_HEIGHT = 5;
+	public static final float FLAGPOLE_HEIGHT = 7;
 
 	//main menu
 	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("glassy-ui.json"));
