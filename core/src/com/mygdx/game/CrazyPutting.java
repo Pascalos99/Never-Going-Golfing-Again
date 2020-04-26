@@ -163,7 +163,7 @@ public class CrazyPutting  implements ApplicationListener {
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.f));
         //environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
-        shadowLight = new DirectionalShadowLight(16384, 16384, 120f, 120f, 1f, 150f);
+        shadowLight = new DirectionalShadowLight(16384, 16384, 130f, 130f, 1f, 150f);
         environment.add(shadowLight.set(0.8f, 0.8f, 0.8f, -0.5f, -1.0f, 0.5f));
         environment.shadowMap = shadowLight;
 
