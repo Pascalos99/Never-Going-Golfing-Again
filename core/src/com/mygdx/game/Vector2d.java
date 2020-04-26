@@ -60,6 +60,10 @@ public class Vector2d {
 		return new Vector2d(_x, _y);
 	}
 
+	public Vector2d scale(double scale) {
+		return new Vector2d(scale * x, scale * y);
+	}
+
 	public double distance(Vector2d o) {
 		return Math.sqrt((o.x - x)*(o.x - x) + (o.y - y)*(o.y - y));
 	}

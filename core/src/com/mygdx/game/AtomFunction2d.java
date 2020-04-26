@@ -32,4 +32,8 @@ public class AtomFunction2d implements Function2d {
 		return function.apply(map);
 	}
 
+	public String toString() {
+		return function.toString();
+	}
+
 }

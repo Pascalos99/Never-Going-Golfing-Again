@@ -77,7 +77,7 @@ public final class Variables {
 	//CRAZY PUTTING
 	public static PerspectiveCamera CAMERA;
 	public static GameInfo GAME_ASPECTS;
-	public static final float WORLD_SCALING = (float)(1/(2f*Math.PI/ 50));
+	public static final float WORLD_SCALING = (float)(1d/(2d*Math.PI/ 50d));
 	public static final float BALL_RADIUS = 0.05f / WORLD_SCALING;
 	public static PuttingCourse WORLD;
 	public static final float FLAGPOLE_HEIGHT = 5;
@@ -99,7 +99,7 @@ public final class Variables {
 	public static double AIR_FRICTION = 0.5d;
 	public static double VELOCITY_CUTTOFF = 0.1d * SPEED_CORRECTION; // in m/s
 
-	public static PhysicsSetting CURRENT_PHYSICS_SETTING = Runge_Kutta;
+	public static PhysicsSetting CURRENT_PHYSICS_SETTING = Verlet;
 
 	// AI
 	/** @return the current shot angle in radians on the range [-pi, pi] where an angle of 0 rad is when the ball is being shot in the

@@ -1,7 +1,5 @@
 package com.mygdx.game;
 
-import static com.mygdx.game.Variables.MAX_SHOT_VELOCITY;
-import static com.mygdx.game.Variables.MENU_SKIN;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -13,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.io.File;
+
+import static com.mygdx.game.Variables.*;
 
 public class SettingsScreen implements Screen {
     private Menu parent;
@@ -133,7 +133,7 @@ public class SettingsScreen implements Screen {
         goalY = new TextField("5", MENU_SKIN);
         Label gY =new Label("Goal Y: ", MENU_SKIN);
 
-        height = new TextField("(sin(2x+y) + cos(2y+y) + 3 - 0.2(x-3)^2 - 0.2(y-3)^2) / 7.692307692307692", MENU_SKIN);
+        height = new TextField("sin(2x+y) + cos(2y+y) + 3 - 0.2(x-3)^2 - 0.2(y-3)^2", MENU_SKIN);
         Label h =new Label("Height function: ", MENU_SKIN);
 
 
@@ -249,7 +249,7 @@ public class SettingsScreen implements Screen {
     }
 
     public String getHeightFunction(){
-        return height.getText();
+        return "("+height.getText()+")/"+WORLD_SCALING;
     }
 
     static class ColorSelection {
