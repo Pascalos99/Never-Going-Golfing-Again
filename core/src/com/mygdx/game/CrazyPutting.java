@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
@@ -20,7 +19,6 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 
-import static com.mygdx.game.AIUtils.fluctuation;
 import static com.mygdx.game.Variables.CAMERA;
 import static com.mygdx.game.Variables.BALL_RADIUS;
 import static com.mygdx.game.Variables.GAME_ASPECTS;
@@ -155,6 +153,7 @@ public class CrazyPutting  implements ApplicationListener {
         }
 
         currentPlayer.notifyStartOfTurn();
+        currentPlayer.loadCamera();
 
         arrow = modelBuilder.createBox((float)((2 * SHOT_VELOCITY) / MAX_SHOT_VELOCITY), 0.05f, 0.05f,
                 new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
@@ -207,14 +206,15 @@ public class CrazyPutting  implements ApplicationListener {
         CAMERA.update();
 
         if (currentPlayer.requestedTurnRight()) {
-            yaw += -Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
+            YAW += -Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
         }
 
         if (currentPlayer.requestedTurnLeft()) {
-            yaw += Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
+            YAW += Gdx.graphics.getDeltaTime()*cameraRotationSpeed;
         }
 
         if(currentPlayer.requestedHit() && currentPlayer.getBall().turn_state == TURN_STATE_START) {
+            currentPlayer.saveCamera();
             double standard_factor = Math.sqrt(3)/Math.sqrt(2);
 
             if (currentPlayer instanceof Player.Human)
@@ -229,24 +229,24 @@ public class CrazyPutting  implements ApplicationListener {
 
         if (currentPlayer.requestedZoomIn()) {
 
-            if (view_zoom > 1f) {
-                view_zoom -= cameraZoomSpeed;
+            if (VIEW_ZOOM > 1f) {
+                VIEW_ZOOM -= cameraZoomSpeed;
             }
 
             else{
-                view_zoom = 1f;
+                VIEW_ZOOM = 1f;
             }
 
         }
 
         if (currentPlayer.requestedZoomOut()) {
 
-            if (view_zoom < 50f) {
-                view_zoom += cameraZoomSpeed;
+            if (VIEW_ZOOM < 50f) {
+                VIEW_ZOOM += cameraZoomSpeed;
             }
 
             else{
-                view_zoom = 50f;
+                VIEW_ZOOM = 50f;
             }
 
         }
@@ -301,6 +301,7 @@ public class CrazyPutting  implements ApplicationListener {
                     currentPlayer = next_player;
                     currentPlayer.getBall().turn_state = TURN_STATE_START;
                     currentPlayer.notifyStartOfTurn();
+                    currentPlayer.loadCamera();
                 }
 
             }
@@ -321,6 +322,7 @@ public class CrazyPutting  implements ApplicationListener {
                 currentPlayer = getNextPlayer();
                 currentPlayer.getBall().turn_state = TURN_STATE_START;
                 currentPlayer.notifyStartOfTurn();
+                currentPlayer.loadCamera();
             }
 
             if (lastShotVelocity != SHOT_VELOCITY) {

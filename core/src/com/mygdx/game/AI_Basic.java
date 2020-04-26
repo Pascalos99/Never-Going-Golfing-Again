@@ -12,11 +12,12 @@ public class AI_Basic implements AI_controller {
         return "Point and shoot based AI";
     }
 
-    public void calculate(Player player) {
+    public boolean calculate(Player player) {
         Vector2d currentPos = new Vector2d(player.getBall().x, player.getBall().y);
         Vector2d toFlag = WORLD.flag_position.sub(currentPos);
         angle = Math.atan2(toFlag.get_y(), toFlag.get_x());
         velocity = toFlag.get_length() * 0.75 + 0.5;
+        return true;
     }
 
     private double angle;
