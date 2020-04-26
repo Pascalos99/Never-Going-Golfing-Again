@@ -11,10 +11,10 @@ public final class AIUtils {
         return a + (b - a) * t;
     }
 
-    static Vector2d findLowestGradient(Function2d h){
+    static Vector2d findLowestGradient(Function2d h, int parts){
         Vector2d xy = null;
         double total_gradient = 0;
-        int steps = 1000;
+        int steps = parts; //1000
 
         for(double i = 0d; i < 1d; i += 1d/((double) steps)){
             double x = linearInterpolate(0, 50, i);
@@ -73,9 +73,9 @@ public final class AIUtils {
         return  distance;
     }
 
-    static List<Vector2d> getPointsWithGradient(Function2d h, Vector2d gradient, double tolerance){
+    static List<Vector2d> getPointsWithGradient(Function2d h, Vector2d gradient, double tolerance, int parts){
         double total_gradient = gradient.abs().get_x() + gradient.abs().get_y();
-        int steps = 1000;
+        int steps = parts; //1000
         List<Vector2d> points = new ArrayList<Vector2d>();
 
         for(double i = 0d; i < 1d; i += 1d/((double) steps)) {
@@ -99,6 +99,32 @@ public final class AIUtils {
         }
 
         return points;
+    }
+
+    public static double fluctuation(Function2d h, int parts){
+        int steps = parts; //1000
+        double error = 0d;
+        Vector2d old_gradient = h.gradient(0, 0);
+
+        for(double i = 0d; i < 1d; i += 1d/((double) steps)) {
+            double x = linearInterpolate(0, 50, i);
+
+            for (double j = 0d; j < 1d; j += 1d / ((double) steps)) {
+                double y = linearInterpolate(0, 50, j);
+                double height = h.evaluate(x, y);
+
+                if (height > 0) {
+                    Vector2d gradient = h.gradient(x, y);
+                    double total_gradient = gradient.abs().get_x() + gradient.abs().get_y();
+                    double old_total_gradient = old_gradient.abs().get_x() + old_gradient.abs().get_y();
+                    error += old_total_gradient - total_gradient;
+                }
+
+            }
+
+        }
+
+        return error / (steps * steps);
     }
 
 }

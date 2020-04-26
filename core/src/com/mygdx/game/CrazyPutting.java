@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 
+import static com.mygdx.game.AIUtils.fluctuation;
 import static com.mygdx.game.Variables.CAMERA;
 import static com.mygdx.game.Variables.BALL_RADIUS;
 import static com.mygdx.game.Variables.GAME_ASPECTS;
