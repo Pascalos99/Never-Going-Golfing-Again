@@ -69,9 +69,6 @@ public final class Variables {
 			new SettingsScreen.ColorSelection("White", Color.WHITE)
 	};
 
-
-
-
 	// Default player names
 	public static String[] PLAYER_NAMES = {
 			"Lightning", "Blitz", "DQBO", "Some Player", "Putting Crazy", "Lord Putter", "Harry Potter", "Pheonix"
@@ -113,7 +110,7 @@ public final class Variables {
 		return Math.atan2(dir.get_y()/*sin*/, dir.get_x()/*cos*/);
 	}
 	public static double AI_SHOT_ANGLE_BOUND = 0.03;
-	public static AI_controller[] AVAILABLE_BOTS = {new AI_Basic(), new AI_SimpleLearner(), new AI_Fedora()};
+	public static AI_controller[] AVAILABLE_BOTS = {new AI_Basic(), new AI_SimpleLearner(), new AI_Fedora(), new AI_Genetic()};
 
 	public static int TURN_STATE_START = 0;
 	public static int TURN_STATE_WAIT = 1;
