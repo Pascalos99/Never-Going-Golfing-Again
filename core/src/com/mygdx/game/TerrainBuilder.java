@@ -137,8 +137,9 @@ public class TerrainBuilder {
         MeshPartBuilder builder;
         AtomFunction2d func = new AtomFunction2d(FunctionParser.parse("sin(x)+cos(y)"));
         double y_scalar = WORLD_SCALING;
+
         try{
-            func = new AtomFunction2d(FunctionParser.parse(GAME_ASPECTS.getHeightFunction()));
+            func = new AtomFunction2d(GAME_ASPECTS.getHeightFunction());
         } catch(Error e) {
             System.out.println(e);
         }
@@ -152,12 +153,8 @@ public class TerrainBuilder {
                 float gw = (float) (2f*Math.PI) / (gridWidth * 5f);
                 float gd = (float) (2f*Math.PI) / (gridDepth * 5f);
                 modelBuilder.begin();
-                if(WIREFRAME){
-                    builder = modelBuilder.part("grid", GL20.GL_LINES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));
-                } else {
-                    builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));
-                }
-
+                builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));
+//                builder = modelBuilder.part("grid", GL20.GL_LINES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));
                 float x, y = 0;
 
                 for (int i = 0; i < gridWidth; i++) {
@@ -171,52 +168,41 @@ public class TerrainBuilder {
 
                         if(i==0&&a==0){
                             borderPoints1.add(new Vector3(pos1.x+a*10,pos1.y,pos1.z+b*10));
-
                             if(k==gridDepth-1&&b==4)
                                 borderPoints1.add(new Vector3(pos2.x+a*10,pos2.y,pos2.z+b*10));
-
                         }
-
                         if(k==0&&b==0){
                             borderPoints2.add(new Vector3(pos1.x+a*10,pos1.y,pos1.z+b*10));
-
                             if(i==gridDepth-1&&a==4)
                                 borderPoints2.add(new Vector3(pos4.x+a*10,pos4.y,pos4.z+b*10));
-
                         }
-
                         if(i==gridWidth-1&&a==4){
                             borderPoints3.add(new Vector3(pos3.x+a*10,pos3.y,pos3.z+b*10));
-
                             if(k==0&&b==0)
                                 borderPoints3.add(new Vector3(pos4.x+a*10,pos4.y,pos4.z+b*10));
-
                         }
-
                         if(k==gridDepth-1&&b==4){
                             borderPoints4.add(new Vector3(pos3.x+a*10,pos3.y,pos3.z+b*10));
-
                             if(i==0&&a==0)
                                 borderPoints4.add(new Vector3(pos2.x+a*10,pos2.y,pos2.z+b*10));
-
                         }
 
-                        float d=1/resolution;
+                        float d=(float)(1.0f/y_scalar);
 
                         vec1 = new Vector2d((i+(a*gridWidth)) * gw, (k+(b*gridDepth)) * gd);
-                        nor1 = new Vector3(-(float) (func.gradient(vec1).get_x()), d, 0).add(new Vector3(0, d, -(float) (func.gradient(vec1).get_y())));
+                        nor1 = new Vector3(0, (float) (func.gradient(vec1).get_y()), 1).crs(new Vector3(1, (float) (func.gradient(vec1).get_x()), 0));
                         nor1.nor();
 
                         vec2 = new Vector2d((i+(a*gridWidth)) * gw, (k + 1+(b*gridDepth)) * gd);
-                        nor2 = new Vector3(-(float) (func.gradient(vec2).get_x()), d, 0).add(new Vector3(0, d, -(float) (func.gradient(vec2).get_y())));
+                        nor2 = new Vector3(0, (float) (func.gradient(vec2).get_y()), 1).crs(new Vector3(1, (float) (func.gradient(vec2).get_x()), 0));
                         nor2.nor();
 
                         vec3 = new Vector2d((i + 1+(a*gridWidth)) * gw, (k + 1+(b*gridDepth)) * gd);
-                        nor3 = new Vector3(-(float) (func.gradient(vec3).get_x()), d, 0).add(new Vector3(0, d, -(float) (func.gradient(vec3).get_y())));
+                        nor3 = new Vector3(0, (float) (func.gradient(vec3).get_y()), 1).crs(new Vector3(1, (float) (func.gradient(vec3).get_x()), 0));
                         nor3.nor();
 
                         vec4 = new Vector2d((i + 1+(a*gridWidth)) * gw, (k+(b*gridDepth)) * gd);
-                        nor4 = new Vector3(-(float) (func.gradient(vec4).get_x()), d, 0).add(new Vector3(0, d, -(float) (func.gradient(vec4).get_y())));
+                        nor4 = new Vector3(0, (float) (func.gradient(vec4).get_y()), 1).crs(new Vector3(1, (float) (func.gradient(vec4).get_x()), 0));
                         nor4.nor();
 
                         v1 = new MeshPartBuilder.VertexInfo().setPos(pos1).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
@@ -225,7 +211,7 @@ public class TerrainBuilder {
                         v4 = new MeshPartBuilder.VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(0.5f, 0.5f);
 
                         builder.rect(v1, v2, v3, v4);
-                        builder.line(pos1,pos1.add(nor1));
+//                        builder.line(pos1,pos1.cpy().add(nor1.cpy().scl(0.4f)));
                     }
                 }
 

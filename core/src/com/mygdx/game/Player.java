@@ -3,6 +3,9 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.async.ThreadUtils;
+
 import static com.mygdx.game.Variables.*;
 
 public abstract class Player {
@@ -13,11 +16,27 @@ public abstract class Player {
     private Ball ball;
     private Vector3 cameraPosition=new Vector3(-5f,5f,-5f);
 
+    private double pitch = PITCH;
+    private double yaw = YAW;
+    private double view_zoom = VIEW_ZOOM;
+
     public Player(String name,int id, String color){
         this.name = name;
         this.id=id;
         this.ballColor=color;
         shots=0;
+    }
+
+    public void loadCamera() {
+        PITCH = pitch;
+        YAW = yaw;
+        VIEW_ZOOM = view_zoom;
+    }
+
+    public void saveCamera() {
+        pitch = PITCH;
+        yaw = YAW;
+        view_zoom = VIEW_ZOOM;
     }
 
     public abstract void notifyStartOfTurn();
@@ -35,14 +54,14 @@ public abstract class Player {
     }
 
     public Vector3 getCameraPosition(){
-        double xzLen = Math.cos(pitch);
-        double _x = xzLen * Math.cos(yaw);
-        double _y = Math.sin(pitch);
-        double _z = xzLen * Math.sin(-yaw);
+        double xzLen = Math.cos(PITCH);
+        double _x = xzLen * Math.cos(YAW);
+        double _y = Math.sin(PITCH);
+        double _z = xzLen * Math.sin(-YAW);
 
-        _x *= view_zoom;
-        _y *= view_zoom;
-        _z *= view_zoom;
+        _x *= VIEW_ZOOM;
+        _y *= VIEW_ZOOM;
+        _z *= VIEW_ZOOM;
 
         Vector3d add = ball.getPosition();
         Vector3 pre = new Vector3((float)_x, (float)_y, (float)_z);
@@ -126,6 +145,7 @@ public abstract class Player {
         }
     }
 
+    @SuppressWarnings("DuplicatedCode")
     static class Bot extends Player {
 
         private double velocity_inching_bound = SHOT_VELOCITY_INCREASE() * 2;
@@ -142,14 +162,38 @@ public abstract class Player {
         }
 
         public String getBotName() {
-            return bot.getTypeName();
+            return bot.getName();
         }
         public AI_controller getAI() {
             return bot;
         }
 
         public void notifyStartOfTurn() {
-            bot.calculate(this);
+            done_calculating = false;
+            started_calculating = false;
+            Player player = this;
+            Timer t = new Timer();
+            Timer.Task calc = new Timer.Task(){ public void run() {
+                started_calculating = true;
+                bot.startCalculation(player);
+                testCalculate();
+            }};
+            t.scheduleTask(calc, 0.02f); // in between bot delay
+        }
+        private boolean done_calculating;
+        private boolean started_calculating;
+
+        private boolean testCalculate() {
+            if (!started_calculating) return false;
+            if (done_calculating) return true;
+            boolean done = bot.finishedCalculation();
+            if (!done) return false;
+            startSequence();
+            done_calculating = true;
+            return true;
+        }
+
+        private void startSequence() {
             adjusted_speed = false;
             desired_shot_velocity = bot.getShotVelocity();
             if (desired_shot_velocity > GAME_ASPECTS.maxVelocity) desired_shot_velocity = GAME_ASPECTS.maxVelocity;
@@ -161,6 +205,7 @@ public abstract class Player {
         }
 
         public boolean requestedHit(){
+            if (!testCalculate()) return false;
             if (turn_over) return false;
             if (Math.abs(getShotAngle() - desired_shot_angle) < AI_SHOT_ANGLE_BOUND)
                 if (adjusted_speed) {
@@ -171,6 +216,7 @@ public abstract class Player {
         }
 
         public boolean requestedTurnRight(){
+            if (!testCalculate()) return false;
 
             if(getBall().turn_state == TURN_STATE_WAIT){
                 return Gdx.input.isKeyPressed(Input.Keys.RIGHT);
@@ -181,10 +227,10 @@ public abstract class Player {
                 else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
                 return false;
             }
-
         }
 
         public boolean requestedTurnLeft(){
+            if (!testCalculate()) return false;
 
             if(getBall().turn_state == TURN_STATE_WAIT){
                 return Gdx.input.isKeyPressed(Input.Keys.LEFT);
@@ -214,6 +260,8 @@ public abstract class Player {
         }
 
         public boolean requestedIncreaseHitVelocity(){
+            if (!testCalculate()) return false;
+
             if (SHOT_VELOCITY > desired_shot_velocity) return false;
             if (Math.abs(SHOT_VELOCITY - desired_shot_velocity) > velocity_inching_bound) return true;
             SHOT_VELOCITY = desired_shot_velocity;
@@ -222,6 +270,8 @@ public abstract class Player {
         }
 
         public boolean requestedDecreaseHitVelocity(){
+            if (!testCalculate()) return false;
+
             if (SHOT_VELOCITY < desired_shot_velocity) return false;
             if (Math.abs(SHOT_VELOCITY - desired_shot_velocity) > velocity_inching_bound) return true;
             SHOT_VELOCITY = desired_shot_velocity;

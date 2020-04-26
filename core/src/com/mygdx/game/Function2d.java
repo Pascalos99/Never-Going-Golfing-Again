@@ -2,25 +2,40 @@ package com.mygdx.game;
 
 public interface Function2d {
 
-	public default double evaluate(Vector2d p) {
+	default double evaluate(Vector2d p) {
 		return evaluate(p.get_x(), p.get_y());
 	}
 
-	public default Vector2d gradient(Vector2d p) {
+	default Vector2d gradient(Vector2d p) {
 		return gradient(p.get_x(), p.get_y());
 	}
 
-	public Vector2d gradient(double x, double y);
+	Vector2d gradient(double x, double y);
 
-	public double evaluate(double x, double y);
+	double evaluate(double x, double y);
 	
-	public static Function2d getConstant(double value) {
+	static Function2d getConstant(double value) {
 		return new Function2d() {
 			public double evaluate(double x, double y) {
 				return value;
 			}
 			public Vector2d gradient(double x, double y) {
 				return new Vector2d(0, 0);
+			}
+		};
+	}
+
+	default Function2d getScaledBy(double scale) {
+		Function2d from = this;
+		return new Function2d() {
+			@Override
+			public Vector2d gradient(double x, double y) {
+				return from.gradient(x, y).scale(scale);
+			}
+
+			@Override
+			public double evaluate(double x, double y) {
+				return from.evaluate(x, y) * scale;
 			}
 		};
 	}
