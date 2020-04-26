@@ -117,7 +117,7 @@ public final class AIUtils {
                     Vector2d gradient = h.gradient(x, y);
                     double total_gradient = gradient.abs().get_x() + gradient.abs().get_y();
                     double old_total_gradient = old_gradient.abs().get_x() + old_gradient.abs().get_y();
-                    error += old_total_gradient - total_gradient;
+                    error += Math.abs(old_total_gradient - total_gradient);
                 }
 
             }

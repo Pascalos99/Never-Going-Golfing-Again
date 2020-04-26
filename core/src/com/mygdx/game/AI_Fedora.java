@@ -29,8 +29,18 @@ public class AI_Fedora implements AI_controller {
     public void calculate(Player player) {
 
         if(points == null){
-            res = (int) resolution(fluctuation(WORLD.get_height(), 100));
+            double error = fluctuation(WORLD.get_height(), 100);
+            System.out.println("Cumulative Error: " + error);
+            res = (int) resolution(error);
             System.out.println("Calculated resolution is " + res);
+
+            if(res < 0)
+                res = (int)resolution(0.003);
+
+            else if(res > 1070)
+                res = 1070;
+
+            System.out.println("Re-limited resolution is " + res);
             Vector2d lowest = findLowestGradient(WORLD.get_height(), res);
             points = getPointsWithGradient(WORLD.get_height(), lowest, 0.01, res);
             System.out.println("Fedora found " + points.size() + " options.");
