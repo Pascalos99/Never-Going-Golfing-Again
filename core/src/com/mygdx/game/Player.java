@@ -171,9 +171,11 @@ public abstract class Player {
         public void notifyStartOfTurn() {
             done_calculating = false;
             started_calculating = false;
+            Player player = this;
             Timer t = new Timer();
             Timer.Task calc = new Timer.Task(){ public void run() {
                 started_calculating = true;
+                bot.startCalculation(player);
                 testCalculate();
             }};
             t.scheduleTask(calc, 0.02f); // in between bot delay
@@ -184,7 +186,7 @@ public abstract class Player {
         private boolean testCalculate() {
             if (!started_calculating) return false;
             if (done_calculating) return true;
-            boolean done = bot.calculate(this);
+            boolean done = bot.finishedCalculation();
             if (!done) return false;
             startSequence();
             done_calculating = true;

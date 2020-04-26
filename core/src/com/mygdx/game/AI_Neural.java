@@ -16,8 +16,11 @@ public class AI_Neural implements AI_controller {
     }
 
     @Override
-    public boolean calculate(Player player) {
+    public void startCalculation(Player player) {
         calculate_grid(5000);
+    }
+
+    public boolean finishedCalculation() {
         return true;
     }
 
