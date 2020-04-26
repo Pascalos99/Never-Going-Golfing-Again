@@ -206,7 +206,7 @@ public class Ball implements TopDownPhysicsObject {
         );
 
         if(flight_state == LAUNCH)
-            vec = new Vector3d(vec.get_x(), toWorldScale(height), vec.get_z());
+            vec = new Vector3d(vec.get_x(), toWorldScale(height + BALL_RADIUS), vec.get_z());
 
         return vec;
     }
