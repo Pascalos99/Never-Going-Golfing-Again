@@ -137,7 +137,6 @@ public class TerrainBuilder {
         MeshPartBuilder builder;
         AtomFunction2d func = new AtomFunction2d(FunctionParser.parse("sin(x)+cos(y)"));
         double y_scalar = WORLD_SCALING;
-
         try{
             func = new AtomFunction2d(FunctionParser.parse(GAME_ASPECTS.getHeightFunction()));
         } catch(Error e) {
@@ -153,7 +152,12 @@ public class TerrainBuilder {
                 float gw = (float) (2f*Math.PI) / (gridWidth * 5f);
                 float gd = (float) (2f*Math.PI) / (gridDepth * 5f);
                 modelBuilder.begin();
-                builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));
+                if(WIREFRAME){
+                    builder = modelBuilder.part("grid", GL20.GL_LINES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));
+                } else {
+                    builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));
+                }
+
                 float x, y = 0;
 
                 for (int i = 0; i < gridWidth; i++) {
@@ -221,6 +225,7 @@ public class TerrainBuilder {
                         v4 = new MeshPartBuilder.VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(0.5f, 0.5f);
 
                         builder.rect(v1, v2, v3, v4);
+                        builder.line(pos1,pos1.add(nor1));
                     }
                 }
 

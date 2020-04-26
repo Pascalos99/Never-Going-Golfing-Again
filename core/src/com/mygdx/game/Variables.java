@@ -121,4 +121,6 @@ public final class Variables {
 
 	public static CrazyPutting GAME = null;
 	public static boolean ALLOW_FLIGHT = true;
+
+	public static boolean WIREFRAME = false;
 }
