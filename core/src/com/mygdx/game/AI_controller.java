@@ -21,7 +21,14 @@ public interface AI_controller {
     /** Gets ran at the start of your turn ONCE, the player parameter is the current player the bot is controlling during
      * its turn.<br> It can be used to get information on the ball
      *   (current position for instance would be new Vector2d(player.getBall().x, player.getBall().y) ) */
-    boolean calculate(Player player);
+    void startCalculation(Player player);
+
+    /**
+     * @return {@code true} if calculation is completed and the bot is ready to return the correct shot angle and velocity upon request.
+     *          this enables you to multi-thread in order to calculate, if you are not multi-threading, you will likely not need to
+     *          do more than just always return {@code true}.
+     */
+    boolean finishedCalculation();
 
     /** @return the desired shot angle in radians (positive x is 2k rad, negative x is 2k + pi rad,
      *      positive y is 2k + pi/2 rad and negative y is 2k - pi/2 rad; here k is any member of Z,
