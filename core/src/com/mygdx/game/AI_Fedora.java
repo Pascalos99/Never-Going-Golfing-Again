@@ -1,17 +1,16 @@
 package com.mygdx.game;
 
+import java.util.List;
+
 import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.AIUtils.*;
 
 public class AI_Fedora implements AI_controller {
-    private int TOTAL_STEPS = 8;
-    private double TURN_STEP = (360d * Math.PI / 180d) / (double)TOTAL_STEPS;
-    private  double shot_angle, shot_speed;
+    private double shot_angle, shot_speed;
+    private List<Vector2d> points;
 
     private static class Fedora {}
     public Fedora the_fedora;
-
-    private Vector2d old_pos;
-    private double angle_offset = 0.0;
 
     @Override
     public String getTypeName() {
@@ -20,60 +19,45 @@ public class AI_Fedora implements AI_controller {
 
     @Override
     public void calculate(Player player) {
-        boolean rechoose = rewinded(player.getBall());
 
-        if(rechoose)
-            angle_offset += 0.1;
-
-        else
-            angle_offset = 0.0;
-
-        double x = player.getBall().x;
-        double y = player.getBall().y;
-        double fx = GAME_ASPECTS.goalX;
-        double fy = GAME_ASPECTS.goalY;
-
-        Vector2d relative = new Vector2d(fx - x, fy - y);
-
-        Vector2d[] vecs = new Vector2d[TOTAL_STEPS];
-
-        for(int i = 0; i < vecs.length; i++){
-            vecs[i] = relative.rotate((TURN_STEP * i) + angle_offset).normalize();
+        if(points == null){
+            Vector2d lowest = findLowestGradient(WORLD.get_height());
+            points = getPointsWithGradient(WORLD.get_height(), lowest, 0.01);
         }
 
-        Vector2d best_direction = null, old_to_flag = null;
-        double best_speed = 0d;
+        Vector2d selection = null;
+        double distance = 0d;
+        double speed = 0d;
 
-        for(int i = 0; i < vecs.length; i++){
-            Vector2d direction = vecs[i];
+        for (Vector2d p : points){
 
-            for(double speed = 0.24d; speed < GAME_ASPECTS.maxVelocity; speed += 0.24d){
-                old_pos = new Vector2d(player.getBall().x, player.getBall().y);
-                Ball ball = player.getBall().simulateHit(direction, speed);
-                Vector2d to_flag = WORLD.flag_position.sub(new Vector2d(ball.x, ball.y));
+                for(double i = 0d; i < 6d; i += MAX_SHOT_VELOCITY/20d) {
+                    double new_distance = unfoldDistance(p, WORLD.get_flag_position(), WORLD.get_height(), 1000);
 
-                if(!ball.isStuck()){
-
-                    if(best_direction == null){
-                        best_direction = direction;
-                        old_to_flag = to_flag;
-                        best_speed = speed;
+                    if(selection == null){
+                        selection = p;
+                        distance = new_distance;
+                        speed = i;
                     }
 
-                    else if(to_flag.get_length() < old_to_flag.get_length()){
-                        best_direction = direction;
-                        old_to_flag = to_flag;
-                        best_speed = speed;
+                    else if (new_distance < distance && successful(p, player.getBall(), i, new_distance)) {
+                        distance = new_distance;
+                        selection = p;
+                        speed = i;
                     }
 
                 }
 
-            }
-
         }
 
-        shot_angle = Math.atan2(best_direction.get_y(), best_direction.get_x());
-        shot_speed = best_speed;
+        points.remove(selection);
+
+        if(points.isEmpty())
+            points = null;
+
+        Vector2d direction = selection.sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
+        shot_angle = Math.atan2(direction.get_y(), direction.get_x());
+        shot_speed = speed;
     }
 
     @Override
@@ -86,17 +70,15 @@ public class AI_Fedora implements AI_controller {
         return shot_speed;
     }
 
-    private boolean rewinded(Ball ball){
+    private  boolean successful(Vector2d p, Ball b, double speed, double expected_distance){
+        Vector2d relative = p.sub(new Vector2d(b.x, b.y)).normalize();
+        Ball out = b.simulateHit(relative, speed, 8000, 0.01);
 
-        if(old_pos == null)
-            return false;
+        if(out.isTouchingFlag())
+            return true;
 
-        else{
-
-            if(old_pos.get_x() == ball.x && old_pos.get_y() == ball.y)
-                return true;
-
-        }
+        if(!out.isStuck() && unfoldDistance(new Vector2d(out.x, out.y), WORLD.get_flag_position(), WORLD.get_height(), 1000) - expected_distance < 1d)
+            return true;
 
         return false;
     }
