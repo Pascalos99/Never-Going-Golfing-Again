@@ -127,7 +127,7 @@ public final class AIUtils {
         return error / (steps * steps);
     }
 
-    static double[][] gridLike(Function2d h, int steps){
+    static double[][] asGrid(Function2d h, int steps){
         double[][] heights = new double[steps][steps];
 
         for(double i = 0d; i < 1d; i += 1d/((double) steps)) {
@@ -137,12 +137,11 @@ public final class AIUtils {
                 double y = linearInterpolate(0, 50, j);
                 double height = h.evaluate(x, y);
 
-                heights[(int)(y * steps)][(int)(x * steps)] = 0;
+                heights[(int)(i * steps)][(int)(j * steps)] = 0;
 
                 if (height > 0) {
-                    heights[(int)(y * steps)][(int)(x * steps)] = height;
+                    heights[(int)(i * steps)][(int)(j * steps)] = height;
                 }
-
             }
 
         }
