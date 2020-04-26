@@ -152,6 +152,10 @@ public class CrazyPutting  implements ApplicationListener {
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
+
+        System.out.format("the height function is %s\n", WORLD.get_height());
+        System.out.format("f(10,10) = %.4f\n", WORLD.get_height().evaluate(10, 10));
+
     }
 
     @Override

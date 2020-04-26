@@ -139,7 +139,7 @@ public class TerrainBuilder {
         double y_scalar = WORLD_SCALING;
 
         try{
-            func = new AtomFunction2d(FunctionParser.parse(GAME_ASPECTS.getHeightFunction()));
+            func = new AtomFunction2d(GAME_ASPECTS.getHeightFunction());
         } catch(Error e) {
             System.out.println(e);
         }
