@@ -142,7 +142,7 @@ public abstract class Player {
         }
 
         public String getBotName() {
-            return bot.getTypeName();
+            return bot.getName();
         }
         public AI_controller getAI() {
             return bot;
