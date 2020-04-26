@@ -22,7 +22,7 @@ public class AI_Fedora implements AI_controller {
 
     @Override
     public String getDescription() {
-        return "Heuristic sampling route selection AI.";
+        return "Heuristic selection with route sampling AI.";
     }
 
     @Override
