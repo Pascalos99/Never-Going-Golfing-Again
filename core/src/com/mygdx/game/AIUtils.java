@@ -14,7 +14,7 @@ public final class AIUtils {
     static Vector2d findLowestGradient(Function2d h, int parts){
         Vector2d xy = null;
         double total_gradient = 0;
-        int steps = parts; //1000
+        int steps = parts;
 
         for(double i = 0d; i < 1d; i += 1d/((double) steps)){
             double x = linearInterpolate(0, 50, i);
@@ -52,7 +52,7 @@ public final class AIUtils {
         return h.gradient(xy);
     }
 
-    static double unfoldDistance(Vector2d a, Vector2d b, Function2d h, int steps){ // Computes real distance from A to B
+    static double unfoldDistance(Vector2d a, Vector2d b, Function2d h, int steps){
         double distance = 0d;
         Vector2d prev = a;
 
@@ -75,7 +75,7 @@ public final class AIUtils {
 
     static List<Vector2d> getPointsWithGradient(Function2d h, Vector2d gradient, double tolerance, int parts){
         double total_gradient = gradient.abs().get_x() + gradient.abs().get_y();
-        int steps = parts; //1000
+        int steps = parts;
         List<Vector2d> points = new ArrayList<Vector2d>();
 
         for(double i = 0d; i < 1d; i += 1d/((double) steps)) {
@@ -102,7 +102,7 @@ public final class AIUtils {
     }
 
     public static double fluctuation(Function2d h, int parts){
-        int steps = parts; //1000
+        int steps = parts;
         double error = 0d;
         Vector2d old_gradient = h.gradient(0, 0);
 
@@ -125,6 +125,29 @@ public final class AIUtils {
         }
 
         return error / (steps * steps);
+    }
+
+    static double[][] gridLike(Function2d h, int steps){
+        double[][] heights = new double[steps][steps];
+
+        for(double i = 0d; i < 1d; i += 1d/((double) steps)) {
+            double x = linearInterpolate(0, 50, i);
+
+            for (double j = 0d; j < 1d; j += 1d / ((double) steps)) {
+                double y = linearInterpolate(0, 50, j);
+                double height = h.evaluate(x, y);
+
+                heights[(int)(y * steps)][(int)(x * steps)] = 0;
+
+                if (height > 0) {
+                    heights[(int)(y * steps)][(int)(x * steps)] = height;
+                }
+
+            }
+
+        }
+
+        return  heights;
     }
 
 }

@@ -77,7 +77,6 @@ public class AI_Fedora implements AI_controller {
         else if(selection == null || speed == 0d){
             selection = WORLD.get_flag_position();
             speed = MAX_SHOT_VELOCITY;
-            System.out.println("Fedora thinks there is no way to win this map.");
         }
 
         if(points.isEmpty())
@@ -86,7 +85,6 @@ public class AI_Fedora implements AI_controller {
         Vector2d direction = selection.sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
         shot_angle = Math.atan2(direction.get_y(), direction.get_x());
         shot_speed = speed;
-        System.out.println("Fedora is done calculating.");
     }
 
     @Override
