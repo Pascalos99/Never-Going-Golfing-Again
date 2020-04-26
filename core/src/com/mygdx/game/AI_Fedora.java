@@ -1,13 +1,15 @@
 package com.mygdx.game;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.mygdx.game.Variables.*;
 import static com.mygdx.game.AIUtils.*;
 
 public class AI_Fedora implements AI_controller {
-    private double RESOLUTION_SLOPE = 234894.41577521723;
-    private int res;
+    private double RESOLUTION_SLOPE = (1010d - 10d) / 0.0046d;
+    private int explore_resolution;
 
     private double shot_angle, shot_speed;
     private List<Vector2d> points;
@@ -31,20 +33,33 @@ public class AI_Fedora implements AI_controller {
         if(points == null){
             double error = fluctuation(WORLD.get_height(), 100);
             System.out.println("Cumulative Error: " + error);
-            res = (int) resolution(error);
-            System.out.println("Calculated resolution is " + res);
-
-            if(res < 0)
-                res = (int)resolution(0.003);
-
-            else if(res > 1070)
-                res = 1070;
-
-            System.out.println("Re-limited resolution is " + res);
-            Vector2d lowest = findLowestGradient(WORLD.get_height(), res);
-            points = getPointsWithGradient(WORLD.get_height(), lowest, 0.01, res);
+            explore_resolution = (int) resolution(error);
+            System.out.println("Calculated resolution is " + explore_resolution);
+            Vector2d lowest = findLowestGradient(WORLD.get_height(), explore_resolution);
+            points = getPointsWithGradient(WORLD.get_height(), lowest, 0.01, explore_resolution);
             System.out.println("Fedora found " + points.size() + " options.");
         }
+
+        Collections.sort(points, new Comparator<Vector2d>() {
+            @Override
+            public int compare(Vector2d a, Vector2d b) {
+                Vector2d rel_a = a.sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
+                Vector2d rel_b = b.sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
+                Vector2d goal = WORLD.get_flag_position().sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
+
+                double comp_a = rel_a.dot(goal);
+                double comp_b = rel_b.dot(goal);
+
+                if(comp_a > comp_b)
+                    return 1;
+
+                if(comp_a < comp_b)
+                    return -1;
+
+                return 0;
+            }
+        });
+
 
         Vector2d selection = null;
         double distance = 0d;
@@ -70,6 +85,9 @@ public class AI_Fedora implements AI_controller {
                 }
 
         }
+
+        selection = points.get(points.size() - 1);
+        speed = MAX_SHOT_VELOCITY;
 
         if(selection != null)
             points.remove(selection);

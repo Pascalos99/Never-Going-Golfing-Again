@@ -127,7 +127,7 @@ public final class AIUtils {
         return error / (steps * steps);
     }
 
-    static double[][] gridLike(Function2d h, int steps){
+    static double[][] asGrid(Function2d h, int steps){
         double[][] heights = new double[steps][steps];
 
         for(double i = 0d; i < 1d; i += 1d/((double) steps)) {
