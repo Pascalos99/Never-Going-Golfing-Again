@@ -60,6 +60,23 @@ public class AI_Fedora implements AI_controller {
             }
         });
 
+        for(int i = 0; i < points.size() - 1; i++){
+            Vector2d a_point = points.get(i);
+            Vector2d b_point = points.get(i + 1);
+
+            Vector2d rel_a = a_point.sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
+            Vector2d rel_b = b_point.sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
+            Vector2d goal = WORLD.get_flag_position().sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
+
+            double comp_a = rel_a.dot(goal);
+            double comp_b = rel_b.dot(goal);
+
+            if(Math.abs(comp_a - comp_b) < 0.5){
+
+            }
+
+        }
+
 
         Vector2d selection = null;
         double distance = 0d;

@@ -163,15 +163,11 @@ public class CrazyPutting  implements ApplicationListener {
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.f));
         //environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
-        shadowLight = new DirectionalShadowLight(16384, 16384, 130f, 130f, 1f, 150f);
+        shadowLight = new DirectionalShadowLight(1024, 1024, 60f, 60f, .1f, 50f);
         environment.add(shadowLight.set(0.8f, 0.8f, 0.8f, -0.5f, -1.0f, 0.5f));
         environment.shadowMap = shadowLight;
 
-        System.out.format("the height function is %s\n", WORLD.get_height());
-        System.out.format("f(10,10) = %.4f\n", WORLD.get_height().evaluate(10, 10));
-
         shadowBatch = new ModelBatch(new DepthShaderProvider());
-
     }
 
     @Override
@@ -259,28 +255,38 @@ public class CrazyPutting  implements ApplicationListener {
             add_shot_velocity(-SHOT_VELOCITY_INCREASE());
         }
 
+        modelBatch.begin(CAMERA);
 
-        for(Player p : GAME_ASPECTS.players) {
-            if (p.getBall().hit_count > 0 || p == currentPlayer)
-                shadowLight.begin(Vector3.Zero, CAMERA.direction);
-                shadowBatch.begin(shadowLight.getCamera());
-                shadowBatch.render(p.getBall().getModel(),environment);
-                modelBatch.render(p.getBall().getModel(), environment);
+        if(ALLOW_LIGHT) {
+            shadowLight.begin(Vector3.Zero, CAMERA.direction);
+            shadowBatch.begin(shadowLight.getCamera());
         }
 
-        modelBatch.begin(CAMERA);
+        for(Player p : GAME_ASPECTS.players) {
+
+            if ((p.getBall().hit_count > 0 || p == currentPlayer) && ALLOW_LIGHT)
+                shadowBatch.render(p.getBall().getModel(), environment);
+
+            modelBatch.render(p.getBall().getModel(), environment);
+        }
+
         for (int i = 0; i < 25; i++)
             modelBatch.render(terrainInstance[i], environment);
-        shadowBatch.render(flagInstance, environment);
-        shadowBatch.render(poleInstance, environment);
-        shadowBatch.end();
-        shadowLight.end();
+
         modelBatch.render(flagInstance, environment);
         modelBatch.render(poleInstance, environment);
         modelBatch.render(flagRangeInstance, environment);
 
         modelBatch.render(waterInstance, environment);
         modelBatch.render(wallInstance, environment);
+
+        if(ALLOW_LIGHT) {
+            shadowBatch.render(flagInstance, environment);
+            shadowBatch.render(poleInstance, environment);
+            shadowBatch.end();
+            shadowLight.end();
+        }
+
         modelBatch.end();
 
         if(!currentPlayer.getBall().is_moving){

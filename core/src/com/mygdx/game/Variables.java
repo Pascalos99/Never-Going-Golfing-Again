@@ -86,7 +86,7 @@ public final class Variables {
 	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("glassy-ui.json"));
 
 	//PHYSICS
-	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is
+	public static double GRADIENT_CUTTOFF = 0.5d; // no clue what unit this is
 	public static double MAX_SHOT_VELOCITY = 6d;
 	public static double SHOT_VELOCITY = MAX_SHOT_VELOCITY/2d;
 	public static double SHOT_VELOCITY_INCREASE() { return 0.01 * MAX_SHOT_VELOCITY; }
@@ -118,4 +118,5 @@ public final class Variables {
 
 	public static CrazyPutting GAME = null;
 	public static boolean ALLOW_FLIGHT = true;
+	public static boolean ALLOW_LIGHT = false;
 }
