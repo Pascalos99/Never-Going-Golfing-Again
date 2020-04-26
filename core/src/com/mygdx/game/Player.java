@@ -13,11 +13,27 @@ public abstract class Player {
     private Ball ball;
     private Vector3 cameraPosition=new Vector3(-5f,5f,-5f);
 
+    private double pitch = PITCH;
+    private double yaw = YAW;
+    private double view_zoom = VIEW_ZOOM;
+
     public Player(String name,int id, String color){
         this.name = name;
         this.id=id;
         this.ballColor=color;
         shots=0;
+    }
+
+    public void loadCamera() {
+        PITCH = pitch;
+        YAW = yaw;
+        VIEW_ZOOM = view_zoom;
+    }
+
+    public void saveCamera() {
+        pitch = PITCH;
+        yaw = YAW;
+        view_zoom = VIEW_ZOOM;
     }
 
     public abstract void notifyStartOfTurn();
@@ -35,14 +51,14 @@ public abstract class Player {
     }
 
     public Vector3 getCameraPosition(){
-        double xzLen = Math.cos(pitch);
-        double _x = xzLen * Math.cos(yaw);
-        double _y = Math.sin(pitch);
-        double _z = xzLen * Math.sin(-yaw);
+        double xzLen = Math.cos(PITCH);
+        double _x = xzLen * Math.cos(YAW);
+        double _y = Math.sin(PITCH);
+        double _z = xzLen * Math.sin(-YAW);
 
-        _x *= view_zoom;
-        _y *= view_zoom;
-        _z *= view_zoom;
+        _x *= VIEW_ZOOM;
+        _y *= VIEW_ZOOM;
+        _z *= VIEW_ZOOM;
 
         Vector3d add = ball.getPosition();
         Vector3 pre = new Vector3((float)_x, (float)_y, (float)_z);

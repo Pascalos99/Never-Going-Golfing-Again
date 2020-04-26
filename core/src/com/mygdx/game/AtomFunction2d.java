@@ -15,7 +15,7 @@ public class AtomFunction2d implements Function2d {
 		this.function = function.simplify();
 		derivative_x = function.derivate("x").simplify();
 		derivative_y = function.derivate("y").simplify();
-		map = new HashMap<String, Double>();
+		map = new HashMap<>();
 	}
 
 	@Override
