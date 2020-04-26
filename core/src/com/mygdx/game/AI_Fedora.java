@@ -13,8 +13,13 @@ public class AI_Fedora implements AI_controller {
     public Fedora the_fedora;
 
     @Override
-    public String getTypeName() {
+    public String getName() {
         return "Fedora Bot";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Heuristic sampling route selection AI.";
     }
 
     @Override
