@@ -120,4 +120,6 @@ public final class Variables {
 	public static boolean ALLOW_FLIGHT = true;
 
 	public static boolean WIREFRAME = false;
+
+	public static boolean SHADOWS = false;
 }

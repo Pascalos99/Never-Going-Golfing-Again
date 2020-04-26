@@ -262,19 +262,23 @@ public class CrazyPutting  implements ApplicationListener {
 
         for(Player p : GAME_ASPECTS.players) {
             if (p.getBall().hit_count > 0 || p == currentPlayer)
-                shadowLight.begin(Vector3.Zero, CAMERA.direction);
-                shadowBatch.begin(shadowLight.getCamera());
-                shadowBatch.render(p.getBall().getModel(),environment);
+                if(SHADOWS) {
+                    shadowLight.begin(Vector3.Zero, CAMERA.direction);
+                    shadowBatch.begin(shadowLight.getCamera());
+                    shadowBatch.render(p.getBall().getModel(), environment);
+                }
                 modelBatch.render(p.getBall().getModel(), environment);
         }
 
         modelBatch.begin(CAMERA);
         for (int i = 0; i < 25; i++)
             modelBatch.render(terrainInstance[i], environment);
-        shadowBatch.render(flagInstance, environment);
-        shadowBatch.render(poleInstance, environment);
-        shadowBatch.end();
-        shadowLight.end();
+        if(SHADOWS)  {
+            shadowBatch.render(flagInstance, environment);
+            shadowBatch.render(poleInstance, environment);
+            shadowBatch.end();
+            shadowLight.end();
+        }
         modelBatch.render(flagInstance, environment);
         modelBatch.render(poleInstance, environment);
         modelBatch.render(flagRangeInstance, environment);
