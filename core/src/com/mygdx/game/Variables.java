@@ -118,5 +118,5 @@ public final class Variables {
 
 	public static CrazyPutting GAME = null;
 	public static boolean ALLOW_FLIGHT = true;
-	public static boolean ALLOW_LIGHT = false;
+	public static boolean CAST_SHADOWS = false;
 }

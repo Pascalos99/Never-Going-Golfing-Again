@@ -11,11 +11,9 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 
@@ -257,14 +255,14 @@ public class CrazyPutting  implements ApplicationListener {
 
         modelBatch.begin(CAMERA);
 
-        if(ALLOW_LIGHT) {
+        if(CAST_SHADOWS) {
             shadowLight.begin(Vector3.Zero, CAMERA.direction);
             shadowBatch.begin(shadowLight.getCamera());
         }
 
         for(Player p : GAME_ASPECTS.players) {
 
-            if ((p.getBall().hit_count > 0 || p == currentPlayer) && ALLOW_LIGHT)
+            if ((p.getBall().hit_count > 0 || p == currentPlayer) && CAST_SHADOWS)
                 shadowBatch.render(p.getBall().getModel(), environment);
 
             modelBatch.render(p.getBall().getModel(), environment);
@@ -280,7 +278,7 @@ public class CrazyPutting  implements ApplicationListener {
         modelBatch.render(waterInstance, environment);
         modelBatch.render(wallInstance, environment);
 
-        if(ALLOW_LIGHT) {
+        if(CAST_SHADOWS) {
             shadowBatch.render(flagInstance, environment);
             shadowBatch.render(poleInstance, environment);
             shadowBatch.end();

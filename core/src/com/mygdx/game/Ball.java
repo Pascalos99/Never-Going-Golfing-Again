@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.math.Vector3;
 
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class Ball implements TopDownPhysicsObject {
     private static int LAUNCH = 0;
     private static int ROLL = 2;
 
+    public double travel_distance;
+
     Ball(double radius, double x_pos, double y_pos, ModelInstance model, Player owner) {
         x = x_pos;
         y = y_pos;
@@ -40,6 +43,8 @@ public class Ball implements TopDownPhysicsObject {
 
         flight_state = ROLL;
         height_velocity = 0;
+
+        travel_distance = 0d;
     }
 
     public void step(double delta, List<TopDownPhysicsObject> ents) {
@@ -70,6 +75,8 @@ public class Ball implements TopDownPhysicsObject {
 
                 double height_difference = h.evaluate(x, y) - h.evaluate(test_x, test_y);
                 height_velocity = height_difference + delta * (-mass * flightGravity());
+
+                travel_distance += (new Vector3((float)velocity.get_x(), 0f, (float)velocity.get_y())).len();
 
                 if(fence_check && velocity.get_length() < VELOCITY_CUTTOFF){
                     is_moving = false;
@@ -110,6 +117,8 @@ public class Ball implements TopDownPhysicsObject {
                     flight_state = ROLL;
                     height_velocity = 0;
                 }
+
+                travel_distance += (new Vector3((float)velocity.get_x(), 0f, (float)velocity.get_y())).len();
 
             }
 
@@ -263,6 +272,7 @@ public class Ball implements TopDownPhysicsObject {
         old_x = x;
         old_y = y;
         turn_state = TURN_STATE_WAIT;
+        travel_distance = 0d;
     }
 
     public void rewind(){
