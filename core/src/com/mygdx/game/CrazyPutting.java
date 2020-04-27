@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
@@ -160,12 +161,16 @@ public class CrazyPutting  implements ApplicationListener {
         arrowInstance = new ModelInstance(arrow, 0, 0, 0);
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.f));
-        //environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
-        shadowLight = new DirectionalShadowLight(16384, 16384, 130f, 130f, 1f, 150f);
-        environment.add(shadowLight.set(0.8f, 0.8f, 0.8f, -0.5f, -1.0f, 0.5f));
-        environment.shadowMap = shadowLight;
 
-        shadowBatch = new ModelBatch(new DepthShaderProvider());
+        if(CAST_SHADOWS){
+            shadowLight = new DirectionalShadowLight(16384, 16384, 130f, 130f, 1f, 150f);
+            environment.add(shadowLight.set(0.8f, 0.8f, 0.8f, -0.5f, -1.0f, 0.5f));
+            environment.shadowMap = shadowLight;
+            shadowBatch = new ModelBatch(new DepthShaderProvider());
+        } else {
+            environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
+        }
+
     }
 
     @Override
