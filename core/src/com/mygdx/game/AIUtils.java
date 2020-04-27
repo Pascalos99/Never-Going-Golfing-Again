@@ -68,6 +68,7 @@ public final class AIUtils {
             Vector3 prev_vec3 = new Vector3(((float)prev.get_x()), (float)prev_h, ((float)prev.get_y()));
 
             distance += curr_vec3.dst(prev_vec3);
+            prev = curr;
         }
 
         return  distance;
