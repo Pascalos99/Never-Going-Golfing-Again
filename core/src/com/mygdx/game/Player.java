@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.async.ThreadUtils;
 
 import static com.mygdx.game.Variables.*;
 
@@ -159,13 +158,6 @@ public abstract class Player {
         public Bot(String name, int id, String color, AI_controller bot) {
             super(name, id, color);
             this.bot = bot;
-        }
-
-        public String getBotName() {
-            return bot.getName();
-        }
-        public AI_controller getAI() {
-            return bot;
         }
 
         public void notifyStartOfTurn() {

@@ -5,7 +5,7 @@ import java.util.*;
 import static com.mygdx.game.Variables.WORLD;
 import static java.lang.Math.PI;
 
-public class AI_SimpleLearner implements AI_controller {
+public class AI_SimpleLearner extends AI_controller {
 
     public AI_SimpleLearner() {
         VMODs = new HashMap<>();
@@ -24,7 +24,7 @@ public class AI_SimpleLearner implements AI_controller {
     }
 
     @Override
-    public void startCalculation(Player player) {
+    public void calculate(Player player) {
         current_player = player;
         if (!has_seen_player(player)) setup(player);
         Vector2d currentPos = new Vector2d(player.getBall().x, player.getBall().y);
@@ -43,10 +43,6 @@ public class AI_SimpleLearner implements AI_controller {
 
         if (last_distance_to_flag.get(player) < best_distance_to_flag.get(player))
             best_distance_to_flag.put(player, last_distance_to_flag.get(player));
-    }
-
-    public boolean finishedCalculation() {
-        return true;
     }
 
     private static double epi = PI/8;
