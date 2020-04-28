@@ -18,10 +18,8 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 
-import static com.mygdx.game.Variables.CAMERA;
-import static com.mygdx.game.Variables.BALL_RADIUS;
-import static com.mygdx.game.Variables.GAME_ASPECTS;
-
+import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.AIUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,14 +110,14 @@ public class CrazyPutting  implements ApplicationListener {
         builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.RED)));
         builder.box(0.5f,3.1f,0,1f,0.7f,0.03f);
         Model flag = modelBuilder.end();
-        poleInstance = new ModelInstance(pole,(float) course.get_flag_position().get_x() * WORLD_SCALING, (float) course.getHeightAt(course.get_flag_position().get_x(), course.get_flag_position().get_y()), (float) course.get_flag_position().get_y() * WORLD_SCALING);
-        flagInstance = new ModelInstance(flag,(float) course.get_flag_position().get_x() * WORLD_SCALING, (float) course.getHeightAt(course.get_flag_position().get_x(), course.get_flag_position().get_y()), (float) course.get_flag_position().get_y() * WORLD_SCALING);
+        poleInstance = new ModelInstance(pole,(float) course.get_flag_position().get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.get_flag_position().get_x(), course.get_flag_position().get_y())), (float) course.get_flag_position().get_y() * WORLD_SCALING);
+        flagInstance = new ModelInstance(flag,(float) course.get_flag_position().get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.get_flag_position().get_x(), course.get_flag_position().get_y())), (float) course.get_flag_position().get_y() * WORLD_SCALING);
 
         Model poleRange = modelBuilder.createCylinder( side, FLAGPOLE_HEIGHT, side, 40, new Material(ColorAttribute.createDiffuse(new Color(1, 0.4f, 1, 1f)), new BlendingAttribute(0.3f)),
                 Usage.Position | Usage.Normal);
 
-        flagPoleInstance = new ModelInstance(pole, (float) course.get_flag_position().get_x()*WORLD_SCALING, (float) course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y()), (float) (course.get_flag_position().get_y()*WORLD_SCALING));
-        flagRangeInstance = new ModelInstance(poleRange,  (float) course.get_flag_position().get_x()*WORLD_SCALING, (float) course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y()), (float) course.get_flag_position().get_y()*WORLD_SCALING);
+        flagPoleInstance = new ModelInstance(pole, (float) course.get_flag_position().get_x()*WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y())), (float) (course.get_flag_position().get_y()*WORLD_SCALING));
+        flagRangeInstance = new ModelInstance(poleRange,  (float) course.get_flag_position().get_x()*WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y())), (float) course.get_flag_position().get_y()*WORLD_SCALING);
         terrainInstance = TerrainBuilder.buildTerrain();
         waterInstance = TerrainBuilder.buildWater();
         wallInstance = TerrainBuilder.buildWalls();
@@ -171,6 +169,12 @@ public class CrazyPutting  implements ApplicationListener {
             environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
         }
 
+        System.out.println("Corner to corner distance: " + unfoldDistance(
+                new Vector2d(0, 0),
+                new Vector2d(50d / WORLD_SCALING, 50d / WORLD_SCALING),
+                WORLD.get_height(),
+                100
+        ));
     }
 
     @Override
@@ -179,9 +183,11 @@ public class CrazyPutting  implements ApplicationListener {
 
     @Override
     public void render() {
+
         if(Gdx.input.isKeyPressed(Input.Keys.P)){
             gameScreen.endGame=true;
         }
+
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClearColor(1, 1, 1, 1);
@@ -219,11 +225,16 @@ public class CrazyPutting  implements ApplicationListener {
             if (currentPlayer instanceof Player.Human)
                 SHOT_VELOCITY=gameScreen.getInputVelocity();
 
-            if (!currentPlayer.getBall().is_moving)
+            if (!currentPlayer.getBall().is_moving) {
                 currentPlayer.getBall().hit(
                         (new Vector2d(CAMERA.direction.x, CAMERA.direction.z)).normalize(),
                         SHOT_VELOCITY * standard_factor
                 );
+
+                Vector2d vec = (new Vector2d(CAMERA.direction.x, CAMERA.direction.z)).normalize();
+                System.out.println("Hit direction is " + vec.angle());
+            }
+
         }
 
         if (currentPlayer.requestedZoomIn()) {
