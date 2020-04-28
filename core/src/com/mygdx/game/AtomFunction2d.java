@@ -19,14 +19,14 @@ public class AtomFunction2d implements Function2d {
 	}
 
 	@Override
-	public Vector2d gradient(double x, double y) {
+	public synchronized Vector2d gradient(double x, double y) {
 		map.put("x", x);
 		map.put("y", y);
 		return new Vector2d(derivative_x.apply(map), derivative_y.apply(map));
 	}
 
 	@Override
-	public double evaluate(double x, double y) {
+	public synchronized double evaluate(double x, double y) {
 		map.put("x", x);
 		map.put("y", y);
 		return function.apply(map);

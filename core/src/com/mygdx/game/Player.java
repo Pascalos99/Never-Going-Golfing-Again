@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.async.ThreadUtils;
 
 import static com.mygdx.game.Variables.*;
 
@@ -154,18 +153,12 @@ public abstract class Player {
         private double desired_shot_velocity;
         private double desired_shot_angle;
         private boolean adjusted_speed;
+        private boolean adjusted_angle;
         private boolean turn_over;
 
         public Bot(String name, int id, String color, AI_controller bot) {
             super(name, id, color);
             this.bot = bot;
-        }
-
-        public String getBotName() {
-            return bot.getName();
-        }
-        public AI_controller getAI() {
-            return bot;
         }
 
         public void notifyStartOfTurn() {
@@ -195,6 +188,7 @@ public abstract class Player {
 
         private void startSequence() {
             adjusted_speed = false;
+            adjusted_angle = false;
             desired_shot_velocity = bot.getShotVelocity();
             if (desired_shot_velocity > GAME_ASPECTS.maxVelocity) desired_shot_velocity = GAME_ASPECTS.maxVelocity;
             if (desired_shot_velocity < 0) desired_shot_velocity = 0;
@@ -207,39 +201,34 @@ public abstract class Player {
         public boolean requestedHit(){
             if (!testCalculate()) return false;
             if (turn_over) return false;
-            if (Math.abs(getShotAngle() - desired_shot_angle) < AI_SHOT_ANGLE_BOUND)
-                if (adjusted_speed) {
-                    turn_over = true;
-                    return true;
-                }
+            if (adjusted_speed && adjusted_angle) {
+                turn_over = true;
+                return true;
+            }
             return false;
         }
 
         public boolean requestedTurnRight(){
             if (!testCalculate()) return false;
-
             if(getBall().turn_state == TURN_STATE_WAIT){
                 return Gdx.input.isKeyPressed(Input.Keys.RIGHT);
             }
-
             else {
                 if (!turnRight(getShotAngle(), desired_shot_angle)) return false;
                 else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
-                return false;
+                return setShotAngle();
             }
         }
 
         public boolean requestedTurnLeft(){
             if (!testCalculate()) return false;
-
             if(getBall().turn_state == TURN_STATE_WAIT){
                 return Gdx.input.isKeyPressed(Input.Keys.LEFT);
             }
-
             else {
                 if (turnRight(getShotAngle(), desired_shot_angle)) return false;
                 else if (Math.abs(getShotAngle() - desired_shot_angle) > AI_SHOT_ANGLE_BOUND) return true;
-                return false;
+                return setShotAngle();
             }
 
         }
@@ -264,9 +253,7 @@ public abstract class Player {
 
             if (SHOT_VELOCITY > desired_shot_velocity) return false;
             if (Math.abs(SHOT_VELOCITY - desired_shot_velocity) > velocity_inching_bound) return true;
-            SHOT_VELOCITY = desired_shot_velocity;
-            adjusted_speed = true;
-            return false;
+            return setShotVelocity();
         }
 
         public boolean requestedDecreaseHitVelocity(){
@@ -274,8 +261,18 @@ public abstract class Player {
 
             if (SHOT_VELOCITY < desired_shot_velocity) return false;
             if (Math.abs(SHOT_VELOCITY - desired_shot_velocity) > velocity_inching_bound) return true;
+            return setShotVelocity();
+        }
+
+        private boolean setShotVelocity() {
             SHOT_VELOCITY = desired_shot_velocity;
             adjusted_speed = true;
+            return false;
+        }
+
+        private boolean setShotAngle() {
+            YAW = Math.PI - desired_shot_angle;
+            adjusted_angle = true;
             return false;
         }
 

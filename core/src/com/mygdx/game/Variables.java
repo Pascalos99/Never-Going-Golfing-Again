@@ -92,7 +92,7 @@ public final class Variables {
 	public static double SHOT_VELOCITY = MAX_SHOT_VELOCITY/2d;
 	public static double SHOT_VELOCITY_INCREASE() { return 0.01 * MAX_SHOT_VELOCITY; }
 
-	public static double PITCH = Math.PI * (2/9d);
+	public static double PITCH = Math.PI * 2/9d;
 	public static double YAW = Math.PI * 0.75;
 	public static double VIEW_ZOOM = 7;
 
@@ -111,7 +111,7 @@ public final class Variables {
 		return Math.atan2(dir.get_y()/*sin*/, dir.get_x()/*cos*/);
 	}
 	public static double AI_SHOT_ANGLE_BOUND = 0.03;
-	public static AI_controller[] AVAILABLE_BOTS = {new AI_Basic(), new AI_SimpleLearner(), new AI_Fedora(), new AI_Neural()};
+	public static AI_controller[] AVAILABLE_BOTS = {new AI_Basic(), new AI_SimpleLearner(), new AI_Fedora(), new AI_Finder()};
 
 	public static int TURN_STATE_START = 0;
 	public static int TURN_STATE_WAIT = 1;

@@ -6,7 +6,7 @@ import java.util.List;
 import static com.mygdx.game.Variables.*;
 import static com.mygdx.game.AIUtils.*;
 
-public class AI_Fedora implements AI_controller {
+public class AI_Fedora extends AI_controller {
     private double RESOLUTION_SLOPE = (1010d - 10d) / 0.0046d;
     private int explore_resolution;
     private int MAX_OPTIONS = 100;
@@ -31,7 +31,7 @@ public class AI_Fedora implements AI_controller {
     }
 
     @Override
-    public void startCalculation(Player player) {
+    public void calculate(Player player) {
         double error = fluctuation(WORLD.get_height(), 100);
 
         if(old_ball_position != null && old_ball_position.get_x() != player.getBall().x && old_ball_position.get_y() != player.getBall().y){
@@ -158,24 +158,10 @@ public class AI_Fedora implements AI_controller {
         //System.out.println("Decided shot velocity " + selection_speed);
 
         Vector2d direction = selection.sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
-        shot_angle = Math.atan2(direction.get_y(), direction.get_x());
-        shot_speed = selection_speed;
+        setShotAngle(Math.atan2(direction.get_y(), direction.get_x()));
+        setShotVelocity(selection_speed);
 
         old_ball_position = new Vector2d(player.getBall().x, player.getBall().y);
-    }
-
-    public boolean finishedCalculation() {
-        return true;
-    }
-
-    @Override
-    public double getShotAngle() {
-        return shot_angle;
-    }
-
-    @Override
-    public double getShotVelocity() {
-        return shot_speed;
     }
 
     private double resolution(double x){
