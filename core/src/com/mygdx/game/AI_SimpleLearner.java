@@ -29,7 +29,7 @@ public class AI_SimpleLearner extends AI_controller {
         if (!has_seen_player(player)) setup(player);
         Vector2d currentPos = new Vector2d(player.getBall().x, player.getBall().y);
         Vector2d toFlag = WORLD.flag_position.sub(currentPos);
-        angle = Math.atan2(toFlag.get_y(), toFlag.get_x());
+        angle = toFlag.angle();
         double distance_to_flag = toFlag.get_length();
 
         if (best_distance_to_flag.get(player) - distance_to_flag < delta_distance_bound)

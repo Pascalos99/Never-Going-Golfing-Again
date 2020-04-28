@@ -68,4 +68,6 @@ public class Vector2d {
 		return Math.sqrt((o.x - x)*(o.x - x) + (o.y - y)*(o.y - y));
 	}
 
+	public double angle() { return Math.atan2(get_y(), get_x()); }
+
 }

@@ -108,7 +108,7 @@ public final class Variables {
 	 * 		and switches abruptly from pi to -pi at the negative x-axis direction. */
 	public static double getShotAngle() {
 		Vector2d dir = new Vector2d(CAMERA.direction.x, CAMERA.direction.z).normalize();
-		return Math.atan2(dir.get_y()/*sin*/, dir.get_x()/*cos*/);
+		return dir.angle();
 	}
 	public static double AI_SHOT_ANGLE_BOUND = 0.03;
 	public static AI_controller[] AVAILABLE_BOTS = {new AI_Basic(), new AI_SimpleLearner(), new AI_Fedora(), new AI_Finder()};
