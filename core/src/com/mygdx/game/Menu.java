@@ -51,28 +51,21 @@ public class Menu extends Game {
 		System.out.print(">");
 		switch (screen){
 			case MAIN_MENU:
-				if(mainMenu==null){
-					System.out.println("Main Menu");
-					//will have all the buttons for game Choices and exit
-					mainMenu = new MainMenuScreen(this);
-					this.setScreen(mainMenu);
-				}
+				System.out.println("Main Menu");
+				//will have all the buttons for game Choices and exit
+				mainMenu = new MainMenuScreen(this);
+				this.setScreen(mainMenu);
 				break;
 			case DEFAULT_GAME:
 				System.out.println("Default GAME");
 				settings = new SettingsScreen(this);
-				//TODO: replace this printing with code for actual world and game generation
-
 				changeScreen(PLAY);
 				break;
 			case CUSTOM_GAME:
-				if(settings==null){
-					//TODO:replace this test code with game generation code
-					System.out.println("Custom GAME");
-					settings = new SettingsScreen(this);
-
-					this.setScreen(settings);
-				}
+				//TODO:replace this test code with game generation code
+				System.out.println("Custom GAME");
+				settings = new SettingsScreen(this);
+				this.setScreen(settings);
 				break;
 			case RANDOM_GAME:
 				System.out.println("Random GAME");
@@ -80,18 +73,14 @@ public class Menu extends Game {
 				this.setScreen(gameScreen);
 				break;
 			case PLAYER_SELECT:
-				if(players==null){
-					System.out.println("Player Select");
-					players =new PlayerScreen(this);
-					this.setScreen(players);
-				}
+				System.out.println("Player Select");
+				players =new PlayerScreen(this);
+				this.setScreen(players);
 				break;
 			case GAME_SELECT:
-				if (gameSelect == null) {
-					System.out.println("Game Select");
-					gameSelect= new GameSelectScreen(this);
-					this.setScreen(gameSelect);
-				}
+				System.out.println("Game Select");
+				gameSelect= new GameSelectScreen(this);
+				this.setScreen(gameSelect);
 				break;
 			case PLAY:
 				System.out.println("PLAY");
@@ -103,8 +92,6 @@ public class Menu extends Game {
 				gameScreen = new GameScreen(this, gameInfo);
 				this.setScreen(gameScreen);
 				break;
-
-
 
 		}
 	}

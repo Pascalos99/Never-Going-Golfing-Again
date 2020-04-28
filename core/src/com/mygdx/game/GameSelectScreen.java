@@ -8,7 +8,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
+import static com.mygdx.game.Variables.MENU_SKIN;
 
 public class GameSelectScreen implements Screen {
     private Menu parent;
@@ -25,7 +28,15 @@ public class GameSelectScreen implements Screen {
         TextButton defGame = new TextButton("Default Game", Variables.MENU_SKIN);
         TextButton customGame = new TextButton("Custom Game", Variables.MENU_SKIN);
         TextButton randomGame = new TextButton("Random Game", Variables.MENU_SKIN);
+        TextButton backButton= new TextButton("BACK",MENU_SKIN);
+        backButton.align(Align.bottomLeft);
+        backButton.addListener(new ChangeListener(){
 
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                parent.changeScreen(Menu.PLAYER_SELECT);
+            }
+        });
         table.row().pad(10, 0, 10, 0);
         table.add(defGame).fillX().uniformX();
         table.row().pad(0, 0, 10, 0);
@@ -56,6 +67,7 @@ public class GameSelectScreen implements Screen {
             }
 
         });
+        stage.addActor(backButton);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
     }

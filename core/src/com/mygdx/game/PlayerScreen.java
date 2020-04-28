@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -24,7 +25,7 @@ import static com.mygdx.game.Variables.*;
 public class PlayerScreen implements Screen {
     private Menu parent;
     private Stage stage;
-    private static int playerNumber=1;
+    private int playerNumber=1;
     private ArrayList<Player> players =new ArrayList<Player>();
     private Table playerTable;
     private static String humanPlayer = "None";
@@ -50,6 +51,7 @@ public class PlayerScreen implements Screen {
         overall.add(buttons);
         stage.addActor(overall);
 
+        playerTable.row().pad(0, 0, 5, 0);
         enterPlayer();
         TextButton addPlayer = new TextButton("Add Player", MENU_SKIN);
         //TextButton deletePlayer =new TextButton("Delete Player", MENU_SKIN);
@@ -75,7 +77,15 @@ public class PlayerScreen implements Screen {
                 --playerNumber;
             }
         });*/
+        TextButton backButton= new TextButton("BACK",MENU_SKIN);
+        backButton.align(Align.bottomLeft);
+        backButton.addListener(new ChangeListener(){
 
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                parent.changeScreen(Menu.MAIN_MENU);
+            }
+        });
 
         chooseGameMode.addListener(new ChangeListener() {
 
@@ -136,7 +146,7 @@ public class PlayerScreen implements Screen {
                 parent.changeScreen(Menu.GAME_SELECT);
             }
         });
-
+        stage.addActor(backButton);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
 

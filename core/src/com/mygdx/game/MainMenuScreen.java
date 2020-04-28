@@ -52,7 +52,12 @@ public class MainMenuScreen implements Screen {
         chosePlayers.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                CURRENT_PHYSICS_SETTING = ((SelectBox<PhysicsSetting>)phys.getCells().get(1).getActor()).getSelected();
+                try {
+                    CURRENT_PHYSICS_SETTING = ((SelectBox<PhysicsSetting>) phys.getCells().get(1).getActor()).getSelected();
+                }catch(java.lang.IndexOutOfBoundsException e) {
+
+                    e.printStackTrace();
+                }
                 parent.changeScreen(Menu.PLAYER_SELECT);
             }
 

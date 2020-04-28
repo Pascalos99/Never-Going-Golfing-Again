@@ -5,14 +5,19 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
+
+import static com.mygdx.game.Variables.MENU_SKIN;
 
 public class GameScreen implements Screen {
 
@@ -106,6 +111,13 @@ public class GameScreen implements Screen {
                 winList.add(new Label(winners.get(i).toString()+" "+ winners.get(i).getBall().hit_count+"pts", Variables.MENU_SKIN));
                 winList.row();
             }
+            TextButton replayButton= new TextButton("Play Again?",MENU_SKIN);
+            replayButton.addListener(new ChangeListener(){
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    parent.changeScreen(Menu.MAIN_MENU);
+                }
+            });
             if(!gameAspects.players.isEmpty()){
                 for(int i=0;i<gameAspects.players.size();i++) {
                     if (!winners.contains(gameAspects.players.get(i))){
@@ -114,6 +126,7 @@ public class GameScreen implements Screen {
                     }
                 }
             }
+            winList.add(replayButton);
         }
 
 

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.io.File;
@@ -57,6 +58,15 @@ public class SettingsScreen implements Screen {
         TextButton play=new TextButton("PLAY", MENU_SKIN);
         TextButton input = new TextButton("Save course to file", MENU_SKIN);
         TextButton output = new TextButton("Load course from file", MENU_SKIN);
+        TextButton backButton= new TextButton("BACK",MENU_SKIN);
+        backButton.align(Align.bottomLeft);
+        backButton.addListener(new ChangeListener(){
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                parent.changeScreen(Menu.GAME_SELECT);
+            }
+        });
         table.add(play);
         TextField inputPath= new TextField("", MENU_SKIN);
         TextField outputPath =new TextField("", MENU_SKIN);
@@ -161,7 +171,7 @@ public class SettingsScreen implements Screen {
         table.add(outputPath);
 
 
-
+        stage.addActor(backButton);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
     }
