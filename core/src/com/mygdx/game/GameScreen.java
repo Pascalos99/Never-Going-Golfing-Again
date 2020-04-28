@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -58,11 +59,11 @@ public class GameScreen implements Screen {
         }
         game =new CrazyPutting(course, gameAspects, this);
         game.create();
-        currentPlayerShotNum=new Label("", Variables.MENU_SKIN);
-        currentPlayerLabel = new Label("", Variables.MENU_SKIN);
-        currentAction= new Label("",Variables.MENU_SKIN);
+        currentPlayerShotNum=new Label("", Variables.GLASSY);
+        currentPlayerLabel = new Label("", Variables.GLASSY);
+        currentAction= new Label("",Variables.GLASSY);
         currentAction.setAlignment(Align.bottomLeft);
-        inputVelocity=new TextField(""+Variables.SHOT_VELOCITY,Variables.MENU_SKIN);
+        inputVelocity=new TextField(""+Variables.SHOT_VELOCITY,Variables.GLASSY);
         inputVelocity.setTextFieldListener(new TextField.TextFieldListener() {
             @Override
             public void keyTyped(TextField textField, char c) {
@@ -71,7 +72,7 @@ public class GameScreen implements Screen {
                 else setInputVel(0.0);
             }
         });
-        Label inputVel= new Label("Initial Velocity: ",Variables.MENU_SKIN);
+        Label inputVel= new Label("Initial Velocity: ",Variables.GLASSY);
         table.row().pad(0, 0, 10, 0);
         table.add(currentPlayerLabel);
         table.add(currentPlayerShotNum);

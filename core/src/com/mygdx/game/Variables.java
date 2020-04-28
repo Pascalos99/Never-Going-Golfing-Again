@@ -83,7 +83,8 @@ public final class Variables {
 	public static final float FLAGPOLE_HEIGHT = 7;
 
 	//main menu
-	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("glassy-ui.json"));
+	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("quantum/quantum-horizon-ui.json"));
+	public static Skin 	GLASSY = new Skin(Gdx.files.internal("glassy/glassy-ui.json"));
 
 	//PHYSICS
 	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is
