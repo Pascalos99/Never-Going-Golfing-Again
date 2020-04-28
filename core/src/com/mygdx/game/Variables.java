@@ -59,14 +59,14 @@ public final class Variables {
 
 	// Ball color
 	public static SettingsScreen.ColorSelection[] BALL_COLORS = {
-			new SettingsScreen.ColorSelection("Red", Color.RED),
+			new SettingsScreen.ColorSelection("White", Color.WHITE),
 			new SettingsScreen.ColorSelection("Yellow", Color.YELLOW),
 			new SettingsScreen.ColorSelection("Pink", Color.PINK),
-			new SettingsScreen.ColorSelection("Blue", Color.BLUE),
-			new SettingsScreen.ColorSelection("Cyan", Color.CYAN),
+			new SettingsScreen.ColorSelection("Red", Color.RED),
 			new SettingsScreen.ColorSelection("Purple", Color.PURPLE),
-			new SettingsScreen.ColorSelection("Black", Color.BLACK),
-			new SettingsScreen.ColorSelection("White", Color.WHITE)
+			new SettingsScreen.ColorSelection("Cyan", Color.CYAN),
+			new SettingsScreen.ColorSelection("Blue", Color.BLUE),
+			new SettingsScreen.ColorSelection("Black", Color.BLACK)
 	};
 
 	// Default player names
@@ -83,7 +83,7 @@ public final class Variables {
 	public static final float FLAGPOLE_HEIGHT = 7;
 
 	//main menu
-	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("quantum/quantum-horizon-ui.json"));
+	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("orange/uiskin.json"));
 	public static Skin 	GLASSY = new Skin(Gdx.files.internal("glassy/glassy-ui.json"));
 
 	//PHYSICS
