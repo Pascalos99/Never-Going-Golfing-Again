@@ -6,7 +6,6 @@ import java.util.List;
 import static com.mygdx.game.Variables.*;
 
 public class PuttingCoursePhysics implements PhysicsEngine {
-    public static final double BALL_SIZE = 0.22;
     protected List<TopDownPhysicsObject> ents;
     protected List<Double> deltas;
 
@@ -14,10 +13,18 @@ public class PuttingCoursePhysics implements PhysicsEngine {
     protected double fixed_delta;
 
     private static int DELTA_ARRAY_SIZE_LIMIT = 5;
+    private PuttingCourse world;
 
     PuttingCoursePhysics(){
         ents = new ArrayList<TopDownPhysicsObject>();
         deltas = new ArrayList<Double>(DELTA_ARRAY_SIZE_LIMIT);
+        world = WORLD;
+    }
+
+    PuttingCoursePhysics(PuttingCourse world){
+        ents = new ArrayList<TopDownPhysicsObject>();
+        deltas = new ArrayList<Double>(DELTA_ARRAY_SIZE_LIMIT);
+        this.world = world;
     }
 
     @Override
@@ -48,6 +55,7 @@ public class PuttingCoursePhysics implements PhysicsEngine {
 
     @Override
     public void addBody(TopDownPhysicsObject obj) {
+        obj.setWorld(world, this);
         ents.add(obj);
     }
 

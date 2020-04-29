@@ -93,7 +93,7 @@ public abstract class Player {
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
         ModelInstance model = new ModelInstance(ball, 0, 0, 0);
-        Ball ball_obj = new Ball(PuttingCoursePhysics.BALL_SIZE, x, y, model, this);
+        Ball ball_obj = new Ball(x, y, model, this);
         this.setBall(ball_obj);
         world_physics.addBody(ball_obj);
     }

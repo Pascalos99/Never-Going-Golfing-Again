@@ -12,7 +12,6 @@ public class AI_Fedora extends AI_controller {
     private int MAX_OPTIONS = 100;
     private  double VELOCITY_PARTITIONS = 20d;
 
-    private double shot_angle, shot_speed;
     private List<Vector2d> points;
 
     private Vector2d old_ball_position;
