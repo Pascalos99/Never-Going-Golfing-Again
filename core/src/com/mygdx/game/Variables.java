@@ -1,8 +1,10 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 import static com.mygdx.game.PhysicsSetting.*;
@@ -85,6 +87,9 @@ public final class Variables {
 	//skins
 	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("orange/uiskin.json"));
 	public static Skin 	GLASSY = new Skin(Gdx.files.internal("glassy/glassy-ui.json"));
+
+	//assets
+	//public static Texture CROSS = new Texture(Gdx.files.internal("misc/free_cross_image.jpg"));
 
 	//PHYSICS
 	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is

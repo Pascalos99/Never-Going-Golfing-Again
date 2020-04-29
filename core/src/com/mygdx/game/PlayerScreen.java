@@ -3,12 +3,11 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
@@ -95,11 +94,9 @@ public class PlayerScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 //TODO: if anyone can figure out a better way to turn the table to players, go for it
-                Label dummy = new Label("AA", MENU_SKIN);
                 int id = -1;
                 String name = "";
                 String playerType = "";
-                SelectBox<String> color_select = new SelectBox<String>(MENU_SKIN);
                 String ballColor = null;
 
                 /*for(int i=0;i<playerTable.getRows();i++){
@@ -118,15 +115,15 @@ public class PlayerScreen implements Screen {
               */
 
                 for (int i = 0; i < playerTable.getCells().size; i++) {
-                    if (playerTable.getCells().get(i).getActor().getClass().equals(dummy.getClass())) {
+                    if (playerTable.getCells().get(i).getActor() instanceof Label) {
                         id = (Integer.parseInt(((Label) (playerTable.getCells().get(i).getActor())).getText().toString().replaceAll(" ", "")));
-                    } else if (playerTable.getCells().get(i).getActor().getClass().equals(color_select.getClass())) {
+                    } else if (playerTable.getCells().get(i).getActor() instanceof SelectBox) {
                         if (ballColor == null) {
                             ballColor = ((SelectBox<String>) (playerTable.getCells().get(i).getActor())).getSelected();
                         } else {
                             playerType = ((SelectBox<String>) (playerTable.getCells().get(i).getActor())).getSelected();
                         }
-                    } else {
+                    } else if (playerTable.getCells().get(i).getActor() instanceof TextField) {
                         name = ((TextField) (playerTable.getCells().get(i).getActor())).getText();
                     }
                     if ((id != -1) && (!name.equals("")) && (ballColor != null) && (!playerType.equals(""))) {
@@ -157,16 +154,21 @@ public class PlayerScreen implements Screen {
     }
 
     private void enterPlayer() {
-        if (playerNumber <= 8){
-            Label id = new Label(playerNumber+" ", MENU_SKIN);
-            TextField name = new TextField(pickName(), MENU_SKIN);
-            playerTable.add(id);
-            playerTable.add(name);
-            playerTable.add(addColorSelect());
-            playerTable.add(addPlayerTypeSelect());
-            playerTable.row().pad(0, 0, 5, 0);
-            ++playerNumber;
-            addHoverListener();
+        try {
+            if (playerNumber <= 8) {
+                Label id = new Label(playerNumber + " ", MENU_SKIN);
+                TextField name = new TextField(pickName(), MENU_SKIN);
+                playerTable.add(id);
+                playerTable.add(name);
+                playerTable.add(addColorSelect());
+                playerTable.add(addPlayerTypeSelect());
+                playerTable.add(addPlayerRemove(playerNumber - 1));
+                playerTable.row().pad(0, 0, 5, 0);
+                ++playerNumber;
+                addHoverListener();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -224,6 +226,52 @@ public class PlayerScreen implements Screen {
         playerTypeSelect.setItems(items);
         //playerTypeSelect.setSelectedIndex(0);
         return playerTypeSelect;
+    }
+
+    private ImageButton addPlayerRemove(int index) {
+        //ImageButton button = new ImageButton(new TextureRegionDrawable(CROSS));
+        ImageButton button = new ImageButton(MENU_SKIN);
+        button.addListener(new RemoveListener(index));
+        return button;
+    }
+
+    private class RemoveListener extends ClickListener {
+        int index;
+        public RemoveListener(int index) {
+            this.index = index;
+        }
+        public void clicked(InputEvent event, float x, float y) {
+            Array<Cell> cells = playerTable.getCells();
+            ArrayList<Actor> to_replace = new ArrayList<>();
+            for (Cell cell : cells) to_replace.add(cell.getActor());
+            // updating the index number for each of the delete listeners below the current element:
+            for (int i = (index + 1) * playerTable.getColumns(); i < cells.size; i++) {
+                Array<EventListener> listeners = cells.get(i).getActor().getListeners();
+                for (EventListener listener : listeners)
+                    if (listener instanceof RemoveListener)
+                        ((RemoveListener)listener).index--;
+            }
+            // deleting all the parts belonging to the current element:
+            for (int i = index * playerTable.getColumns(); i < (index + 1) * playerTable.getColumns(); i++) {
+                to_replace.remove(cells.get(i).getActor());
+                cells.get(i).getActor().remove();
+            }
+            // replacing the elements in the table with new versions of the same ones (bc for it didn't work
+            //   just removing the cells from playerTable.getCells())
+            int cols = playerTable.getColumns();
+            playerTable.clear();
+            int k = 0;
+            // make sure to add in the row breaks at the right intervals!
+            for (int i=0; i < to_replace.size()/cols; i++) {
+                for (int j=0; j < cols; j++) playerTable.add(to_replace.get(k++));
+                playerTable.row().pad(0, 0, 5, 0);
+            }
+
+            // return to previous screen if we suddenly have 0 players left
+            playerNumber--;
+            if (playerNumber <= 1)
+                parent.changeScreen(Menu.MAIN_MENU);
+        }
     }
 
     private String pickName() {

@@ -45,6 +45,13 @@ public class AI_SimpleLearner extends AI_controller {
             best_distance_to_flag.put(player, last_distance_to_flag.get(player));
     }
 
+    public void clear() {
+        VMODs = new HashMap<>();
+        last_distance_to_flag = new HashMap<>();
+        best_distance_to_flag = new HashMap<>();
+        angle_adjustment = new HashMap<>();
+    }
+
     private static double epi = PI/8;
     private static double[] velocity_modifiers = {0.7, 0.9, 1.5, 2.5};
     private static double[] angle_modifiers = {0, epi, -epi, 1.5*epi, -1.5*epi};
