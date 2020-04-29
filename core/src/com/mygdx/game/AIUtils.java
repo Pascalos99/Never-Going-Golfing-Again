@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class AIUtils {
-    public static final int OPTIMAL_RESOLUTION = 4000;
+    public static final int OPTIMAL_RESOLUTION = 2000;
 
     public static double linearInterpolate(double a, double b, double t){
         return a + (b - a) * t;

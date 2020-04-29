@@ -33,16 +33,13 @@ public class AI_Fedora extends AI_controller {
 
     @Override
     public void calculate(Player player) {
-        double error = fluctuation(getWorld().get_height(), 100);
+        explore_resolution = 2000;
 
         if(old_ball_position != null && old_ball_position.get_x() != player.getBall().x && old_ball_position.get_y() != player.getBall().y){
             points = null;
         }
 
         if(points == null){
-            System.out.println("Cumulative Error: " + error);
-            explore_resolution = 2000;
-
             Vector2d lowest = findLowestGradient(getWorld().get_height(), explore_resolution);
             points = getPointsWithGradient(getWorld().get_height(), lowest, 0.01, explore_resolution);
             System.out.println("Fedora found " + points.size() + " options.");
@@ -166,8 +163,8 @@ public class AI_Fedora extends AI_controller {
         turns_played++;
     }
 
-    private double resolution(double x){
-        return RESOLUTION_SLOPE * x + 10d;
+    private boolean clearPath(Vector2d start, Vector2d end, Function2d h, int steps){
+        return false;
     }
 
 }

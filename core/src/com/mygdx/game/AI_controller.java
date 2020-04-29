@@ -83,4 +83,8 @@ public abstract class AI_controller {
 
     public final boolean finishedCalculation() { return finished_calculation; }
 
+    public void clearAI(){
+        //AIs that need to be notified at the end of a game must implement this.
+    }
+
 }
