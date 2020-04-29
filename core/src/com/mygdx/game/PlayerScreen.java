@@ -273,6 +273,7 @@ public class PlayerScreen implements Screen {
             int k = 0;
             // make sure to add in the row breaks at the right intervals!
             for (int i=0; i < to_replace.size()/cols; i++) {
+                playerTable.row().pad(0, 0, 5, 0);
                 for (int j=0; j < cols; j++) playerTable.add(to_replace.get(k++));
                 playerTable.row().pad(0, 0, 5, 0);
             }
