@@ -37,17 +37,17 @@ public class MainMenuScreen implements Screen {
 
         TextButton exit = new TextButton("Exit", Variables.MENU_SKIN);
 
-        int margine = 10;
-        phys.row().pad(0, 0, 0, margine);
+        int margin = 10;
+        phys.row().pad(0, 0, 0, margin);
         phys.add(new Label("Select Physics", MENU_SKIN));
 
         phys.add(physicsSelect);
         table.add(phys);
-        table.row().pad(margine, 0, 0, 0);
-        table.add(chosePlayers);
-        table.row().pad(0, 0, margine, 0);
+        table.row().pad(margin, 0, 0, 0);
+        table.add(chosePlayers).fillX().uniformX();
+        table.row().pad(margin, 0, margin, 0);
         table.add(exit).fillX().uniformX();
-        table.row().pad(0, 0, margine, 0);
+        table.row().pad(0, 0, margin, 0);
 
         chosePlayers.addListener(new ChangeListener() {
             @Override
