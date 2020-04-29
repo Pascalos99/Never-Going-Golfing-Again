@@ -1,8 +1,7 @@
 package com.mygdx.game;
 
 import static com.mygdx.game.AIUtils.*;
-import static com.mygdx.game.Variables.GAME_ASPECTS;
-import static com.mygdx.game.Variables.WORLD;
+import static com.mygdx.game.Variables.*;
 
 public class AI_Neural extends AI_controller {
 
@@ -18,8 +17,8 @@ public class AI_Neural extends AI_controller {
 
     @Override
     public void calculate(Player player) {
-        if (WORLD.height_function != current_function) {
-            current_function = WORLD.height_function;
+        if (getWorld().height_function != current_function) {
+            current_function = getWorld().height_function;
             function_grid = asGrid(current_function, 5000);
         }
     }

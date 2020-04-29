@@ -33,7 +33,7 @@ public class AI_Finder extends AI_controller {
     private List<Shot> makeSuit(double x, double y) {
         ArrayList<Shot> list = new ArrayList<>();
         Vector2d currentPos = new Vector2d(x, y);
-        Vector2d toFlag = WORLD.flag_position.sub(currentPos);
+        Vector2d toFlag = getWorld().flag_position.sub(currentPos);
         double angle = Math.atan2(toFlag.get_y(), toFlag.get_x());
         return list;
     }
