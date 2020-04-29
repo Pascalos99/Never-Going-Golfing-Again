@@ -180,7 +180,7 @@ public class CrazyPutting  implements ApplicationListener {
                 VIEW_ZOOM -= cameraZoomSpeed;
             }
 
-            else{
+            else {
                 VIEW_ZOOM = 1f;
             }
 
@@ -215,10 +215,10 @@ public class CrazyPutting  implements ApplicationListener {
 
         for(Player p : GAME_ASPECTS.players) {
 
-            if ((p.getBall().hit_count > 0 || p == currentPlayer) && CAST_SHADOWS)
-                shadowBatch.render(p.getBall().getModel(), environment);
-
-            modelBatch.render(p.getBall().getModel(), environment);
+            if ((p.getBall().hit_count > 0 || p == currentPlayer)) {
+                if (CAST_SHADOWS) shadowBatch.render(p.getBall().getModel(), environment);
+                modelBatch.render(p.getBall().getModel(), environment);
+            }
         }
 
         for (int i = 0; i < 25; i++)
