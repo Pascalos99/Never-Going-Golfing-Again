@@ -82,7 +82,7 @@ public final class Variables {
 	public static PuttingCourse WORLD;
 	public static final float FLAGPOLE_HEIGHT = 7;
 
-	//main menu
+	//skins
 	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("orange/uiskin.json"));
 	public static Skin 	GLASSY = new Skin(Gdx.files.internal("glassy/glassy-ui.json"));
 

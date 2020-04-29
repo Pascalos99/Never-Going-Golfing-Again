@@ -115,7 +115,7 @@ public class GameScreen implements Screen {
             replayButton.addListener(new ChangeListener(){
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    parent.changeScreen(Menu.MAIN_MENU);
+                    parent.create();
                 }
             });
             if(!gameAspects.players.isEmpty()){
