@@ -84,7 +84,6 @@ public class Menu extends Game {
 				break;
 			case PLAY:
 				System.out.println("PLAY");
-				//TODO: add code for starting game
 				gameInfo = new GameInfo(players.getPlayers(),settings.getGravity(),settings.getMassofBall(),
 						settings.getFrictionc(),settings.getMaxV(),settings.getTolerance(),settings.getStartX(),
 						settings.getStartY(),settings.getGoalX(),settings.getGoalY(),settings.getHeightFunction());
@@ -92,7 +91,6 @@ public class Menu extends Game {
 				gameScreen = new GameScreen(this, gameInfo);
 				this.setScreen(gameScreen);
 				break;
-
 		}
 	}
 

@@ -25,12 +25,13 @@ import static com.mygdx.game.Variables.*;
 public class PlayerScreen implements Screen {
     private Menu parent;
     private Stage stage;
-    private int playerNumber=1;
+    private static int playerNumber=1;
     private ArrayList<Player> players =new ArrayList<Player>();
-    private Table playerTable;
+    private static Table playerTable;
     private static String humanPlayer = "None";
     private Label bot_description;
     private ClickListener hover_listener;
+   // private static boolean firstSelection=true;
 
     public PlayerScreen(Menu menu){
         parent=menu;
@@ -38,7 +39,8 @@ public class PlayerScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
         Table buttons = new Table();
         Table overall= new Table();
-        playerTable = new Table();
+        if(playerTable==null)
+            playerTable = new Table();
         bot_description = new Label("", MENU_SKIN);
         addColorSelect();
        // buttons.setDebug(true);
@@ -52,7 +54,8 @@ public class PlayerScreen implements Screen {
         stage.addActor(overall);
 
         playerTable.row().pad(0, 0, 5, 0);
-        enterPlayer();
+        if(playerNumber==1)
+            enterPlayer();
         TextButton addPlayer = new TextButton("Add Player", MENU_SKIN);
         //TextButton deletePlayer =new TextButton("Delete Player", MENU_SKIN);
         TextButton chooseGameMode = new TextButton("Choose Game Mode", MENU_SKIN);
@@ -150,6 +153,7 @@ public class PlayerScreen implements Screen {
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
 
+
     }
 
     private void enterPlayer() {
@@ -218,9 +222,7 @@ public class PlayerScreen implements Screen {
         for (int i=0; i < AVAILABLE_BOTS.length; i++)
             items.add(AVAILABLE_BOTS[i].getName());
         playerTypeSelect.setItems(items);
-
-       // playerTypeSelect.setSelectedIndex(0);
-
+        //playerTypeSelect.setSelectedIndex(0);
         return playerTypeSelect;
     }
 
