@@ -115,7 +115,11 @@ public class GameScreen implements Screen {
             replayButton.addListener(new ChangeListener(){
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
+                    PlayerScreen.playerNumber=1;
+                    PlayerScreen.playerTable=null;
+                    parent.players=null;
                     parent.create();
+
                 }
             });
             if(!gameAspects.players.isEmpty()){

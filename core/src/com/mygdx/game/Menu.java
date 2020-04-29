@@ -11,7 +11,7 @@ public class Menu extends Game {
 		Default Game: just needs world generation and game loop
 		Random Game : needs random world generation and game loop
 		Custom Game: needs world generation based on parameters and game loop
-		Skin: can be changed from line 19 in Main Menu Screen_will change every where else
+		Skin: can be changed from Variables
 		Other :Limit inputs in settings and limit number of players
 
 		Classes
@@ -31,7 +31,7 @@ public class Menu extends Game {
 	//this class will manage switching between screens
 	private MainMenuScreen mainMenu;
 	private SettingsScreen settings;
-	private PlayerScreen players;
+	protected PlayerScreen players;
 	private GameSelectScreen gameSelect;
 	private GameScreen gameScreen;
 

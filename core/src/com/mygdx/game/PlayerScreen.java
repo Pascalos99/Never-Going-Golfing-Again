@@ -25,9 +25,9 @@ import static com.mygdx.game.Variables.*;
 public class PlayerScreen implements Screen {
     private Menu parent;
     private Stage stage;
-    private static int playerNumber=1;
+    protected static int playerNumber=1;
     private ArrayList<Player> players =new ArrayList<Player>();
-    private static Table playerTable;
+    protected static Table playerTable;
     private static String humanPlayer = "None";
     private Label bot_description;
     private ClickListener hover_listener;
