@@ -9,22 +9,16 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.*;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
-
-import static com.mygdx.game.Variables.*;
-import static com.mygdx.game.AIUtils.*;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.AIUtils.*;
 
 public class CrazyPutting  implements ApplicationListener {
 
@@ -32,24 +26,21 @@ public class CrazyPutting  implements ApplicationListener {
     private Model arrow;
     private double lastShotVelocity = SHOT_VELOCITY;
     private PuttingCourse course;
-    private float cameraRotationSpeed = 1.4f;//100;
+    private float cameraRotationSpeed = 1.4f;
     private float cameraZoomSpeed = 0.5f;
 
     private ModelInstance arrowInstance;
     private ModelInstance [] terrainInstance;
     private ModelInstance waterInstance;
     private ModelInstance wallInstance;
-    private ModelInstance flagPoleInstance;
-    private ModelInstance flagInstance;
-    private ModelInstance poleInstance;
-    private ModelInstance flagRangeInstance;
+
+    private ModelInstance [] flagInstances;
 
     private Environment environment;
-    private PhysicsEngine world_physics;
+    private PuttingCoursePhysics world_physics;
     private SpriteBatch batch;
-    DirectionalShadowLight shadowLight;
-    ModelBatch shadowBatch;
-    private Texture waterTexture;
+    private DirectionalShadowLight shadowLight;
+    private ModelBatch shadowBatch;
     private Sprite waterSprite;
     private Sprite skySprite;
     private double previous_time;
@@ -59,116 +50,62 @@ public class CrazyPutting  implements ApplicationListener {
 
     public CrazyPutting( PuttingCourse c, GameInfo gameAspects,GameScreen p){
         this.gameScreen=p;
-        GAME_ASPECTS = gameAspects;
         this.course=c;
-        players = new ArrayList<>(gameAspects.players);
-        currentPlayer=players.get(0);
-        if (SHOT_VELOCITY > gameAspects.maxVelocity) SHOT_VELOCITY = gameAspects.maxVelocity;
+        this.players = new ArrayList<>(gameAspects.players);
+        this.currentPlayer=players.get(0);
+        GAME_ASPECTS = gameAspects;
         WORLD = c;
         GAME = this;
+        if (SHOT_VELOCITY > gameAspects.maxVelocity) SHOT_VELOCITY = gameAspects.maxVelocity;
     }
 
     @Override
     public void create() {
-        System.out.println(new Vector2d(5, 0).rotate(1.5708));
-        CAMERA = new PerspectiveCamera(75,
-                Gdx.graphics.getWidth(),
-                Gdx.graphics.getHeight());
+        //initialize graphics setter
+        GameSetup graphicsSetup=new GameSetup();
 
-        CAMERA.position.set(-5f, 5f, -5f);
-        CAMERA.lookAt(0f, 0f, 0f);
+        graphicsSetup.initCamera();
 
-        CAMERA.near = 0.1f;
-        CAMERA.far = 200.0f;
-
+        //prepare model and sprite batches for rendering
         modelBatch = new ModelBatch();
-
         batch = new SpriteBatch();
-        waterTexture = new Texture(Gdx.files.internal("water.jpg"));
-        waterSprite = new Sprite(waterTexture);
-        waterSprite.setColor(0, 0, 1, 0.3f);
-        waterSprite.setOrigin(0,0);
-        waterSprite.setPosition(0,0);
-        waterSprite.setSize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
 
-        skySprite = new Sprite(waterTexture);
-        skySprite.setColor(1, 1, 1, 0.2f);
-        skySprite.setOrigin(0,0);
-        skySprite.setPosition(0,0);
-        skySprite.setSize(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-
-        float side =(float) (2*GAME_ASPECTS.getTolerance())*WORLD_SCALING;
-
-        ModelBuilder modelBuilder = new ModelBuilder();
-
-        modelBuilder.begin();
-        MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.BROWN)));
-        builder.cylinder(0.1f, FLAGPOLE_HEIGHT, 0.1f, 30);
-        Model pole = modelBuilder.end();
-        modelBuilder = new ModelBuilder();
-        modelBuilder.begin();
-        builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.RED)));
-        builder.box(0.5f,3.1f,0,1f,0.7f,0.03f);
-        Model flag = modelBuilder.end();
-        poleInstance = new ModelInstance(pole,(float) course.get_flag_position().get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.get_flag_position().get_x(), course.get_flag_position().get_y())), (float) course.get_flag_position().get_y() * WORLD_SCALING);
-        flagInstance = new ModelInstance(flag,(float) course.get_flag_position().get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.get_flag_position().get_x(), course.get_flag_position().get_y())), (float) course.get_flag_position().get_y() * WORLD_SCALING);
-
-        Model poleRange = modelBuilder.createCylinder( side, FLAGPOLE_HEIGHT, side, 40, new Material(ColorAttribute.createDiffuse(new Color(1, 0.4f, 1, 1f)), new BlendingAttribute(0.3f)),
-                Usage.Position | Usage.Normal);
-
-        flagPoleInstance = new ModelInstance(pole, (float) course.get_flag_position().get_x()*WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y())), (float) (course.get_flag_position().get_y()*WORLD_SCALING));
-        flagRangeInstance = new ModelInstance(poleRange,  (float) course.get_flag_position().get_x()*WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y())), (float) course.get_flag_position().get_y()*WORLD_SCALING);
+        //initialize terrain and world objects
+        TerrainBuilder terrainBuilder = new TerrainBuilder();
+        Texture waterTexture = new Texture(Gdx.files.internal("water.jpg"));
+        waterSprite = terrainBuilder.initWater(waterTexture);
+        skySprite = terrainBuilder.initSky(waterTexture);
+        flagInstances = terrainBuilder.initFlag(course); //0 is pole, 1 is flag, 2 is range
+        arrowInstance = terrainBuilder.initArrow();
         terrainInstance = TerrainBuilder.buildTerrain();
         waterInstance = TerrainBuilder.buildWater();
         wallInstance = TerrainBuilder.buildWalls();
 
+        //initialize physics
         world_physics = new PuttingCoursePhysics();
-        //world_physics.useFixedDelta(true, 0.01);
         previous_time = System.currentTimeMillis() / 1000.0;
 
+        //setup players
         for(Player p : GAME_ASPECTS.players){
-            Vector2d start = GAME_ASPECTS.getStart();
-            double x = start.get_x();
-            double y = start.get_y();
-
-            Color ball_color = null;
-
-            for (int i=0; i < BALL_COLORS.length; i++)
-                if (p.getBallColor().equals(BALL_COLORS[i].name)) {
-                    ball_color = BALL_COLORS[i].color;
-                    break;
-                }
-
-            Model ball = modelBuilder.createSphere(BALL_RADIUS * WORLD_SCALING * 2, BALL_RADIUS * WORLD_SCALING * 2, BALL_RADIUS * WORLD_SCALING * 2, 30, 30,
-                    new Material(ColorAttribute.createDiffuse(ball_color)),
-                    Usage.Position | Usage.Normal
-            );
-            ModelInstance model = new ModelInstance(ball, 0, 0, 0);
-            Ball ball_obj = new Ball(PuttingCoursePhysics.BALL_SIZE, x, y, model, p);
-            p.setBall(ball_obj);
-            world_physics.addBody(ball_obj);
+            p.init(world_physics);
         }
-
         currentPlayer.notifyStartOfTurn();
         currentPlayer.loadCamera();
 
-        arrow = modelBuilder.createBox((float)((2 * SHOT_VELOCITY) / MAX_SHOT_VELOCITY), 0.05f, 0.05f,
-                new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
-                Usage.Position | Usage.Normal
-        );
-        arrowInstance = new ModelInstance(arrow, 0, 0, 0);
+        //initialize environment and lights
         environment = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.2f, 0.2f, 0.2f, 1.f));
 
         if(CAST_SHADOWS){
+            shadowBatch = new ModelBatch(new DepthShaderProvider());
             shadowLight = new DirectionalShadowLight(16384, 16384, 130f, 130f, 1f, 150f);
             environment.add(shadowLight.set(0.8f, 0.8f, 0.8f, -0.5f, -1.0f, 0.5f));
             environment.shadowMap = shadowLight;
-            shadowBatch = new ModelBatch(new DepthShaderProvider());
         } else {
             environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
         }
 
+        //TODO remove?
         System.out.println("Corner to corner distance: " + unfoldDistance(
                 new Vector2d(0, 0),
                 new Vector2d(50d / WORLD_SCALING, 50d / WORLD_SCALING),
@@ -287,16 +224,16 @@ public class CrazyPutting  implements ApplicationListener {
         for (int i = 0; i < 25; i++)
             modelBatch.render(terrainInstance[i], environment);
 
-        modelBatch.render(flagInstance, environment);
-        modelBatch.render(poleInstance, environment);
-        modelBatch.render(flagRangeInstance, environment);
+        modelBatch.render(flagInstances[0], environment);
+        modelBatch.render(flagInstances[1], environment);
+        modelBatch.render(flagInstances[2], environment);
 
         modelBatch.render(waterInstance, environment);
         modelBatch.render(wallInstance, environment);
 
         if(CAST_SHADOWS) {
-            shadowBatch.render(flagInstance, environment);
-            shadowBatch.render(poleInstance, environment);
+            shadowBatch.render(flagInstances[0], environment);
+            shadowBatch.render(flagInstances[1], environment);
             shadowBatch.end();
             shadowLight.end();
         }

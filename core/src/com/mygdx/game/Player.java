@@ -2,6 +2,13 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
 
@@ -66,6 +73,29 @@ public abstract class Player {
         Vector3 pre = new Vector3((float)_x, (float)_y, (float)_z);
 
         return pre.add(new Vector3((float) add.get_x(), (float) add.get_y(), (float) add.get_z()));
+    }
+
+    public void init(PuttingCoursePhysics world_physics){
+        ModelBuilder modelBuilder = new ModelBuilder();
+        Vector2d start = GAME_ASPECTS.getStart();
+        double x = start.get_x();
+        double y = start.get_y();
+
+        Color ball_color = null;
+
+        for (int i=0; i < BALL_COLORS.length; i++)
+            if (this.getBallColor().equals(BALL_COLORS[i].name)) {
+                ball_color = BALL_COLORS[i].color;
+                break;
+            }
+        Model ball = modelBuilder.createSphere(BALL_RADIUS * WORLD_SCALING * 2, BALL_RADIUS * WORLD_SCALING * 2, BALL_RADIUS * WORLD_SCALING * 2, 30, 30,
+                new Material(ColorAttribute.createDiffuse(ball_color)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
+        );
+        ModelInstance model = new ModelInstance(ball, 0, 0, 0);
+        Ball ball_obj = new Ball(PuttingCoursePhysics.BALL_SIZE, x, y, model, this);
+        this.setBall(ball_obj);
+        world_physics.addBody(ball_obj);
     }
 
     public int getId(){
