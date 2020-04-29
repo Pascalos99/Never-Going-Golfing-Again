@@ -2,7 +2,7 @@ package com.mygdx.game;
 
 import java.util.*;
 
-import static com.mygdx.game.Variables.WORLD;
+import static com.mygdx.game.Variables.*;
 import static java.lang.Math.PI;
 
 public class AI_SimpleLearner extends AI_controller {
@@ -28,7 +28,7 @@ public class AI_SimpleLearner extends AI_controller {
         current_player = player;
         if (!has_seen_player(player)) setup(player);
         Vector2d currentPos = new Vector2d(player.getBall().x, player.getBall().y);
-        Vector2d toFlag = WORLD.flag_position.sub(currentPos);
+        Vector2d toFlag = getWorld().flag_position.sub(currentPos);
         angle = toFlag.angle();
         double distance_to_flag = toFlag.get_length();
 

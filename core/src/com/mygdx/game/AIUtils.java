@@ -6,12 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class AIUtils {
+    public static final int OPTIMAL_RESOLUTION = 4000;
 
-    static double linearInterpolate(double a, double b, double t){
+    public static double linearInterpolate(double a, double b, double t){
         return a + (b - a) * t;
     }
 
-    static Vector2d findLowestGradient(Function2d h, int parts){
+    public static Vector2d findLowestGradient(Function2d h, int parts){
         Vector2d xy = null;
         double total_gradient = 0;
         int steps = parts;
@@ -52,7 +53,7 @@ public final class AIUtils {
         return h.gradient(xy);
     }
 
-    static double unfoldDistance(Vector2d a, Vector2d b, Function2d h, int steps){
+    public static double unfoldDistance(Vector2d a, Vector2d b, Function2d h, int steps){
         double distance = 0d;
         Vector2d prev = a;
 
@@ -74,7 +75,7 @@ public final class AIUtils {
         return  distance;
     }
 
-    static List<Vector2d> getPointsWithGradient(Function2d h, Vector2d gradient, double tolerance, int parts){
+    public static List<Vector2d> getPointsWithGradient(Function2d h, Vector2d gradient, double tolerance, int parts){
         double total_gradient = gradient.abs().get_x() + gradient.abs().get_y();
         int steps = parts;
         List<Vector2d> points = new ArrayList<Vector2d>();
@@ -128,7 +129,7 @@ public final class AIUtils {
         return error / (steps * steps);
     }
 
-    static double[][] asGrid(Function2d h, int steps){
+    public static double[][] asGrid(Function2d h, int steps){
         double[][] heights = new double[steps][steps];
 
         for(double i = 0d; i < 1d; i += 1d/((double) steps)) {

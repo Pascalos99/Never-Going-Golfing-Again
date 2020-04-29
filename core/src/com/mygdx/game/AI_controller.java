@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import static com.mygdx.game.Variables.*;
+
 /**
  *  To make your own bot, steps:
  *  1. Make your own class extending this class, let's stick to the naming convention of "AI_*.java"
@@ -12,6 +14,23 @@ package com.mygdx.game;
  *      <b>different</b> value for getTypeName(), otherwise only the first instance will be used at all times.
  */
 public abstract class AI_controller {
+    protected PuttingCourse world;
+
+    AI_controller(PuttingCourse world){
+        this.world = null;
+    }
+
+    AI_controller(){
+        this(WORLD);
+    }
+
+    protected PuttingCourse getWorld(){
+
+        if(world == null)
+            return WORLD;
+
+        return world;
+    }
 
     /** this string has to be UNIQUE for each class that implements AI_controller */
     public abstract String getName();

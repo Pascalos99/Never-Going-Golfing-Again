@@ -16,6 +16,8 @@ public class AI_Fedora extends AI_controller {
 
     private Vector2d old_ball_position;
 
+    private int turns_played;
+
     private static class Fedora {}
     public Fedora the_fedora;
 
@@ -31,7 +33,7 @@ public class AI_Fedora extends AI_controller {
 
     @Override
     public void calculate(Player player) {
-        double error = fluctuation(WORLD.get_height(), 100);
+        double error = fluctuation(getWorld().get_height(), 100);
 
         if(old_ball_position != null && old_ball_position.get_x() != player.getBall().x && old_ball_position.get_y() != player.getBall().y){
             points = null;
@@ -39,23 +41,17 @@ public class AI_Fedora extends AI_controller {
 
         if(points == null){
             System.out.println("Cumulative Error: " + error);
-            explore_resolution = (int) resolution(error);
-            System.out.println("Calculated resolution is " + explore_resolution);
+            explore_resolution = 2000;
 
-            if(explore_resolution > 2000){
-                explore_resolution = 2000;
-                System.out.println("Resolution trimmed down to " + 2000);
-            }
-
-            Vector2d lowest = findLowestGradient(WORLD.get_height(), explore_resolution);
-            points = getPointsWithGradient(WORLD.get_height(), lowest, 0.01, explore_resolution);
+            Vector2d lowest = findLowestGradient(getWorld().get_height(), explore_resolution);
+            points = getPointsWithGradient(getWorld().get_height(), lowest, 0.01, explore_resolution);
             System.out.println("Fedora found " + points.size() + " options.");
         }
 
         Collections.sort(points, (a, b) -> {
             Vector2d ball_to_point_a = a.sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
             Vector2d ball_to_point_b = b.sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
-            Vector2d ball_to_flag = WORLD.get_flag_position().sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
+            Vector2d ball_to_flag = getWorld().get_flag_position().sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
 
             double dotp_a = ball_to_point_a.dot(ball_to_flag);
             double dotp_b = ball_to_point_b.dot(ball_to_flag);
@@ -83,15 +79,15 @@ public class AI_Fedora extends AI_controller {
             Vector2d p = points.get(point_i);
 
             Vector2d player_to_point = p.sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
-            Vector2d player_to_flag = WORLD.get_flag_position().sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
+            Vector2d player_to_flag = getWorld().get_flag_position().sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
 
             double comp = player_to_point.dot(player_to_flag);
             System.out.println("Point (" + points.indexOf(p) + ")'s dot product is " + comp);
 
             for(double speed_i = MAX_SHOT_VELOCITY / VELOCITY_PARTITIONS; speed_i <= MAX_SHOT_VELOCITY; speed_i += MAX_SHOT_VELOCITY / VELOCITY_PARTITIONS) {
                 Ball simulated_ball = player.getBall().simulateHit(player_to_point, speed_i, 8000, 0.01);
-                double ball_to_flag = WORLD.get_flag_position().distance(new Vector2d(simulated_ball.x, simulated_ball.y));
-                double real_ball_to_flag = WORLD.get_flag_position().distance(new Vector2d(player.getBall().x, player.getBall().y));
+                double ball_to_flag = getWorld().get_flag_position().distance(new Vector2d(simulated_ball.x, simulated_ball.y));
+                double real_ball_to_flag = getWorld().get_flag_position().distance(new Vector2d(player.getBall().x, player.getBall().y));
 
                 System.out.println("\tTest speed=" + speed_i + " | Resulting distance=" + ball_to_flag + " | Travel distance=" + simulated_ball.travel_distance);
                 System.out.println("\t\tDistance from ball to flag=" + real_ball_to_flag);
@@ -108,7 +104,7 @@ public class AI_Fedora extends AI_controller {
                 if(simulated_ball.is_moving)
                     motion_test = 1d;
 
-                double distance_test = ball_to_flag - WORLD.get_hole_tolerance();
+                double distance_test = ball_to_flag - getWorld().get_hole_tolerance();
                 double travel_test = simulated_ball.travel_distance;
 
                 if(travel_test == 0d)
@@ -151,7 +147,7 @@ public class AI_Fedora extends AI_controller {
 
         else if(selection == null){
             System.out.println("Doing direct shot.");
-            selection = WORLD.get_flag_position();
+            selection = getWorld().get_flag_position();
         }
 
         if(selection_speed == 0d)
@@ -166,6 +162,8 @@ public class AI_Fedora extends AI_controller {
         setShotVelocity(selection_speed);
 
         old_ball_position = new Vector2d(player.getBall().x, player.getBall().y);
+        System.out.println("Turns played: " + turns_played);
+        turns_played++;
     }
 
     private double resolution(double x){
