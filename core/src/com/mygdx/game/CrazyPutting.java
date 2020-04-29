@@ -311,7 +311,6 @@ public class CrazyPutting  implements ApplicationListener {
             batch.end();
         }
 
-        isolate(currentPlayer);
     }
 
     public void add_shot_velocity(double amount) {
@@ -346,25 +345,6 @@ public class CrazyPutting  implements ApplicationListener {
         else
             return players.get(players.indexOf(currentPlayer) + 1);
 
-    }
-
-    public PuttingCoursePhysics isolate(Player p){
-        Ball ball = (Ball) p.getBall().dupe();
-        PuttingCoursePhysics world = (PuttingCoursePhysics) world_physics.dupe();
-        world.addBody(ball);
-        return world;
-    }
-
-    public static Ball findIsolatedBall(PuttingCoursePhysics world){
-
-        for(TopDownPhysicsObject obj : world.getBodies()){
-
-            if(obj instanceof Ball)
-                return (Ball)obj;
-
-        }
-
-        return null;
     }
 
 }

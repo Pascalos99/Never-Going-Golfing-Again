@@ -8,5 +8,6 @@ public interface TopDownPhysicsObject {
     public double getOrientation();
     public ModelInstance getModel();
     public TopDownPhysicsObject dupe();
+    public void setWorld(PuttingCourse world, PhysicsEngine engine);
 
 }

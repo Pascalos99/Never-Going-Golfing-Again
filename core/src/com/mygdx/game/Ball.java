@@ -10,7 +10,6 @@ import static com.mygdx.game.Variables.*;
 public class Ball implements TopDownPhysicsObject {
     public Vector2d velocity;
     public double x, y, old_x, old_y, init_x, init_y;
-    public double r;
     public double mass = 0.005;
     private ModelInstance model;
     public boolean is_moving = false;
@@ -25,12 +24,14 @@ public class Ball implements TopDownPhysicsObject {
     private static int LAUNCH = 0;
     private static int ROLL = 2;
 
+    private PuttingCourse world;
+    private PuttingCoursePhysics engine;
+
     public double travel_distance;
 
-    Ball(double radius, double x_pos, double y_pos, ModelInstance model, Player owner) {
+    Ball(double x_pos, double y_pos, ModelInstance model, Player owner) {
         x = x_pos;
         y = y_pos;
-        r = radius;
         velocity = new Vector2d(0, 0);
         hit_count = 0;
         this.model = model;
@@ -50,7 +51,7 @@ public class Ball implements TopDownPhysicsObject {
     public void step(double delta, List<TopDownPhysicsObject> ents) {
 
         if(is_moving) {
-            Function2d h = WORLD.get_height();
+            Function2d h = world.get_height();
             Vector2d gradient = h.gradient(new Vector2d(x, y));
             double test_x = x;
             double test_y = y;
@@ -143,10 +144,6 @@ public class Ball implements TopDownPhysicsObject {
 
     }
 
-    public int getFlight_state() {
-        return flight_state;
-    }
-
     private boolean ballVsFenceCollision(){
         boolean r = false;
 
@@ -213,7 +210,7 @@ public class Ball implements TopDownPhysicsObject {
     public Vector3d getPosition() {
         Vector3d vec = new Vector3d(
                 toWorldScale(x),
-                toWorldScale(WORLD.get_height().evaluate(x, y) + BALL_RADIUS),
+                toWorldScale(world.get_height().evaluate(x, y) + BALL_RADIUS),
                 toWorldScale(y)
         );
 
@@ -232,7 +229,7 @@ public class Ball implements TopDownPhysicsObject {
 
     @Override
     public TopDownPhysicsObject dupe() {
-        return new Ball(r, x, y, null, null);
+        return new Ball(x, y, null, null);
     }
 
     @Override
@@ -241,9 +238,9 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     public boolean isTouchingFlag() {
-        Vector2d flag = WORLD.get_flag_position();
+        Vector2d flag = world.get_flag_position();
         Vector2d ballPos = new Vector2d(x,y);
-        double _r = WORLD.get_hole_tolerance();
+        double _r = world.get_hole_tolerance();
         if(flag.distance(ballPos) < _r) {
           return true;
         }
@@ -253,7 +250,7 @@ public class Ball implements TopDownPhysicsObject {
 
     public boolean isOnWater() {
 
-        if (WORLD.getHeightAt(x, y) <= 0 && flight_state == ROLL)
+        if (world.getHeightAt(x, y) <= 0 && flight_state == ROLL)
             return true;
 
         return false;
@@ -281,9 +278,9 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     private Vector2d f(Vector2d pos, Vector2d vel){
-        Function2d h = WORLD.get_height();
-        double gravity = WORLD.get_gravity();
-        double friction = WORLD.get_friction_coefficient();
+        Function2d h = world.get_height();
+        double gravity = world.get_gravity();
+        double friction = world.get_friction_coefficient();
 
         if(isOnWater()){
             friction = 6d;
@@ -350,22 +347,19 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     public double flightGravity(){
-        return WORLD.get_gravity() * 8d;
+        return world.get_gravity() * 8d;
     }
 
     public static Vector2d correctHitVector(Vector2d direction, double speed){
         return new Vector2d(direction.get_x() * speed * SPEED_CORRECTION, direction.get_y() * speed * SPEED_CORRECTION);
     }
 
-    public Ball simulateHit(Vector2d direction, double speed){
-        return simulateHit(direction, speed, 2000, 0.01);
-    }
-
     public Ball simulateHit(Vector2d direction, double speed, int ticks, double h){
-        PuttingCoursePhysics phy = GAME.isolate(owner);
+        PuttingCoursePhysics phy = (PuttingCoursePhysics) engine.dupe();
+        Ball ball = (Ball) this.dupe();
+        phy.addBody(ball);
         phy.useFixedDelta(true, h);
 
-        Ball ball = CrazyPutting.findIsolatedBall(phy);
         ball.hit(direction, speed);
 
         for(int i = 0; i < ticks; i++){
@@ -388,6 +382,12 @@ public class Ball implements TopDownPhysicsObject {
         );
 
         return xy;
+    }
+
+    @Override
+    public void setWorld(PuttingCourse world, PhysicsEngine engine){
+        this.world = world;
+        this.engine = (PuttingCoursePhysics) engine;
     }
 
 }
