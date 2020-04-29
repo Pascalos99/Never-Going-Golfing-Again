@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
 
+import static com.mygdx.game.Variables.AVAILABLE_BOTS;
 import static com.mygdx.game.Variables.MENU_SKIN;
 
 public class GameScreen implements Screen {
@@ -118,6 +119,7 @@ public class GameScreen implements Screen {
                     PlayerScreen.playerNumber=1;
                     PlayerScreen.playerTable=null;
                     parent.players=null;
+                    for (AI_controller bot : AVAILABLE_BOTS) bot.clear();
                     parent.create();
 
                 }
@@ -130,7 +132,7 @@ public class GameScreen implements Screen {
                     }
                 }
             }
-            winList.add(replayButton);
+            winList.add(replayButton).padTop(30);
         }
 
 

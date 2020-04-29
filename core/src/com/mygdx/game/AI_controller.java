@@ -43,6 +43,12 @@ public abstract class AI_controller {
      *   (current position for instance would be new Vector2d(player.getBall().x, player.getBall().y) ) */
     protected abstract void calculate(Player player);
 
+    /** This method is ran when the game is restart at the end of the game. It should erase any game-specific information
+     * that was previously stored in the AI after playing a game (unless this doesn't inhibit performance of coarse, in which
+     * case you can leave this method empty)<br><br>
+     * By default, this method call is empty. Overwrite it if you wish.*/
+    public void clear() {}
+
     /** Use this method inside the calculate() method to set the shot angle of the next shot. This value will be queried after
      *  calculate() has finished (and therefore will just *update* the 'current' value until calculation is done, after which
      *  the last value will be used to make the actual shot) */
