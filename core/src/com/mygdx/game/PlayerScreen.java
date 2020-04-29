@@ -3,11 +3,10 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
@@ -229,8 +228,11 @@ public class PlayerScreen implements Screen {
     }
 
     private ImageButton addPlayerRemove(int index) {
-        //ImageButton button = new ImageButton(new TextureRegionDrawable(CROSS));
-        ImageButton button = new ImageButton(MENU_SKIN);
+        Sprite sprite = new Sprite(CROSS);
+        sprite.setSize(50f, 50f);
+        Drawable draw = new SpriteDrawable(sprite);
+        ImageButton button = new ImageButton(draw);
+        // ImageButton button = new ImageButton(MENU_SKIN);
         button.addListener(new RemoveListener(index));
         return button;
     }
@@ -244,9 +246,17 @@ public class PlayerScreen implements Screen {
             Array<Cell> cells = playerTable.getCells();
             ArrayList<Actor> to_replace = new ArrayList<>();
             for (Cell cell : cells) to_replace.add(cell.getActor());
+
             // updating the index number for each of the delete listeners below the current element:
             for (int i = (index + 1) * playerTable.getColumns(); i < cells.size; i++) {
-                Array<EventListener> listeners = cells.get(i).getActor().getListeners();
+                Actor actor = cells.get(i).getActor();
+                if (actor instanceof Label) {
+                    String txt = ((Label)actor).getText().toString();
+                    int value = Integer.parseInt(txt.replaceAll(" ","")) - 1;
+                    String mod = txt.replaceAll("[0-9]", value+"");
+                    ((Label)actor).setText(mod);
+                }
+                Array<EventListener> listeners = actor.getListeners();
                 for (EventListener listener : listeners)
                     if (listener instanceof RemoveListener)
                         ((RemoveListener)listener).index--;

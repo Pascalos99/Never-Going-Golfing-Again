@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+import java.io.IOException;
+
 import static com.mygdx.game.PhysicsSetting.*;
 
 public final class Variables {
@@ -89,7 +91,15 @@ public final class Variables {
 	public static Skin 	GLASSY = new Skin(Gdx.files.internal("glassy/glassy-ui.json"));
 
 	//assets
-	//public static Texture CROSS = new Texture(Gdx.files.internal("misc/free_cross_image.jpg"));
+	public static Texture CROSS;
+	static {
+		try {
+			CROSS = new Texture(Gdx.files.internal("misc/better_cross.png"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("it gave error with message: \""+e.getMessage()+"\"");
+		}
+	}
 
 	//PHYSICS
 	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is
