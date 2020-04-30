@@ -111,8 +111,7 @@ public class CrazyPutting  implements ApplicationListener {
     }
 
     @Override
-    public void render() {
-
+    public void render() { //TODO cleanup
         if(Gdx.input.isKeyPressed(Input.Keys.P)){
             gameScreen.endGame=true;
         }
