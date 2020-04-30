@@ -104,14 +104,6 @@ public class CrazyPutting  implements ApplicationListener {
         } else {
             environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -1.0f, 1f));
         }
-
-        //TODO remove?
-        System.out.println("Corner to corner distance: " + unfoldDistance(
-                new Vector2d(0, 0),
-                new Vector2d(50d / WORLD_SCALING, 50d / WORLD_SCALING),
-                WORLD.get_height(),
-                100
-        ));
     }
 
     @Override
