@@ -175,6 +175,15 @@ public class SettingsScreen implements Screen {
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
     }
+
+    public static SettingsScreen randomGame(Menu menu) {
+        SettingsScreen scr = new SettingsScreen(menu);
+        String func = AtomFunction2d.randomPolynomial(System.currentTimeMillis());
+        scr.height.setText(func);
+        System.out.println("random function = "+func);
+        return scr;
+    }
+
     @Override
     public void show() {
 

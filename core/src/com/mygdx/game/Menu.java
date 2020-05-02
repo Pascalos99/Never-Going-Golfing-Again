@@ -69,8 +69,8 @@ public class Menu extends Game {
 				break;
 			case RANDOM_GAME:
 				System.out.println("Random GAME");
-				gameScreen = new GameScreen(this, gameInfo);
-				this.setScreen(gameScreen);
+				settings = SettingsScreen.randomGame(this);
+				changeScreen(PLAY);
 				break;
 			case PLAYER_SELECT:
 				System.out.println("Player Select");
