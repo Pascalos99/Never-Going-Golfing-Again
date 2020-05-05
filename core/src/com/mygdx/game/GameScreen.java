@@ -38,26 +38,45 @@ public class GameScreen implements Screen {
     CrazyPutting game;
     public boolean allowNextTurn=true;
     public boolean endGame=false;
-    private final String inAction= "W & S to zoom in/out\nUP & DOWN to increase/decrease\nLEFT & RIGHT rotate camera";
+    private final String inAction= "P to force end\nW & S to zoom in/out\nUP & DOWN to increase/decrease\nLEFT & RIGHT rotate camera";
     private final String inWater="R is your only option";
     public ArrayList<Player> winners;
-
+    private ArrayList<Label> playerLabels=new ArrayList<>();
+    private Table playerOverview;
     public  GameScreen(Menu menu, GameInfo gameInfo) {
         parent = menu;
         gameAspects=gameInfo;
         winners= new ArrayList<>();
         stage = new Stage(new ScreenViewport());
+        for(Player p:gameAspects.players)
+            playerLabels.add(new Label(p.getName(),MENU_SKIN));
+
         Gdx.input.setInputProcessor(stage);
         //table
         Table table = new Table();
+        playerOverview=new Table();
+        playerOverview.left().top();
+        playerOverview.setDebug(true);
         //let it fill the window
         table.setFillParent(true);
-       // table.setDebug(true);
+        table.setDebug(true);
         table.right().bottom();
         stage.addActor(table);
+        stage.addActor(playerOverview);
+        playerOverview.setFillParent(true);
+        playerOverview.add(new Label("Name", Variables.QUANTUM_SKIN));
+        playerOverview.add(new Label("Shots", Variables.QUANTUM_SKIN));
+        playerOverview.row();
+        //add All Players
+        for(Label player : playerLabels){
+            playerOverview.add(player);
+            playerOverview.add(new Label("0", MENU_SKIN));
+            playerOverview.row();
+        }
+
         generator.setPathPreference(true);
         if(gameAspects!=null){
-          //  figure out how to amke function 2D
+          //  figure out how to make function 2D
             course = new PuttingCourse(new AtomFunction2d(gameAspects.getHeightFunction()) ,Function2d.getConstant(gameAspects.getFriction()) ,size,size,gameAspects.getGoal(),gameAspects.getStart()
                     ,gameAspects.getTolerance(),gameAspects.getMaxV() ,gameAspects.getGravity());
         }else{
@@ -65,6 +84,7 @@ public class GameScreen implements Screen {
         }
         game =new CrazyPutting(course, gameAspects, this);
         game.create();
+
         currentPlayerShotNum=new Label("", Variables.GLASSY);
         currentPlayerLabel = new Label("", Variables.GLASSY);
         currentAction= new Label("",Variables.GLASSY);
@@ -104,6 +124,7 @@ public class GameScreen implements Screen {
         if(!endGame ) {
             game.render();
         } else {
+            //endgame screen
             Table winList = new Table();
             winList.setFillParent(true);
             winList.center();
@@ -135,22 +156,37 @@ public class GameScreen implements Screen {
             winList.add(replayButton).padTop(30);
         }
 
-
-
-
         if(!game.getCurrentPlayer().getBall().isOnWater()){
             currentAction.setText(inAction);
         }else{
             currentAction.setText(inWater);
         }
+        playerHighlight(game.getCurrentPlayer());
         currentPlayerLabel.setText("CurrentPlayer : "+game.getCurrentPlayer().getName());
         currentPlayerShotNum.setText("Attempts: "+game.getCurrentPlayer().getBall().hit_count);
+
         stage.act(delta);
         stage.draw();
-        if(Gdx.input.isKeyPressed(Input.Keys.U)){
-            parent.changeScreen(0);
+
+    }
+
+    private void playerHighlight(Player currentPlayer) {
+
+        for(int i=0;i<playerOverview.getCells().size;i++){
+            int cur= playerLabels.indexOf(((Label)playerOverview.getCells().get(i).getActor()));
+            if(cur!=-1) {
+                if (((Label) playerOverview.getCells().get(i).getActor()).getText().toString().equals(currentPlayer.getName())) {
+                    ((Label) playerOverview.getCells().get(i + 1).getActor()).setText(game.getCurrentPlayer().getBall().hit_count);
+                    playerLabels.get(cur).getStyle().fontColor = Color.GREEN;
+                    ((Label) playerOverview.getCells().get(i + 1).getActor()).getStyle().fontColor = Color.GREEN;
+                } else {
+                    playerLabels.get(cur).getStyle().fontColor = Color.ORANGE;
+                    ((Label) playerOverview.getCells().get(i + 1).getActor()).getStyle().fontColor = Color.ORANGE;
+                }
+            }
         }
     }
+
 
     @Override
     public void resize(int width, int height) {

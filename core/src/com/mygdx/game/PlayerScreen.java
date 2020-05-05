@@ -98,21 +98,6 @@ public class PlayerScreen implements Screen {
                 String playerType = "";
                 String ballColor = null;
 
-                /*for(int i=0;i<playerTable.getRows();i++){
-                    int correctedIndex =i*(playerTable.getColumns()-1);
-                    id=(Integer.parseInt(((Label)(playerTable.getCells().get(correctedIndex).getActor())).getText().toString().replaceAll(" ","")));
-                    name = ((TextField)(playerTable.getCells().get(correctedIndex+1).getActor())).getText();
-                    ballColor =((SelectBox<String>) (playerTable.getCells().get(i).getActor())).getSelected();
-                    playerType = ((SelectBox<String>) (playerTable.getCells().get(i).getActor())).getSelected();
-
-                    if(playerType.equals(humanPlayer)){
-                        players.add(new Player.Human(name,id,ballColor));
-                    } else if(playerType.equals(AVAILABLE_BOTS[0].getTypeName())){
-                        players.add(new Player.Bot(name,id,ballColor,AVAILABLE_BOTS[0]));
-                    }
-                }
-              */
-
                 for (int i = 0; i < playerTable.getCells().size; i++) {
                     if (playerTable.getCells().get(i).getActor() instanceof Label) {
                         id = (Integer.parseInt(((Label) (playerTable.getCells().get(i).getActor())).getText().toString().replaceAll(" ", "")));

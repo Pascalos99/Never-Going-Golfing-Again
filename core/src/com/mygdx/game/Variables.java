@@ -89,6 +89,7 @@ public final class Variables {
 	//skins
 	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("orange/uiskin.json"));
 	public static Skin 	GLASSY = new Skin(Gdx.files.internal("glassy/glassy-ui.json"));
+		public static Skin QUANTUM_SKIN =new Skin(Gdx.files.internal("quantum/quantum-horizon-ui.json"));
 
 	//assets
 	public static Texture CROSS;
