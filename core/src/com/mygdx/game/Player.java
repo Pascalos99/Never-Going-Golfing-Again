@@ -177,7 +177,8 @@ public abstract class Player {
     @SuppressWarnings("DuplicatedCode")
     static class Bot extends Player {
 
-        private double velocity_inching_bound = SHOT_VELOCITY_INCREASE() * 2;
+        private static double velocity_inching_bound = SHOT_VELOCITY_INCREASE() * 2;
+        private static float shot_wait_time = 1f;
 
         private AI_controller bot;
         private double desired_shot_velocity;
@@ -192,25 +193,32 @@ public abstract class Player {
         }
 
         public void notifyStartOfTurn() {
+            shot_timer_done = false;
             done_calculating = false;
             started_calculating = false;
             Player player = this;
-            Timer t = new Timer();
+            Timer shot_timer = new Timer();
+            shot_timer.scheduleTask(new Timer.Task(){
+                public void run() {
+                    shot_timer_done = true;
+            }}, shot_wait_time);
+            Timer calculation = new Timer();
             Timer.Task calc = new Timer.Task(){ public void run() {
                 started_calculating = true;
                 bot.startCalculation(player);
                 testCalculate();
             }};
-            t.scheduleTask(calc, 0.02f); // in between bot delay
+            calculation.scheduleTask(calc, 0.02f); // in between bot delay
         }
         private boolean done_calculating;
         private boolean started_calculating;
+        private boolean shot_timer_done;
 
         private boolean testCalculate() {
             if (!started_calculating) return false;
             if (done_calculating) return true;
             boolean done = bot.finishedCalculation();
-            if (!done) return false;
+            if (!done || !shot_timer_done) return false;
             startSequence();
             done_calculating = true;
             return true;
