@@ -6,15 +6,21 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
+import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import static com.mygdx.game.Variables.AVAILABLE_BOTS;
@@ -56,10 +62,10 @@ public class GameScreen implements Screen {
         Table table = new Table();
         playerOverview=new Table();
         playerOverview.left().top();
-        playerOverview.setDebug(true);
+        playerOverview.setDebug(false); // debug
         //let it fill the window
         table.setFillParent(true);
-        table.setDebug(true);
+        table.setDebug(false); // debug
         table.right().bottom();
         stage.addActor(table);
         stage.addActor(playerOverview);
@@ -90,12 +96,18 @@ public class GameScreen implements Screen {
         currentAction= new Label("",Variables.GLASSY);
         currentAction.setAlignment(Align.bottomLeft);
         inputVelocity=new TextField(""+Variables.SHOT_VELOCITY,Variables.GLASSY);
-        inputVelocity.setTextFieldListener(new TextField.TextFieldListener() {
-            @Override
-            public void keyTyped(TextField textField, char c) {
-                String input = inputVelocity.getText();
-                if (input.matches("[0-9]*\\.*[0-9]+")) setInputVel(Double.parseDouble(input));
-                else setInputVel(0.0);
+        inputVelocity.setTextFieldListener((textField, c) -> {
+            String input = inputVelocity.getText();
+            if (input.matches("[0-9]*\\.*[0-9]+")) setInputVel(Double.parseDouble(input));
+            else setInputVel(0.0);
+        });
+        stage.addListener(new ClickListener(){
+            public void clicked(InputEvent event, float x, float y) {
+                Rectangle2D rect = new Rectangle2D.Double(
+                        inputVelocity.getX(), inputVelocity.getY(), inputVelocity.getWidth(), inputVelocity.getHeight());
+                if (stage.getKeyboardFocus() == inputVelocity && !rect.contains(x, y)) {
+                    stage.unfocusAll();
+                }
             }
         });
         Label inputVel= new Label("Initial Velocity: ",Variables.GLASSY);
