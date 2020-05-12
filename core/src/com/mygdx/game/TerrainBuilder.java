@@ -192,8 +192,8 @@ public class TerrainBuilder {
 
         for (int a = 0; a < 5; a++) {
             for (int b = 0; b < 5; b++) {
-                float gw = (float) 20 / (gridWidth * 5f);
-                float gd = (float) 20 / (gridDepth * 5f);
+                float gw = (float) BOUNDED_WORLD_SIZE / (gridWidth * 5f);
+                float gd = (float) BOUNDED_WORLD_SIZE / (gridDepth * 5f);
                 modelBuilder.begin();
                 builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));
 //                builder = modelBuilder.part("grid", GL20.GL_LINES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));

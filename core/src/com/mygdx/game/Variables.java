@@ -34,6 +34,7 @@ public final class Variables {
 	// World-border settings
 	public static final Function2d	OUT_OF_BOUNDS_FRICTION = Function2d.getConstant(100000);
 	public static final	Function2d 	OUT_OF_BOUNDS_HEIGHT = new AtomFunction2d("-sin(y/8 - x/8)/8 - cos(x/8 + y/4)/8 - 2");
+	public static final float BOUNDED_WORLD_SIZE = 20.0f;
 
 	// Settings for path generation
 	public static final int 	NUM_FLAG_POS_TRIES = 2000;
