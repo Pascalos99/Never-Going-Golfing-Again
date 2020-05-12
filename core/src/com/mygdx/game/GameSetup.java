@@ -14,7 +14,7 @@ public class GameSetup {
         CAMERA.lookAt(0f, 0f, 0f);
 
         CAMERA.near = 0.1f;
-        CAMERA.far = 200.0f;
+        CAMERA.far = 300.0f;
     }
 
 

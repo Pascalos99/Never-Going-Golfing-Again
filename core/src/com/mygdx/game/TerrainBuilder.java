@@ -26,7 +26,8 @@ public class TerrainBuilder {
     private static ArrayList<Vector3> borderPoints2 = new ArrayList<Vector3>();
     private static ArrayList<Vector3> borderPoints3 = new ArrayList<Vector3>();
     private static ArrayList<Vector3> borderPoints4 = new ArrayList<Vector3>();
-    private static float resolution = 0.2f;
+    private static float scalingFactor = GRAPHICS_SCALING;
+    private static float resolution = 0.2f*scalingFactor;
 
     public ModelInstance[] initFlag(PuttingCourse course) {
         ModelBuilder modelBuilder = new ModelBuilder();
@@ -74,9 +75,9 @@ public class TerrainBuilder {
         MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(new Color(0.2f, 0.2f, 1, 1f)), new BlendingAttribute(0.5f)));
 
         Vector3 pos1 = new Vector3(0, 0, 0);
-        Vector3 pos2 = new Vector3(0, 0, 50);
-        Vector3 pos3 = new Vector3(50, 0, 50);
-        Vector3 pos4 = new Vector3(50, 0, 0);
+        Vector3 pos2 = new Vector3(0, 0, 50*scalingFactor);
+        Vector3 pos3 = new Vector3(50*scalingFactor, 0, 50*scalingFactor);
+        Vector3 pos4 = new Vector3(50*scalingFactor, 0, 0);
 
         MeshPartBuilder.VertexInfo v1 = new MeshPartBuilder.VertexInfo().setPos(pos1).setNor(new Vector3(0, 1, 0)).setCol(null).setUV(0.5f, 0.0f);
         MeshPartBuilder.VertexInfo v2 = new MeshPartBuilder.VertexInfo().setPos(pos2).setNor(new Vector3(0, 1, 0)).setCol(null).setUV(0.0f, 0.0f);
@@ -106,9 +107,9 @@ public class TerrainBuilder {
             Vector3 p2 = new Vector3(borderPoints1.get(i + 1).x, borderPoints1.get(i + 1).y, borderPoints1.get(i + 1).z);
 
             v1 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p1.x, 1 + Math.max(p1.y, 0), p1.z)).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
-            v2 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p1.x, -10, p1.z)).setNor(nor1).setCol(null).setUV(0.0f, 0.0f);
+            v2 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p1.x, -10*scalingFactor, p1.z)).setNor(nor1).setCol(null).setUV(0.0f, 0.0f);
             v4 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p2.x, 1 + Math.max(p2.y, 0), p2.z)).setNor(nor1).setCol(null).setUV(0.0f, 0.5f);
-            v3 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p2.x, -10, p2.z)).setNor(nor1).setCol(null).setUV(0.5f, 0.5f);
+            v3 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p2.x, -10*scalingFactor, p2.z)).setNor(nor1).setCol(null).setUV(0.5f, 0.5f);
 
             builder.rect(v1, v2, v3, v4);
         }
@@ -120,9 +121,9 @@ public class TerrainBuilder {
             Vector3 p2 = new Vector3(borderPoints3.get(i + 1).x, borderPoints3.get(i + 1).y, borderPoints3.get(i + 1).z);
 
             v2 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p1.x, 1 + Math.max(p1.y, 0), p1.z)).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
-            v1 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p1.x, -10, p1.z)).setNor(nor1).setCol(null).setUV(0.0f, 0.0f);
+            v1 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p1.x, -10*scalingFactor, p1.z)).setNor(nor1).setCol(null).setUV(0.0f, 0.0f);
             v3 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p2.x, 1 + Math.max(p2.y, 0), p2.z)).setNor(nor1).setCol(null).setUV(0.0f, 0.5f);
-            v4 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p2.x, -10, p2.z)).setNor(nor1).setCol(null).setUV(0.5f, 0.5f);
+            v4 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p2.x, -10*scalingFactor, p2.z)).setNor(nor1).setCol(null).setUV(0.5f, 0.5f);
 
             builder.rect(v1, v2, v3, v4);
         }
@@ -134,9 +135,9 @@ public class TerrainBuilder {
             Vector3 p2 = new Vector3(borderPoints2.get(i + 1).x, borderPoints2.get(i + 1).y, borderPoints2.get(i + 1).z);
 
             v2 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p1.x, 1 + Math.max(p1.y, 0), p1.z)).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
-            v1 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p1.x, -10, p1.z)).setNor(nor1).setCol(null).setUV(0.0f, 0.0f);
+            v1 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p1.x, -10*scalingFactor, p1.z)).setNor(nor1).setCol(null).setUV(0.0f, 0.0f);
             v3 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p2.x, 1 + Math.max(p2.y, 0), p2.z)).setNor(nor1).setCol(null).setUV(0.0f, 0.5f);
-            v4 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p2.x, -10, p2.z)).setNor(nor1).setCol(null).setUV(0.5f, 0.5f);
+            v4 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p2.x, -10*scalingFactor, p2.z)).setNor(nor1).setCol(null).setUV(0.5f, 0.5f);
 
             builder.rect(v1, v2, v3, v4);
         }
@@ -148,18 +149,18 @@ public class TerrainBuilder {
             Vector3 p2 = new Vector3(borderPoints4.get(i + 1).x, borderPoints4.get(i + 1).y, borderPoints4.get(i + 1).z);
 
             v1 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p1.x, 1 + Math.max(p1.y, 0), p1.z)).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
-            v2 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p1.x, -10, p1.z)).setNor(nor1).setCol(null).setUV(0.0f, 0.0f);
+            v2 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p1.x, -10*scalingFactor, p1.z)).setNor(nor1).setCol(null).setUV(0.0f, 0.0f);
             v4 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p2.x, 1 + Math.max(p2.y, 0), p2.z)).setNor(nor1).setCol(null).setUV(0.0f, 0.5f);
-            v3 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p2.x, -10, p2.z)).setNor(nor1).setCol(null).setUV(0.5f, 0.5f);
+            v3 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(p2.x, -10*scalingFactor, p2.z)).setNor(nor1).setCol(null).setUV(0.5f, 0.5f);
 
             builder.rect(v1, v2, v3, v4);
         }
 
         nor1 = new Vector3(0, -1, 0);
-        v2 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(0, -10, 0)).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
-        v1 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(0, -10, 50)).setNor(nor1).setCol(null).setUV(0.0f, 0.0f);
-        v4 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(50, -10, 50)).setNor(nor1).setCol(null).setUV(0.0f, 0.5f);
-        v3 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(50, -10, 0)).setNor(nor1).setCol(null).setUV(0.5f, 0.5f);
+        v2 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(0, -10*scalingFactor, 0)).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
+        v1 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(0, -10*scalingFactor, 50*scalingFactor)).setNor(nor1).setCol(null).setUV(0.0f, 0.0f);
+        v4 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(50*scalingFactor, -10*scalingFactor, 50*scalingFactor)).setNor(nor1).setCol(null).setUV(0.0f, 0.5f);
+        v3 = new MeshPartBuilder.VertexInfo().setPos(new Vector3(50*scalingFactor, -10*scalingFactor, 0)).setNor(nor1).setCol(null).setUV(0.5f, 0.5f);
 
         builder.rect(v1, v2, v3, v4);
 
@@ -208,24 +209,24 @@ public class TerrainBuilder {
                         pos4 = new Vector3((i + 1) * resolution, (float) (func.evaluate((i + 1 + (a * gridWidth)) * gw, (k + (b * gridDepth)) * gd) * y_scalar), k * resolution);
 
                         if (i == 0 && a == 0) {
-                            borderPoints1.add(new Vector3(pos1.x + a * 10, pos1.y, pos1.z + b * 10));
+                            borderPoints1.add(new Vector3(pos1.x + a * 10*scalingFactor, pos1.y, pos1.z + b * 10*scalingFactor));
                             if (k == gridDepth - 1 && b == 4)
-                                borderPoints1.add(new Vector3(pos2.x + a * 10, pos2.y, pos2.z + b * 10));
+                                borderPoints1.add(new Vector3(pos2.x + a * 10*scalingFactor, pos2.y, pos2.z + b * 10*scalingFactor));
                         }
                         if (k == 0 && b == 0) {
-                            borderPoints2.add(new Vector3(pos1.x + a * 10, pos1.y, pos1.z + b * 10));
+                            borderPoints2.add(new Vector3(pos1.x + a * 10*scalingFactor, pos1.y, pos1.z + b * 10*scalingFactor));
                             if (i == gridDepth - 1 && a == 4)
-                                borderPoints2.add(new Vector3(pos4.x + a * 10, pos4.y, pos4.z + b * 10));
+                                borderPoints2.add(new Vector3(pos4.x + a * 10*scalingFactor, pos4.y, pos4.z + b * 10*scalingFactor));
                         }
                         if (i == gridWidth - 1 && a == 4) {
-                            borderPoints3.add(new Vector3(pos3.x + a * 10, pos3.y, pos3.z + b * 10));
+                            borderPoints3.add(new Vector3(pos3.x + a * 10*scalingFactor, pos3.y, pos3.z + b * 10*scalingFactor));
                             if (k == 0 && b == 0)
-                                borderPoints3.add(new Vector3(pos4.x + a * 10, pos4.y, pos4.z + b * 10));
+                                borderPoints3.add(new Vector3(pos4.x + a * 10*scalingFactor, pos4.y, pos4.z + b * 10*scalingFactor));
                         }
                         if (k == gridDepth - 1 && b == 4) {
-                            borderPoints4.add(new Vector3(pos3.x + a * 10, pos3.y, pos3.z + b * 10));
+                            borderPoints4.add(new Vector3(pos3.x + a * 10*scalingFactor, pos3.y, pos3.z + b * 10*scalingFactor));
                             if (i == 0 && a == 0)
-                                borderPoints4.add(new Vector3(pos2.x + a * 10, pos2.y, pos2.z + b * 10));
+                                borderPoints4.add(new Vector3(pos2.x + a * 10*scalingFactor, pos2.y, pos2.z + b * 10*scalingFactor));
                         }
 
                         float d = (float) (1.0f / y_scalar);
@@ -257,7 +258,7 @@ public class TerrainBuilder {
                 }
 
                 rect = modelBuilder.end();
-                terrainInstance[a * 5 + b] = new ModelInstance(rect, a * 10, 0, b * 10);
+                terrainInstance[a * 5 + b] = new ModelInstance(rect, a * 10* scalingFactor, 0, b * 10* scalingFactor);
             }
         }
 

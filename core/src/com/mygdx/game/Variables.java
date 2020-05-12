@@ -81,10 +81,11 @@ public final class Variables {
 	//CRAZY PUTTING
 	public static PerspectiveCamera CAMERA;
 	public static GameInfo GAME_ASPECTS;
-	public static final float WORLD_SCALING = (float)(1d/(20/ 50d));
+	public static final float WORLD_SCALING = (float)(1d/(2d*Math.PI/ 50d));
 	public static final float BALL_RADIUS = 0.05f / WORLD_SCALING;
 	public static PuttingCourse WORLD;
 	public static final float FLAGPOLE_HEIGHT = 7;
+	public static float GRAPHICS_SCALING = (float)(20/(2*Math.PI));
 
 	//skins
 	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("orange/uiskin.json"));
