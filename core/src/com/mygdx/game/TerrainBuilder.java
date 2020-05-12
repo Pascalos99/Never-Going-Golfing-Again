@@ -190,10 +190,9 @@ public class TerrainBuilder {
         int gridDepth = 50;
 
         for (int a = 0; a < 5; a++) {
-
             for (int b = 0; b < 5; b++) {
-                float gw = (float) (2f * Math.PI) / (gridWidth * 5f);
-                float gd = (float) (2f * Math.PI) / (gridDepth * 5f);
+                float gw = (float) 20 / (gridWidth * 5f);
+                float gd = (float) 20 / (gridDepth * 5f);
                 modelBuilder.begin();
                 builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));
 //                builder = modelBuilder.part("grid", GL20.GL_LINES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));
