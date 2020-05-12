@@ -86,6 +86,7 @@ public final class Variables {
 	public static PuttingCourse WORLD;
 	public static final float FLAGPOLE_HEIGHT = 7;
 	public static float GRAPHICS_SCALING = (float)(20/(2*Math.PI));
+	public static Vector2d WORLD_SHIFT;
 
 	//skins
 	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("orange/uiskin.json"));

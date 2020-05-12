@@ -268,7 +268,31 @@ public class SettingsScreen implements Screen {
     }
 
     public String getHeightFunction(){
+        String shifted_function = "";
         return "("+height.getText()+")/"+WORLD_SCALING;
+    }
+
+    public void setWorldShift(Vector2d start, Vector2d goal, double world_range) {
+        double delta_x = Math.abs(start.get_x() - goal.get_x());
+        double delta_y = Math.abs(start.get_y() - goal.get_y());
+        double min_x = Math.min(start.get_x(), goal.get_x());
+        double min_y = Math.min(start.get_y(), goal.get_y());
+        double new_min_x = world_range/2 - delta_x/2;
+        double new_min_y = world_range/2 - delta_y/2;
+        WORLD_SHIFT = new Vector2d(new_min_x - min_x, new_min_y - min_y);
+    }
+
+    public String applyWorldShift(String function, Vector2d world_shift) {
+        double dx = world_shift.get_x();
+        double dy = world_shift.get_y();
+        StringBuilder sb = new StringBuilder();
+        for (int i=0; i < function.length(); i++) {
+            char c = function.charAt(i);
+            if (c=='x') sb.append(String.format("(x-%.6f)", dx));
+            else if (c=='y') sb.append(String.format("(y-%.6f)", dy));
+            else sb.append(c);
+        }
+        return sb.toString();
     }
 
     static class ColorSelection {
