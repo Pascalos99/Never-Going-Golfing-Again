@@ -154,10 +154,10 @@ public class Ball implements TopDownPhysicsObject {
             velocity = (new Vector2d(-velocity.get_x()/2d, velocity.get_y()));
         }
 
-        if (x > (50 / WORLD_SCALING - BALL_RADIUS)) {
+        if (x > (50*GRAPHICS_SCALING / WORLD_SCALING - BALL_RADIUS)) {
             r = true;
 
-            x = (49.99 / WORLD_SCALING - BALL_RADIUS);
+            x = (49.99*GRAPHICS_SCALING / WORLD_SCALING - BALL_RADIUS);
             velocity = (new Vector2d(-velocity.get_x()/2d, velocity.get_y()));
         }
 
@@ -168,10 +168,10 @@ public class Ball implements TopDownPhysicsObject {
             velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
         }
 
-        if (y > (50 / WORLD_SCALING - BALL_RADIUS)) {
+        if (y > (50*GRAPHICS_SCALING / WORLD_SCALING - BALL_RADIUS)) {
             r = true;
 
-            y = (49.99 / WORLD_SCALING - BALL_RADIUS);
+            y = (49.99*GRAPHICS_SCALING / WORLD_SCALING - BALL_RADIUS);
             velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
         }
 
