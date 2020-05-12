@@ -252,39 +252,63 @@ public class SettingsScreen implements Screen {
         return Double.parseDouble(tolerance.getText());
     }
 
+    private double start_x, start_y, goal_x, goal_y;
+    private boolean calculated_coords = false;
+
+    private void setCoords() {
+        if (calculated_coords) return;
+        start_x = Double.parseDouble(startX.getText());
+        start_y = Double.parseDouble(startY.getText());
+        goal_x = Double.parseDouble(goalX.getText());
+        goal_y = Double.parseDouble(goalY.getText());
+        calculated_coords = true;
+    }
+
     public double getStartX(){
-        return Double.parseDouble(startX.getText());
+        shiftCalculation();
+        return start_x + WORLD_SHIFT.get_x();
     }
 
     public double getStartY(){
-        return Double.parseDouble(startY.getText());
+        shiftCalculation();
+        return start_y + WORLD_SHIFT.get_y();
     }
 
     public double getGoalX(){
-        return Double.parseDouble(goalX.getText());
+        shiftCalculation();
+        return goal_x + WORLD_SHIFT.get_x();
     }
     public double getGoalY(){
-        return Double.parseDouble(goalY.getText());
+        shiftCalculation();
+        return goal_y + WORLD_SHIFT.get_y();
     }
 
-    public String getHeightFunction(){
-        String shifted_function = "";
-        return "("+height.getText()+")/"+WORLD_SCALING;
+    public String getHeightFunction() {
+        shiftCalculation();
+        return "("+applyWorldShift(height.getText())+")/"+WORLD_SCALING;
     }
 
-    public void setWorldShift(Vector2d start, Vector2d goal, double world_range) {
-        double delta_x = Math.abs(start.get_x() - goal.get_x());
-        double delta_y = Math.abs(start.get_y() - goal.get_y());
-        double min_x = Math.min(start.get_x(), goal.get_x());
-        double min_y = Math.min(start.get_y(), goal.get_y());
+    private boolean calculated_world_shift = false;
+
+    private void shiftCalculation() {
+        setCoords();
+        if (!calculated_world_shift) setWorldShift(start_x, start_y, goal_x, goal_y, BOUNDED_WORLD_SIZE);
+    }
+
+    public void setWorldShift(double start_x, double start_y, double goal_x, double goal_y, double world_range) {
+        double delta_x = Math.abs(start_x - goal_x);
+        double delta_y = Math.abs(start_y - goal_y);
+        double min_x = Math.min(start_x, goal_x);
+        double min_y = Math.min(start_y, goal_y);
         double new_min_x = world_range/2 - delta_x/2;
         double new_min_y = world_range/2 - delta_y/2;
         WORLD_SHIFT = new Vector2d(new_min_x - min_x, new_min_y - min_y);
+        calculated_world_shift = true;
     }
 
-    public String applyWorldShift(String function, Vector2d world_shift) {
-        double dx = world_shift.get_x();
-        double dy = world_shift.get_y();
+    public String applyWorldShift(String function) {
+        double dx = WORLD_SHIFT.get_x();
+        double dy = WORLD_SHIFT.get_y();
         StringBuilder sb = new StringBuilder();
         for (int i=0; i < function.length(); i++) {
             char c = function.charAt(i);
