@@ -105,6 +105,9 @@ public final class Variables {
 		}
 	}
 
+	static BackgroundColor TABLE_BKG=new BackgroundColor("Red.png");
+	static BackgroundColor BLANK_BKG= new BackgroundColor("Red.png");
+
 	//PHYSICS
 	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is
 	public static double MAX_SHOT_VELOCITY = 6d;

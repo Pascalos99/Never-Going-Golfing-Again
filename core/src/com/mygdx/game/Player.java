@@ -97,7 +97,7 @@ public abstract class Player {
         this.setBall(ball_obj);
         world_physics.addBody(ball_obj);
     }
-
+    public abstract String getTypeName();
     public int getId(){
         return id;
     }
@@ -172,6 +172,8 @@ public abstract class Player {
         public boolean requestedReset(){
             return Gdx.input.isKeyPressed(Input.Keys.R);
         }
+
+        public String getTypeName() { return "Human"; }
     }
 
     @SuppressWarnings("DuplicatedCode")
@@ -320,6 +322,9 @@ public abstract class Player {
                 return true;
             }
             return false;
+        }
+        public String getTypeName() {
+            return bot.getName();
         }
     }
 

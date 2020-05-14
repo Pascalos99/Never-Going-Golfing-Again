@@ -25,7 +25,8 @@ import java.util.ArrayList;
 
 import static com.mygdx.game.Variables.AVAILABLE_BOTS;
 import static com.mygdx.game.Variables.MENU_SKIN;
-
+import static com.mygdx.game.Variables.TABLE_BKG;
+import static com.mygdx.game.Variables.BLANK_BKG;
 public class GameScreen implements Screen {
 
     private Menu parent;
@@ -39,6 +40,7 @@ public class GameScreen implements Screen {
     static PuttingCourse course = generator.randomCourse(size, hole_tolerance, max_speed, gravity);
     Label currentPlayerLabel;
     Label currentPlayerShotNum;
+    Label currentPlayerType;
     Label currentAction;
     public TextField inputVelocity;
     CrazyPutting game;
@@ -62,7 +64,6 @@ public class GameScreen implements Screen {
         Table table = new Table();
         playerOverview=new Table();
         playerOverview.left().top();
-        playerOverview.setDebug(false); // debug
         //let it fill the window
         table.setFillParent(true);
         table.setDebug(false); // debug
@@ -70,15 +71,19 @@ public class GameScreen implements Screen {
         stage.addActor(table);
         stage.addActor(playerOverview);
         playerOverview.setFillParent(true);
-        playerOverview.add(new Label("Name", Variables.QUANTUM_SKIN));
-        playerOverview.add(new Label("Shots", Variables.QUANTUM_SKIN));
+        playerOverview.add(new Label("Player Overview", Variables.QUANTUM_SKIN));
         playerOverview.row();
-        //add All Players
         for(Label player : playerLabels){
-            playerOverview.add(player);
-            playerOverview.add(new Label("0", MENU_SKIN));
+            Table p = new Table();
+            p.add(player);
+            p.getCells().get(0).padRight(10);
+            p.add(new Label("0", MENU_SKIN));
+            playerOverview.add(p);
             playerOverview.row();
         }
+        TABLE_BKG.setColor(255, 179, 228, 200); // r, g, b, a
+        BLANK_BKG.setColor(0, 0, 0, 0); // r, g, b, a
+
 
         generator.setPathPreference(true);
         if(gameAspects!=null){
@@ -93,6 +98,7 @@ public class GameScreen implements Screen {
 
         currentPlayerShotNum=new Label("", Variables.GLASSY);
         currentPlayerLabel = new Label("", Variables.GLASSY);
+        currentPlayerType=new Label("",Variables.GLASSY);
         currentAction= new Label("",Variables.GLASSY);
         currentAction.setAlignment(Align.bottomLeft);
         inputVelocity=new TextField(""+Variables.SHOT_VELOCITY,Variables.GLASSY);
@@ -111,10 +117,12 @@ public class GameScreen implements Screen {
             }
         });
         Label inputVel= new Label("Initial Velocity: ",Variables.GLASSY);
-        table.row().pad(0, 0, 10, 0);
+        table.row().pad(0, 0, 10, 10);
         table.add(currentPlayerLabel);
         table.add(currentPlayerShotNum);
-        table.row().pad(0, 0, 10, 0);
+
+        table.row().pad(0, 0, 10, 10);
+        table.add(currentPlayerType);
         table.add(inputVel);
         table.add(inputVelocity);
         stage.addActor(currentAction);
@@ -176,25 +184,23 @@ public class GameScreen implements Screen {
         playerHighlight(game.getCurrentPlayer());
         currentPlayerLabel.setText("CurrentPlayer : "+game.getCurrentPlayer().getName());
         currentPlayerShotNum.setText("Attempts: "+game.getCurrentPlayer().getBall().hit_count);
-
+        currentPlayerType.setText("Player Type: "+game.getCurrentPlayer().getTypeName());
         stage.act(delta);
         stage.draw();
 
     }
 
-    private void playerHighlight(Player currentPlayer) {
 
-        for(int i=0;i<playerOverview.getCells().size;i++){
-            int cur= playerLabels.indexOf(((Label)playerOverview.getCells().get(i).getActor()));
-            if(cur!=-1) {
-                if (((Label) playerOverview.getCells().get(i).getActor()).getText().toString().equals(currentPlayer.getName())) {
-                    ((Label) playerOverview.getCells().get(i + 1).getActor()).setText(game.getCurrentPlayer().getBall().hit_count);
-                    playerLabels.get(cur).getStyle().fontColor = Color.GREEN;
-                    ((Label) playerOverview.getCells().get(i + 1).getActor()).getStyle().fontColor = Color.GREEN;
-                } else {
-                    playerLabels.get(cur).getStyle().fontColor = Color.ORANGE;
-                    ((Label) playerOverview.getCells().get(i + 1).getActor()).getStyle().fontColor = Color.ORANGE;
-                }
+
+    private void playerHighlight(Player currentPlayer) {
+        for(int i=1;i<playerOverview.getCells().size;i++){
+            Table curTable = (Table)(playerOverview.getCells().get(i).getActor());
+            int curPlayerIndex= playerLabels.indexOf(((Label)curTable.getCells().get(0).getActor()));
+            if (((Label) curTable.getCells().get(0).getActor()).getText().toString().equals(currentPlayer.getName())) {
+                ((Label) curTable.getCells().get(1).getActor()).setText(game.getCurrentPlayer().getBall().hit_count);
+                curTable.setBackground(TABLE_BKG);
+            } else {
+                curTable.setBackground(BLANK_BKG);
             }
         }
     }
@@ -261,3 +267,5 @@ public class GameScreen implements Screen {
 
     }
 }
+
+
