@@ -1,5 +1,6 @@
-package com.mygdx.game;
+package com.mygdx.game.physics;
 
+import com.mygdx.game.Ball;
 import com.mygdx.game.courses.PuttingCourse;
 
 import java.util.ArrayList;
@@ -17,13 +18,13 @@ public class PuttingCoursePhysics implements PhysicsEngine {
     private static int DELTA_ARRAY_SIZE_LIMIT = 5;
     private PuttingCourse world;
 
-    PuttingCoursePhysics(){
+    public PuttingCoursePhysics(){
         ents = new ArrayList<TopDownPhysicsObject>();
         deltas = new ArrayList<Double>(DELTA_ARRAY_SIZE_LIMIT);
         world = WORLD;
     }
 
-    PuttingCoursePhysics(PuttingCourse world){
+    public PuttingCoursePhysics(PuttingCourse world){
         ents = new ArrayList<TopDownPhysicsObject>();
         deltas = new ArrayList<Double>(DELTA_ARRAY_SIZE_LIMIT);
         this.world = world;

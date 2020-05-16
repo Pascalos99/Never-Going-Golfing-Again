@@ -5,18 +5,17 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.mygdx.game.BackgroundColor;
+import com.mygdx.game.screens.BackgroundColor;
 import com.mygdx.game.CrazyPutting;
-import com.mygdx.game.PhysicsSetting;
+import com.mygdx.game.physics.PhysicsSetting;
 import com.mygdx.game.bots.*;
 import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.parser.Function2d;
-import com.mygdx.game.screens.BackgroundColor;
 import com.mygdx.game.screens.SettingsScreen;
 
-import static com.mygdx.game.PhysicsSetting.*;
+import static com.mygdx.game.physics.PhysicsSetting.*;
 
 public final class Variables {
 	// MATERIAL SETTINGS

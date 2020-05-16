@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.physics;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.mygdx.game.courses.PuttingCourse;

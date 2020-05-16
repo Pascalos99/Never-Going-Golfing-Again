@@ -4,6 +4,9 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.parser.Function2d;
+import com.mygdx.game.physics.PhysicsEngine;
+import com.mygdx.game.physics.PuttingCoursePhysics;
+import com.mygdx.game.physics.TopDownPhysicsObject;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
 
