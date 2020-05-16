@@ -1,8 +1,8 @@
 package com.mygdx.game.bots;
 
 import com.badlogic.gdx.math.Vector3;
-import com.mygdx.game.Function2d;
-import com.mygdx.game.Vector2d;
+import com.mygdx.game.parser.Function2d;
+import com.mygdx.game.utils.Vector2d;
 
 import java.util.ArrayList;
 import java.util.List;

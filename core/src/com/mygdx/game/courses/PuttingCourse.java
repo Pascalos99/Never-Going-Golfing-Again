@@ -1,6 +1,9 @@
-package com.mygdx.game;
+package com.mygdx.game.courses;
 
-import static com.mygdx.game.Variables.*;
+import com.mygdx.game.utils.Vector2d;
+import com.mygdx.game.parser.Function2d;
+
+import static com.mygdx.game.utils.Variables.*;
 
 public class PuttingCourse {
 

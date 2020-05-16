@@ -1,7 +1,9 @@
-package com.mygdx.game;
+package com.mygdx.game.courses;
+
+import com.mygdx.game.Player;
+import com.mygdx.game.utils.Vector2d;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class GameInfo {
     public ArrayList<Player> players;

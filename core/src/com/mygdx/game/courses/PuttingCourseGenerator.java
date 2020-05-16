@@ -1,11 +1,14 @@
-package com.mygdx.game;
+package com.mygdx.game.courses;
+
+import com.mygdx.game.utils.Vector2d;
+import com.mygdx.game.parser.Function2d;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-import static com.mygdx.game.Variables.*;
-import static com.mygdx.game.MapGenUtils.*;
+import static com.mygdx.game.utils.Variables.*;
+import static com.mygdx.game.courses.MapGenUtils.*;
 
 public class PuttingCourseGenerator {
 	

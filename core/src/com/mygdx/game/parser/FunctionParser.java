@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,9 +11,8 @@ import java.util.Scanner;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.AbstractMap.SimpleEntry;
-import static com.mygdx.game.Variables.*;
 
-class FunctionParser {
+public class FunctionParser {
     public static boolean DEBUG = true;
     private static final int TYPOLOGY_NUMBER = 0, TYPOLOGY_VARIABLE = 2, TYPOLOGY_FUNCTION = 3, TYPOLOGY_OPERATOR = 4;
 

@@ -12,15 +12,14 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.Player;
-import com.mygdx.game.Variables;
-import com.mygdx.game.screens.Menu;
+import com.mygdx.game.utils.Variables;
 
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.utils.Variables.*;
 
 public class PlayerScreen implements Screen {
     private Menu parent;

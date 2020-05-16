@@ -2,7 +2,7 @@ package com.mygdx.game.screens;
 
 
 import com.badlogic.gdx.Game;
-import com.mygdx.game.GameInfo;
+import com.mygdx.game.courses.GameInfo;
 
 
 public class Menu extends Game {

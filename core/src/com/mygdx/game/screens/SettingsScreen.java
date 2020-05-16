@@ -10,13 +10,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.game.AtomFunction2d;
-import com.mygdx.game.IO_course_module;
-import com.mygdx.game.Vector2d;
+import com.mygdx.game.parser.AtomFunction2d;
+import com.mygdx.game.courses.IO_course_module;
+import com.mygdx.game.utils.Vector2d;
 
 import java.io.File;
 
-import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.utils.Variables.*;
 
 public class SettingsScreen implements Screen {
     private Menu parent;

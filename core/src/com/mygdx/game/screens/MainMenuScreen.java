@@ -13,10 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.PhysicsSetting;
-import com.mygdx.game.Variables;
-import com.mygdx.game.screens.Menu;
+import com.mygdx.game.utils.Variables;
 
-import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.utils.Variables.*;
 
 public class MainMenuScreen implements Screen {
     private Menu parent;

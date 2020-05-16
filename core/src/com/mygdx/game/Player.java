@@ -12,8 +12,10 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
 import com.mygdx.game.bots.AI_controller;
+import com.mygdx.game.utils.Vector2d;
+import com.mygdx.game.utils.Vector3d;
 
-import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.utils.Variables.*;
 
 public abstract class Player {
     private String name;

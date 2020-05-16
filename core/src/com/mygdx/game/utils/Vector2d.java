@@ -1,7 +1,4 @@
-package com.mygdx.game;
-
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
+package com.mygdx.game.utils;
 
 public class Vector2d {
 	private double x, y;

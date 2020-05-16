@@ -1,7 +1,9 @@
-package com.mygdx.game;
+package com.mygdx.game.courses;
+
+import com.mygdx.game.utils.Vector2d;
 
 import java.io.*;
-import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.utils.Variables.*;
 
 public class IO_course_module {
 

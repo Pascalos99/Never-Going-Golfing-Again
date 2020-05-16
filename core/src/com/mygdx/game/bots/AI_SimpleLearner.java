@@ -1,7 +1,7 @@
 package com.mygdx.game.bots;
 
 import com.mygdx.game.Player;
-import com.mygdx.game.Vector2d;
+import com.mygdx.game.utils.Vector2d;
 
 import java.util.*;
 

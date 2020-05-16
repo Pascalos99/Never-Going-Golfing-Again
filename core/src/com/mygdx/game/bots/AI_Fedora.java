@@ -1,14 +1,14 @@
 package com.mygdx.game.bots;
 
 import com.mygdx.game.Ball;
-import com.mygdx.game.Function2d;
+import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.Player;
-import com.mygdx.game.Vector2d;
+import com.mygdx.game.utils.Vector2d;
 
 import java.util.Collections;
 import java.util.List;
 
-import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.utils.Variables.*;
 import static com.mygdx.game.bots.AIUtils.*;
 
 public class AI_Fedora extends AI_controller {

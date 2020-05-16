@@ -1,4 +1,6 @@
-package com.mygdx.game;
+package com.mygdx.game.parser;
+
+import com.mygdx.game.utils.Vector2d;
 
 public interface Function2d {
 

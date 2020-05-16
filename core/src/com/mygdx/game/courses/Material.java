@@ -1,8 +1,8 @@
-package com.mygdx.game;
+package com.mygdx.game.courses;
 
 import java.awt.*;
 
-import static com.mygdx.game.MaterialType.*;
+import static com.mygdx.game.courses.MaterialType.*;
 
 public enum Material {			// index
 	GRASS			(SURFACE,		0,		new Color(0x47bf67)),

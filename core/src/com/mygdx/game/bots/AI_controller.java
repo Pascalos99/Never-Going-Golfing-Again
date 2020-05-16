@@ -1,9 +1,9 @@
 package com.mygdx.game.bots;
 
 import com.mygdx.game.Player;
-import com.mygdx.game.PuttingCourse;
+import com.mygdx.game.courses.PuttingCourse;
 
-import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.utils.Variables.*;
 
 /**
  *  To make your own bot, steps:

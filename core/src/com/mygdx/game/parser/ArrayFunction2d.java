@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.parser;
 
 public interface ArrayFunction2d extends Function2d {
 	

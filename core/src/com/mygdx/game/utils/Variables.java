@@ -1,11 +1,18 @@
-package com.mygdx.game;
+package com.mygdx.game.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.mygdx.game.BackgroundColor;
+import com.mygdx.game.CrazyPutting;
+import com.mygdx.game.PhysicsSetting;
 import com.mygdx.game.bots.*;
+import com.mygdx.game.courses.GameInfo;
+import com.mygdx.game.courses.PuttingCourse;
+import com.mygdx.game.parser.AtomFunction2d;
+import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.screens.SettingsScreen;
 
 import static com.mygdx.game.PhysicsSetting.*;
@@ -31,7 +38,7 @@ public final class Variables {
 
 	// MAP GENERATION SETTINGS
 	// World-border settings
-	public static final Function2d	OUT_OF_BOUNDS_FRICTION = Function2d.getConstant(100000);
+	public static final Function2d OUT_OF_BOUNDS_FRICTION = Function2d.getConstant(100000);
 	public static final	Function2d 	OUT_OF_BOUNDS_HEIGHT = new AtomFunction2d("-sin(y/8 - x/8)/8 - cos(x/8 + y/4)/8 - 2");
 	public static final float BOUNDED_WORLD_SIZE = 20.0f;
 

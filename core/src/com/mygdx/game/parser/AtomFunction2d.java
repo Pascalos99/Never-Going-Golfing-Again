@@ -1,4 +1,6 @@
-package com.mygdx.game;
+package com.mygdx.game.parser;
+import com.mygdx.game.utils.Vector2d;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;

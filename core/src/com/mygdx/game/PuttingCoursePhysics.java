@@ -1,9 +1,11 @@
 package com.mygdx.game;
 
+import com.mygdx.game.courses.PuttingCourse;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.utils.Variables.*;
 
 public class PuttingCoursePhysics implements PhysicsEngine {
     protected List<TopDownPhysicsObject> ents;

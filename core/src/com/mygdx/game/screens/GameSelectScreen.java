@@ -10,10 +10,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.game.Variables;
+import com.mygdx.game.utils.Variables;
 
-import static com.mygdx.game.Variables.MENU_BKG;
-import static com.mygdx.game.Variables.MENU_SKIN;
+import static com.mygdx.game.utils.Variables.MENU_BKG;
+import static com.mygdx.game.utils.Variables.MENU_SKIN;
 
 public class GameSelectScreen implements Screen {
     private Menu parent;

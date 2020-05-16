@@ -1,10 +1,10 @@
 package com.mygdx.game.bots;
 
-import com.mygdx.game.Function2d;
+import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.Player;
 
 import static com.mygdx.game.bots.AIUtils.*;
-import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.utils.Variables.*;
 
 public class AI_Neural extends AI_controller {
 

@@ -1,9 +1,6 @@
-package com.mygdx.game;
+package com.mygdx.game.utils;
 
 import com.badlogic.gdx.math.Vector3;
-
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
 
 public class Vector3d {
     private double x, y, z;
