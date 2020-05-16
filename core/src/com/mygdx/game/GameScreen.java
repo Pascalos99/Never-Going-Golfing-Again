@@ -100,11 +100,12 @@ public class GameScreen implements Screen {
         currentAction.setAlignment(Align.bottomLeft);
         inputVelocity=new TextField(""+Variables.SHOT_VELOCITY,Variables.GLASSY);
         inputVelocity.setTextFieldListener((textField, c) -> {
-            if ((c < '0' || c > '9') && (c != '.') && (c != 8)) // 8 = backspace
-                inputVelocity.setText(String.valueOf(SHOT_VELOCITY));
+            if (c==' ') {
+                stage.unfocusAll();
+                setInputVel(SHOT_VELOCITY);
+            }
             String input = inputVelocity.getText();
-            if (input.matches("[0-9]*\\.?[0-9]+")) setInputVel(Double.parseDouble(input));
-            else inputVelocity.setText(String.valueOf(SHOT_VELOCITY));
+            if (input.matches("[0-9]*\\.?[0-9]+")) SHOT_VELOCITY = Double.parseDouble(inputVelocity.getText());
         });
         stage.addListener(new ClickListener(){
             public void clicked(InputEvent event, float x, float y) {
@@ -112,6 +113,7 @@ public class GameScreen implements Screen {
                         inputVelocity.getX(), inputVelocity.getY(), inputVelocity.getWidth(), inputVelocity.getHeight());
                 if (stage.getKeyboardFocus() == inputVelocity && !rect.contains(x, y)) {
                     stage.unfocusAll();
+                    setInputVel(SHOT_VELOCITY);
                 }
             }
         });
