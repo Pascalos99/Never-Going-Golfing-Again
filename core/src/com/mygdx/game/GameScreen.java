@@ -255,6 +255,9 @@ public class GameScreen implements Screen {
                    res=res+inputtxt.charAt(i);
                 }
             }
+            if(res.equals("")){
+                res= ""+0.0;
+            }
             inputVelocity.setText(res);
             return Double.parseDouble(res);
         }
@@ -268,5 +271,3 @@ public class GameScreen implements Screen {
 
     }
 }
-
-
