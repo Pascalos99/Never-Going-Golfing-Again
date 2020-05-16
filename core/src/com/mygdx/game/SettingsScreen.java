@@ -44,6 +44,7 @@ public class SettingsScreen implements Screen {
         //tables
         Table table = new Table();
         table.setFillParent(true);
+        table.setBackground(MENU_BKG);
 
         stage.addActor(table);
         Gdx.input.setInputProcessor(stage);

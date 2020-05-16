@@ -102,6 +102,7 @@ public class Menu extends Game {
 	public void create () {
 		//start with the intermediate loading screen
 		mainMenu = new MainMenuScreen(this);
+
 		this.setScreen(mainMenu);
 	}
 

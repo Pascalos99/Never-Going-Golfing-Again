@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import static com.mygdx.game.Variables.MENU_BKG;
 import static com.mygdx.game.Variables.MENU_SKIN;
 
 public class GameSelectScreen implements Screen {
@@ -24,7 +25,7 @@ public class GameSelectScreen implements Screen {
         table.setFillParent(true);
         //table.setDebug(true);
         stage.addActor(table);
-
+        table.setBackground(MENU_BKG);
         TextButton defGame = new TextButton("Default Game", Variables.MENU_SKIN);
         TextButton customGame = new TextButton("Custom Game", Variables.MENU_SKIN);
         TextButton randomGame = new TextButton("Random Game", Variables.MENU_SKIN);
