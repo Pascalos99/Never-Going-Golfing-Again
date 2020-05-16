@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.bots;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import static com.mygdx.game.Variables.*;
-import static com.mygdx.game.AIUtils.*;
+import static com.mygdx.game.utils.Variables.*;
+import static com.mygdx.game.bots.AIUtils.*;
+import com.mygdx.game.Player;
+import com.mygdx.game.utils.Vector2d;
+import com.mygdx.game.Ball;
 import java.util.AbstractMap.SimpleEntry;
 
 public class AI_Fedora extends AI_controller {
