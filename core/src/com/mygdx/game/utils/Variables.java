@@ -13,6 +13,7 @@ import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.parser.Function2d;
+import com.mygdx.game.screens.BackgroundColor;
 import com.mygdx.game.screens.SettingsScreen;
 
 import static com.mygdx.game.PhysicsSetting.*;
