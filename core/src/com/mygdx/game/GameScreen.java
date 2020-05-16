@@ -99,22 +99,22 @@ public class GameScreen implements Screen {
         currentAction= new Label("",Variables.GLASSY);
         currentAction.setAlignment(Align.bottomLeft);
         inputVelocity=new TextField(""+Variables.SHOT_VELOCITY,Variables.GLASSY);
-        inputVelocity.setTextFieldListener((textField, c) -> {
-            if ((c < '0' || c > '9') && (c != '.') && (c != 8)) // 8 = backspace
-                inputVelocity.setText(String.valueOf(SHOT_VELOCITY));
-            String input = inputVelocity.getText();
-            if (input.matches("[0-9]*\\.?[0-9]+")) setInputVel(Double.parseDouble(input));
-            else inputVelocity.setText(String.valueOf(SHOT_VELOCITY));
-        });
-        stage.addListener(new ClickListener(){
-            public void clicked(InputEvent event, float x, float y) {
-                Rectangle2D rect = new Rectangle2D.Double(
-                        inputVelocity.getX(), inputVelocity.getY(), inputVelocity.getWidth(), inputVelocity.getHeight());
-                if (stage.getKeyboardFocus() == inputVelocity && !rect.contains(x, y)) {
-                    stage.unfocusAll();
-                }
-            }
-        });
+//        inputVelocity.setTextFieldListener((textField, c) -> {
+//            if ((c < '0' || c > '9') && (c != '.') && (c != 8)) // 8 = backspace
+//                inputVelocity.setText(String.valueOf(SHOT_VELOCITY));
+//            String input = inputVelocity.getText();
+//            if (input.matches("[0-9]*\\.?[0-9]+")) setInputVel(Double.parseDouble(input));
+//            else inputVelocity.setText(String.valueOf(SHOT_VELOCITY));
+//        });
+//        stage.addListener(new ClickListener(){
+//            public void clicked(InputEvent event, float x, float y) {
+//                Rectangle2D rect = new Rectangle2D.Double(
+//                        inputVelocity.getX(), inputVelocity.getY(), inputVelocity.getWidth(), inputVelocity.getHeight());
+//                if (stage.getKeyboardFocus() == inputVelocity && !rect.contains(x, y)) {
+//                    stage.unfocusAll();
+//                }
+//            }
+//        });
         Label inputVel= new Label("Initial Velocity: ",Variables.GLASSY);
         table.row().pad(0, 0, 10, 10);
         table.add(currentPlayerLabel);
@@ -252,6 +252,9 @@ public class GameScreen implements Screen {
                 if(Character.isDigit(inputtxt.charAt(i)) ||inputtxt.charAt(i)=='.' ){
                    res=res+inputtxt.charAt(i);
                 }
+            }
+            if(res.equals("")){
+                res= ""+0.0;
             }
             inputVelocity.setText(res);
             return Double.parseDouble(res);
