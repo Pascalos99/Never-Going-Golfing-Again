@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.game.bots.*;
+import com.mygdx.game.screens.BackgroundColor;
 import com.mygdx.game.screens.SettingsScreen;
 
 import static com.mygdx.game.PhysicsSetting.*;
