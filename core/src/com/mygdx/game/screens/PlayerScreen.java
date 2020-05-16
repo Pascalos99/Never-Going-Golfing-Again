@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -11,7 +11,9 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
+import com.mygdx.game.Player;
+import com.mygdx.game.Variables;
+import com.mygdx.game.screens.Menu;
 
 
 import java.util.ArrayList;

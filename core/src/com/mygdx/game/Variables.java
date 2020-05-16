@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.game.bots.*;
+import com.mygdx.game.screens.SettingsScreen;
 
 import static com.mygdx.game.PhysicsSetting.*;
 
@@ -103,9 +104,9 @@ public final class Variables {
 		}
 	}
 
-	static BackgroundColor TABLE_BKG=new BackgroundColor("Red.png");
-	static BackgroundColor BLANK_BKG= new BackgroundColor("Red.png");
-	static BackgroundColor MENU_BKG= new BackgroundColor("MenuBKG.png");
+	public static BackgroundColor TABLE_BKG=new BackgroundColor("Red.png");
+	public static BackgroundColor BLANK_BKG= new BackgroundColor("Red.png");
+	public static BackgroundColor MENU_BKG= new BackgroundColor("MenuBKG.png");
 
 	//PHYSICS
 	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is

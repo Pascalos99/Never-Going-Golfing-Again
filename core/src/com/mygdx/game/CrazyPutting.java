@@ -15,6 +15,8 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.screens.GameScreen;
+
 import java.util.ArrayList;
 import java.util.List;
 import static com.mygdx.game.Variables.*;

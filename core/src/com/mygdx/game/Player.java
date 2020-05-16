@@ -134,7 +134,7 @@ public abstract class Player {
 
     public abstract boolean requestedReset();
 
-    static class Human extends Player {
+    public static class Human extends Player {
 
         public Human(String name, int id, String color) {
             super(name, id, color);
@@ -178,7 +178,7 @@ public abstract class Player {
     }
 
     @SuppressWarnings("DuplicatedCode")
-    static class Bot extends Player {
+    public static class Bot extends Player {
 
         private static double velocity_inching_bound = SHOT_VELOCITY_INCREASE() * 2;
         private static float shot_wait_time = 1f;

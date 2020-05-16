@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.screens;
 
 
 import com.badlogic.gdx.Gdx;
@@ -11,8 +11,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.game.PhysicsSetting;
+import com.mygdx.game.Variables;
+import com.mygdx.game.screens.Menu;
 
 import static com.mygdx.game.Variables.*;
 

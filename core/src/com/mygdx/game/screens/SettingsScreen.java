@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -10,6 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.game.AtomFunction2d;
+import com.mygdx.game.IO_course_module;
+import com.mygdx.game.Vector2d;
 
 import java.io.File;
 
@@ -320,9 +323,9 @@ public class SettingsScreen implements Screen {
         return sb.toString();
     }
 
-    static class ColorSelection {
-        String name;
-        Color color;
+    public static class ColorSelection {
+        public String name;
+        public Color color;
         public ColorSelection(String name, Color color) {
             this.name = name;
             this.color = color;

@@ -2,8 +2,7 @@ package com.mygdx.game.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.mygdx.game.Menu;
-import static com.mygdx.game.Variables.*;
+import com.mygdx.game.screens.Menu;
 
 import java.awt.*;
 
