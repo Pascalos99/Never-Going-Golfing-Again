@@ -66,7 +66,6 @@ public class GameScreen implements Screen {
         playerOverview.left().top();
         //let it fill the window
         table.setFillParent(true);
-        table.setDebug(false); // debug
         table.right().bottom();
         stage.addActor(table);
         stage.addActor(playerOverview);

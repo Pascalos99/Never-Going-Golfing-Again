@@ -29,7 +29,6 @@ public class PlayerScreen implements Screen {
     private static String humanPlayer = "None";
     private Label bot_description;
     private ClickListener hover_listener;
-   // private static boolean firstSelection=true;
 
     public PlayerScreen(Menu menu){
         parent=menu;
@@ -37,6 +36,7 @@ public class PlayerScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
         Table buttons = new Table();
         Table overall= new Table();
+        overall.setBackground(MENU_BKG);
         if(playerTable==null)
             playerTable = new Table();
         bot_description = new Label("", MENU_SKIN);
@@ -55,10 +55,8 @@ public class PlayerScreen implements Screen {
         if(playerNumber==1)
             enterPlayer();
         TextButton addPlayer = new TextButton("Add Player", MENU_SKIN);
-        //TextButton deletePlayer =new TextButton("Delete Player", MENU_SKIN);
         TextButton chooseGameMode = new TextButton("Choose Game Mode", MENU_SKIN);
         buttons.add(addPlayer);
-       // buttons.add(deletePlayer);
         buttons.row().padBottom(10);
         buttons.add(chooseGameMode).expandX();
 
@@ -70,14 +68,6 @@ public class PlayerScreen implements Screen {
             }
         });
 
-        /*deletePlayer.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                playerTable.getCells().get(playerTable.getCells().size-1).getActor().remove();
-                playerTable.getCells().get(playerTable.getCells().size-2).getActor().remove();
-                --playerNumber;
-            }
-        });*/
         TextButton backButton= new TextButton("BACK",MENU_SKIN);
         backButton.align(Align.bottomLeft);
         backButton.addListener(new ChangeListener(){

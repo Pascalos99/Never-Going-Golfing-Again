@@ -107,6 +107,7 @@ public final class Variables {
 
 	static BackgroundColor TABLE_BKG=new BackgroundColor("Red.png");
 	static BackgroundColor BLANK_BKG= new BackgroundColor("Red.png");
+	static BackgroundColor MENU_BKG= new BackgroundColor("MenuBKG.png");
 
 	//PHYSICS
 	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is

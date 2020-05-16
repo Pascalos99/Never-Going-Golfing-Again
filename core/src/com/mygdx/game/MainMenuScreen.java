@@ -30,6 +30,7 @@ public class MainMenuScreen implements Screen {
         table.setFillParent(true);
         //  table.setDebug(true);
         stage.addActor(table);
+        table.setBackground(MENU_BKG);
         SelectBox<PhysicsSetting> physicsSelect = new SelectBox<>(MENU_SKIN);
         physicsSelect.setItems(PhysicsSetting.values());
         physicsSelect.setSelected(CURRENT_PHYSICS_SETTING);
