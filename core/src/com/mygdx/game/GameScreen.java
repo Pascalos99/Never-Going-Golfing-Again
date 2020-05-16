@@ -23,10 +23,8 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
-import static com.mygdx.game.Variables.AVAILABLE_BOTS;
-import static com.mygdx.game.Variables.MENU_SKIN;
-import static com.mygdx.game.Variables.TABLE_BKG;
-import static com.mygdx.game.Variables.BLANK_BKG;
+import static com.mygdx.game.Variables.*;
+
 public class GameScreen implements Screen {
 
     private Menu parent;
@@ -103,9 +101,11 @@ public class GameScreen implements Screen {
         currentAction.setAlignment(Align.bottomLeft);
         inputVelocity=new TextField(""+Variables.SHOT_VELOCITY,Variables.GLASSY);
         inputVelocity.setTextFieldListener((textField, c) -> {
+            if ((c < '0' || c > '9') && (c != '.') && (c != 8)) // 8 = backspace
+                inputVelocity.setText(String.valueOf(SHOT_VELOCITY));
             String input = inputVelocity.getText();
-            if (input.matches("[0-9]*\\.*[0-9]+")) setInputVel(Double.parseDouble(input));
-            else setInputVel(0.0);
+            if (input.matches("[0-9]*\\.?[0-9]+")) setInputVel(Double.parseDouble(input));
+            else inputVelocity.setText(String.valueOf(SHOT_VELOCITY));
         });
         stage.addListener(new ClickListener(){
             public void clicked(InputEvent event, float x, float y) {
