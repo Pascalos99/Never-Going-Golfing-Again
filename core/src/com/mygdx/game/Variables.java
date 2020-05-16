@@ -1,13 +1,11 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-
-import java.io.IOException;
+import com.mygdx.game.bots.*;
 
 import static com.mygdx.game.PhysicsSetting.*;
 

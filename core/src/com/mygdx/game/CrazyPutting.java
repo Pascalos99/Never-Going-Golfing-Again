@@ -18,7 +18,6 @@ import com.badlogic.gdx.math.Vector3;
 import java.util.ArrayList;
 import java.util.List;
 import static com.mygdx.game.Variables.*;
-import static com.mygdx.game.AIUtils.*;
 
 public class CrazyPutting  implements ApplicationListener {
 

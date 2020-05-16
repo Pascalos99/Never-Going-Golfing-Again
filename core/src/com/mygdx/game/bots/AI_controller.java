@@ -1,4 +1,7 @@
-package com.mygdx.game;
+package com.mygdx.game.bots;
+
+import com.mygdx.game.Player;
+import com.mygdx.game.PuttingCourse;
 
 import static com.mygdx.game.Variables.*;
 

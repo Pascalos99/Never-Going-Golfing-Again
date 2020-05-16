@@ -3,18 +3,18 @@ package com.mygdx.game;
 import static com.mygdx.game.Variables.*;
 
 public class PuttingCourse {
+
+	public Function2d height_function;
+	public Function2d friction_function;
 	
-	Function2d height_function;
-	Function2d friction_function;
-	
-	Vector2d flag_position;
-	Vector2d start_position;
-	
-	double hole_tolerance;
-	double maximum_velocity;
-	double gravity;
-	
-	int course_width, course_height;
+	public Vector2d flag_position;
+	public Vector2d start_position;
+
+	public final double hole_tolerance;
+	public final double maximum_velocity;
+	public final double gravity;
+
+	public final int course_width, course_height;
 	
 	/**
 	 * @param height

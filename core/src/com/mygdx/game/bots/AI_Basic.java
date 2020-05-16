@@ -1,6 +1,7 @@
-package com.mygdx.game;
+package com.mygdx.game.bots;
 
-import static com.mygdx.game.Variables.WORLD;
+import com.mygdx.game.Player;
+import com.mygdx.game.Vector2d;
 
 public class AI_Basic extends AI_controller {
 
