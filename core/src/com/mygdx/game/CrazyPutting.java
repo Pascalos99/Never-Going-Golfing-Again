@@ -15,10 +15,16 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.courses.GameInfo;
+import com.mygdx.game.courses.PuttingCourse;
+import com.mygdx.game.physics.PuttingCoursePhysics;
+import com.mygdx.game.screens.GameScreen;
+import com.mygdx.game.utils.Vector2d;
+import com.mygdx.game.utils.Vector3d;
+
 import java.util.ArrayList;
 import java.util.List;
-import static com.mygdx.game.Variables.*;
-import static com.mygdx.game.AIUtils.*;
+import static com.mygdx.game.utils.Variables.*;
 
 public class CrazyPutting  implements ApplicationListener {
 
@@ -48,7 +54,7 @@ public class CrazyPutting  implements ApplicationListener {
     private Player currentPlayer;
     private GameScreen gameScreen;
 
-    public CrazyPutting( PuttingCourse c, GameInfo gameAspects,GameScreen p){
+    public CrazyPutting(PuttingCourse c, GameInfo gameAspects, GameScreen p){
         this.gameScreen=p;
         this.course=c;
         this.players = new ArrayList<>(gameAspects.players);
@@ -59,12 +65,22 @@ public class CrazyPutting  implements ApplicationListener {
         if (SHOT_VELOCITY > gameAspects.maxVelocity) SHOT_VELOCITY = gameAspects.maxVelocity;
     }
 
+    public void initCamera(){
+        CAMERA = new PerspectiveCamera(75,
+                Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight());
+
+        CAMERA.position.set(-5f, 5f, -5f);
+        CAMERA.lookAt(0f, 0f, 0f);
+
+        CAMERA.near = 0.1f;
+        CAMERA.far = 300.0f;
+    }
+
     @Override
     public void create() {
         //initialize graphics setter
-        GameSetup graphicsSetup=new GameSetup();
-
-        graphicsSetup.initCamera();
+        initCamera();
 
         //prepare model and sprite batches for rendering
         modelBatch = new ModelBatch();

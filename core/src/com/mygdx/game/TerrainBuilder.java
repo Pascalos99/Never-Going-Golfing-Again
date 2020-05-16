@@ -15,10 +15,14 @@ import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.courses.PuttingCourse;
+import com.mygdx.game.parser.AtomFunction2d;
+import com.mygdx.game.parser.FunctionParser;
+import com.mygdx.game.utils.Vector2d;
 
 import java.util.ArrayList;
 
-import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.utils.Variables.*;
 
 public class TerrainBuilder {
 

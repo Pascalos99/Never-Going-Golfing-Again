@@ -2,10 +2,17 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.courses.PuttingCourse;
+import com.mygdx.game.parser.Function2d;
+import com.mygdx.game.physics.PhysicsEngine;
+import com.mygdx.game.physics.PuttingCoursePhysics;
+import com.mygdx.game.physics.TopDownPhysicsObject;
+import com.mygdx.game.utils.Vector2d;
+import com.mygdx.game.utils.Vector3d;
 
 import java.util.List;
 
-import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.utils.Variables.*;
 
 public class Ball implements TopDownPhysicsObject {
     public Vector2d velocity;
@@ -154,7 +161,12 @@ public class Ball implements TopDownPhysicsObject {
             }
 
         }
+        tick_count++;
+    }
 
+    private int tick_count = 0;
+    public int getTick_count() {
+        return tick_count;
     }
 
     private boolean ballVsFenceCollision(){

@@ -11,8 +11,12 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
+import com.mygdx.game.bots.AI_controller;
+import com.mygdx.game.physics.PuttingCoursePhysics;
+import com.mygdx.game.utils.Vector2d;
+import com.mygdx.game.utils.Vector3d;
 
-import static com.mygdx.game.Variables.*;
+import static com.mygdx.game.utils.Variables.*;
 
 public abstract class Player {
     private String name;
@@ -97,7 +101,7 @@ public abstract class Player {
         this.setBall(ball_obj);
         world_physics.addBody(ball_obj);
     }
-
+    public abstract String getTypeName();
     public int getId(){
         return id;
     }
@@ -133,7 +137,7 @@ public abstract class Player {
 
     public abstract boolean requestedReset();
 
-    static class Human extends Player {
+    public static class Human extends Player {
 
         public Human(String name, int id, String color) {
             super(name, id, color);
@@ -172,10 +176,12 @@ public abstract class Player {
         public boolean requestedReset(){
             return Gdx.input.isKeyPressed(Input.Keys.R);
         }
+
+        public String getTypeName() { return "Human"; }
     }
 
     @SuppressWarnings("DuplicatedCode")
-    static class Bot extends Player {
+    public static class Bot extends Player {
 
         private static double velocity_inching_bound = SHOT_VELOCITY_INCREASE() * 2;
         private static float shot_wait_time = 1f;
@@ -320,6 +326,9 @@ public abstract class Player {
                 return true;
             }
             return false;
+        }
+        public String getTypeName() {
+            return bot.getName();
         }
     }
 
