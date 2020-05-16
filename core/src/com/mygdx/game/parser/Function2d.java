@@ -27,19 +27,8 @@ public interface Function2d {
 		};
 	}
 
-	default Function2d getScaledBy(double scale) {
-		Function2d from = this;
-		return new Function2d() {
-			@Override
-			public Vector2d gradient(double x, double y) {
-				return from.gradient(x, y).scale(scale);
-			}
-
-			@Override
-			public double evaluate(double x, double y) {
-				return from.evaluate(x, y) * scale;
-			}
-		};
+	default double directionalDerivative(double x, double y, Vector2d direction) {
+		return direction.normalize().dot(gradient(x, y));
 	}
 	
 }
