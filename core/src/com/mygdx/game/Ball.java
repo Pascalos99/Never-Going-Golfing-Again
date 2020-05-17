@@ -35,6 +35,10 @@ public class Ball implements TopDownPhysicsObject {
     private PuttingCoursePhysics engine;
 
     public double travel_distance;
+    public double rolling_distance;
+    public int ticks;
+    public double error;
+    public Vector3 frozen_direction;
 
     Ball(double x_pos, double y_pos, ModelInstance model, Player owner) {
         x = x_pos;
@@ -53,6 +57,8 @@ public class Ball implements TopDownPhysicsObject {
         height_velocity = 0;
 
         travel_distance = 0d;
+        rolling_distance = 0d;
+        ticks = 0;
     }
 
     public void step(double delta, List<TopDownPhysicsObject> ents) {
@@ -62,6 +68,7 @@ public class Ball implements TopDownPhysicsObject {
             Vector2d gradient = h.gradient(new Vector2d(x, y));
             double test_x = x;
             double test_y = y;
+            ticks += 1;
 
             if(flight_state == ROLL) {
                 switch (CURRENT_PHYSICS_SETTING) {
@@ -84,7 +91,10 @@ public class Ball implements TopDownPhysicsObject {
                 double height_difference = h.evaluate(x, y) - h.evaluate(test_x, test_y);
                 height_velocity = height_difference + delta * (-mass * flightGravity());
 
+                frozen_direction = new Vector3((float)velocity.get_x(), (float)height_velocity, (float)velocity.get_y());
+
                 travel_distance += (new Vector3((float)velocity.get_x(), 0f, (float)velocity.get_y())).len();
+                rolling_distance += (new Vector3((float)velocity.get_x(), (float)height_velocity, (float)velocity.get_y())).len();
 
                 if(fence_check && velocity.get_length() < VELOCITY_CUTTOFF){
                     is_moving = false;
@@ -126,7 +136,10 @@ public class Ball implements TopDownPhysicsObject {
                     height_velocity = 0;
                 }
 
+                frozen_direction = new Vector3((float)velocity.get_x(), (float)height_velocity, (float)velocity.get_y());
+
                 travel_distance += (new Vector3((float)velocity.get_x(), 0f, (float)velocity.get_y())).len();
+                rolling_distance += (new Vector3((float)velocity.get_x(), (float)height_velocity, (float)velocity.get_y())).len();
 
             }
 
@@ -241,7 +254,15 @@ public class Ball implements TopDownPhysicsObject {
 
     @Override
     public TopDownPhysicsObject dupe() {
-        return new Ball(x, y, null, null);
+        Ball out = new Ball(x, y, null, null);
+
+        out.flight_state = this.flight_state;
+        out.velocity = this.velocity;
+        out.height_velocity = this.height_velocity;
+        out.height = this.height;
+        out.frozen_direction = this.frozen_direction;
+
+        return out;
     }
 
     @Override
@@ -282,6 +303,8 @@ public class Ball implements TopDownPhysicsObject {
         old_y = y;
         turn_state = TURN_STATE_WAIT;
         travel_distance = 0d;
+        rolling_distance = 0d;
+        ticks = 0;
     }
 
     public void rewind(){
@@ -295,7 +318,7 @@ public class Ball implements TopDownPhysicsObject {
         double friction = world.get_friction_coefficient();
 
         if(isOnWater()){
-            friction = 6d;
+            friction = 1d;
         }
 
         Vector2d gradient = h.gradient(pos);
@@ -385,6 +408,12 @@ public class Ball implements TopDownPhysicsObject {
         return ball;
     }
 
+    public Ball resumeSimulatedHit(int ticks, double h){
+        Vector2d direction = new Vector2d(frozen_direction.x, frozen_direction.z);
+        double speed = direction.get_length();
+        return this.simulateHit(direction.normalize(), speed, ticks, h);
+    }
+
     private static Vector2d interpolate(Vector2d start, Vector2d end, int steps, int step){
         double t = (1d / (double)steps) * ((double)step);
 
@@ -400,6 +429,10 @@ public class Ball implements TopDownPhysicsObject {
     public void setWorld(PuttingCourse world, PhysicsEngine engine){
         this.world = world;
         this.engine = (PuttingCoursePhysics) engine;
+    }
+
+    private double euler_error(double h, double n){
+        return 0;
     }
 
 }
