@@ -81,7 +81,7 @@ public class GameScreen implements Screen {
             playerOverview.add(p);
             playerOverview.row();
         }
-        TABLE_BKG.setColor(255, 179, 228, 200); // r, g, b, a
+        TABLE_BKG.setColor(0, 0, 0, 200); // r, g, b, a
         BLANK_BKG.setColor(0, 0, 0, 0); // r, g, b, a
 
 
