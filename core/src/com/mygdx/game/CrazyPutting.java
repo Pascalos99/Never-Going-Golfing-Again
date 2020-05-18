@@ -99,7 +99,7 @@ public class CrazyPutting  implements ApplicationListener {
 
         //initialize physics
         world_physics = new PuttingCoursePhysics();
-        //world_physics.useFixedDelta(true, 0.001d);
+        world_physics.useFixedDelta(true, DELTA);
         previous_time = System.currentTimeMillis() / 1000.0;
 
         //setup players
@@ -174,6 +174,7 @@ public class CrazyPutting  implements ApplicationListener {
                         (new Vector2d(CAMERA.direction.x, CAMERA.direction.z)).normalize(),
                         SHOT_VELOCITY
                 );
+                System.out.println("Shot speed: " + SHOT_VELOCITY);
             }
 
         }

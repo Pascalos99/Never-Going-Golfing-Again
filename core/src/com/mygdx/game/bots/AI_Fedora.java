@@ -11,10 +11,9 @@ import com.mygdx.game.Ball;
 import java.util.AbstractMap.SimpleEntry;
 
 public class AI_Fedora extends AI_controller {
-    private int VECTOR_COUNT = 1000;
+    private int VECTOR_COUNT = 100;
     private double VELOCITY_PARTITIONS = 100d;
     private int MAX_TICKS = 8000;
-    private double DELTA = 0.001d;
 
     private List<TestDataHolder> tests;
     private Vector2d old_ball_position;
@@ -38,38 +37,48 @@ public class AI_Fedora extends AI_controller {
 
     @Override
     public void calculate(Player player) {
-        Vector2d direction = getWorld().get_flag_position().sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
-        System.out.println("Direction: " + direction.toString());
 
-        double VELOCITY_INCREASE = MAX_SHOT_VELOCITY / VELOCITY_PARTITIONS;
-        TestDataHolder output = null;
+        if(!do_not_play && (old_ball_position == null || (old_ball_position.get_x() != player.getBall().x && old_ball_position.get_y() != player.getBall().y))) {
+            old_ball_position = new Vector2d(player.getBall().x, player.getBall().y);
+            List<Vector2d> vectors = cast_vectors(player.getBall());
+            tests = new ArrayList<TestDataHolder>(vectors.size());
 
-        for(double speed_i = VELOCITY_INCREASE; speed_i <= MAX_SHOT_VELOCITY; speed_i += VELOCITY_INCREASE){
-            Ball simulated_ball = player.getBall().simulateHit(direction, speed_i, MAX_TICKS, DELTA);
-            TestDataHolder test = new TestDataHolder(simulated_ball, direction, speed_i);
+            System.out.println(getWorld().get_flag_position());
+            System.out.println("Vectors: " + vectors.size());
 
-            if(simulated_ball.isTouchingFlag())
-                System.out.println("Idiot! pick this one motherfucker!!!" + speed_i);
+            for (Vector2d v : vectors) {
+                TestDataHolder test_data = get_test_data(player.getBall(), v);
 
-            if(output == null)
-                output = test;
+                if (test_data != null)
+                    tests.add(test_data);
 
-            else if(simulated_ball.isStuck() && !simulated_ball.isTouchingFlag())
-                continue;
+            }
 
-            else if(simulated_ball.isTouchingFlag())
-                output = test;
+            System.out.println("Tests: " + tests.size());
 
-            else if(test.distance_to_flag <= output.distance_to_flag)
-                output = test;
+            if(!tests.isEmpty()) {
+                TestDataHolder head = find_closest_to_flag(tests);
+                System.out.println("Closest to flag: " + head.toString());
+
+                if(some_are_touching_flag(tests))
+                    tests = discard_some_tests(tests);
+
+                sort_test_data(tests);
+            }
+
+            else{
+                System.out.println("No solution found.");
+                do_not_play = true;
+            }
 
         }
 
-        if(output != null) {
-            System.out.println("Output: " + output.toString());
+        if(!tests.isEmpty()){
+            TestDataHolder best = tests.get(0);
+            tests.remove(0);
 
-            setShotVelocity(output.speed);
-            setShotAngle(output.direction.angle());
+            setShotAngle(best.direction.angle());
+            setShotVelocity(best.speed);
         }
 
     }
@@ -193,10 +202,7 @@ public class AI_Fedora extends AI_controller {
         }
 
         public double measure(){
-            Vector2d ray = this.direction;
-            Vector2d flag = getWorld().get_flag_position().sub(new Vector2d(this.ball.x, this.ball.y));
-
-            return ray.normalize().dot(flag.normalize());
+            return this.distance_to_flag;
         }
 
         @Override

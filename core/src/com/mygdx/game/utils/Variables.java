@@ -149,4 +149,6 @@ public final class Variables {
 	public static CrazyPutting GAME = null;
 	public static boolean ALLOW_FLIGHT = true;
 	public static boolean CAST_SHADOWS = false;
+
+	public static double DELTA = 0.001d;
 }
