@@ -3,8 +3,9 @@ package com.mygdx.game.bots;
 import com.mygdx.game.Ball;
 import com.mygdx.game.Player;
 import com.mygdx.game.bots.tree_search.*;
-import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
+
+import static com.mygdx.game.utils.Variables.WORLD;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class AI_Finder extends AI_controller {
             GolfNode node = (GolfNode)n;
             if (!node.simulation_successful || node.resulting_ball.isStuck()) return Double.MIN_VALUE;
             Vector2d current = new Vector2d(node.resulting_ball.getPosition().get_x(), node.resulting_ball.getPosition().get_z());
-            Vector2d goal = Variables.WORLD.flag_position;
+            Vector2d goal = WORLD.flag_position;
             double current_distance = current.distance(goal);
             if (node.getDepth() <= 1) return -current_distance;
             double parent = node.getParent().getHeuristic() * (1 + CHILD_IMPROVEMENT);
@@ -46,8 +47,7 @@ public class AI_Finder extends AI_controller {
 
         stopCondition = n -> {
             GolfNode node = (GolfNode)n;
-
-            return false;
+            return node.resulting_ball.isTouchingFlag();
         };
 
     }
