@@ -12,21 +12,22 @@ public abstract class Node {
      *                         exploration will provide.
      */
     protected Node(double estimate_quality) {
-        current_suite_seed = 0;
+        current_suite_count = 0;
         estimate_heuristic = estimate_quality;
         children = new LinkedList<>();
     }
 
-    void setHeuristic(HeuristicFunction heuristic) {
+    final void setHeuristic(HeuristicFunction heuristic) {
         this.heuristic = heuristic;
     }
 
-    void setParent(Node parent) {
+    final void setParent(Node parent) {
         this.parent = parent;
         if (parent==null) depth = 0;
         else {
             depth = parent.depth + 1;
             parent.children.add(this);
+            if (!simulated) parent.suggested_children_count++;
         }
     }
 
@@ -41,37 +42,38 @@ public abstract class Node {
 
     public final double estimate_heuristic;
 
-    long current_suite_seed;
+    long current_suite_count;
     final List<Node> children;
     HeuristicFunction heuristic;
     Node parent;
     int depth;
+    int suggested_children_count = 0;
 
     private boolean simulated;
     private double heuristic_value;
     private double cost;
 
-    public void computeSimulation() {
+    public final void computeSimulation() {
         cost = simulate();
         simulated = true;
         heuristic_value = heuristic.calculate(this);
     }
-    public boolean isSimulated() {
+    public final boolean isSimulated() {
         return simulated;
     }
-    public double getHeuristic() {
+    public final double getHeuristic() {
         return heuristic_value;
     }
-    public double getCost() {
+    public final double getCost() {
         return cost;
     }
-    public Node getParent() {
+    public final Node getParent() {
         return parent;
     }
-    public int getDepth() {
+    public final int getDepth() {
         return depth;
     }
-    public Node[] getChildren() {
+    public final Node[] getChildren() {
         return children.toArray(new Node[children.size()]);
     }
 }

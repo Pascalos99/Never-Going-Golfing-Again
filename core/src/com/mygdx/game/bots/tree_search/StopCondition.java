@@ -9,6 +9,6 @@ public interface StopCondition {
      * @return {@code true} if the simulation should return this node as best node and stop the search immediately,
      *         {@code false} otherwise
      */
-    public boolean isSolution(Node current_node);
+    boolean isSolution(Node current_node);
 
 }

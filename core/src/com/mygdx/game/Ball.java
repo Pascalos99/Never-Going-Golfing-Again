@@ -161,12 +161,10 @@ public class Ball implements TopDownPhysicsObject {
             }
 
         }
-        tick_count++;
     }
 
-    private int tick_count = 0;
-    public int getTick_count() {
-        return tick_count;
+    public int getTickCount() {
+        return ticks;
     }
 
     private boolean ballVsFenceCollision(){
