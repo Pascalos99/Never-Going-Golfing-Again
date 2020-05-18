@@ -28,10 +28,8 @@ public abstract class AI_controller {
     }
 
     protected PuttingCourse getWorld(){
-
         if(world == null)
             return WORLD;
-
         return world;
     }
 
