@@ -35,7 +35,7 @@ public class SimulationTreeSearch {
         suggested_nodes = new ArrayList<>();
         root_node = initial_node;
         total_cost = 0;
-        simulateNode(root_node);
+        simulateNode(root_node, true);
     }
 
     /**
@@ -62,7 +62,7 @@ public class SimulationTreeSearch {
         endorsed_nodes.clear();
         suggested_nodes.clear();
         resetCost();
-        simulateNode(root_node);
+        simulateNode(root_node, true);
     }
 
     /**
@@ -82,8 +82,9 @@ public class SimulationTreeSearch {
         stop_simulation = false;
         while (total_cost <= max_cost && !stop_simulation) {
             Node next_simulation = selectSuggestedNode();
-            simulateNode(next_simulation);
+            simulateNode(next_simulation, true);
         }
+        validateBestNode();
     }
 
     public double getTotalCost() {
@@ -127,7 +128,7 @@ public class SimulationTreeSearch {
         if (parent.suggested_children_count <= 0) makeSuite(parent);
     }
 
-    private void simulateNode(Node node) {
+    private void simulateNode(Node node, boolean makeSuite) {
         if (!node.isSimulated()) {
             node.computeSimulation();
             updateParentSuggestedChildrenCount(node);
@@ -145,7 +146,28 @@ public class SimulationTreeSearch {
         else if (h_value < node.parent.getHeuristic() + minimum_improvement) return;
 
         endorsed_nodes.add(node);
-        makeSuite(node);
+        if (makeSuite) makeSuite(node);
+    }
+
+    public void validateBestNode() {
+        if (stop_simulation) return; // the 'best_node' satisfies the stop condition, so it does not have to be validated
+        Node original_best = best_node;
+        Node current_best = best_node;
+        while (true) {
+            for (Node child : current_best.children)
+                if (endorsed_nodes.contains(child)) return; // there is a child node that is better than best_node
+            resetCost();
+            while (current_best.suggested_children_count <= 0) makeSuite(current_best);
+            for (Node child : current_best.children) {
+                simulateNode(child, false);
+                if (endorsed_nodes.contains(child)) return; // there is a child node that is better than best_node
+            }
+            endorsed_nodes.remove(current_best);
+            if (endorsed_nodes.size() <= 1) { best_node = original_best; return; }
+            current_best = root_node;
+            for (Node node : endorsed_nodes) if (node.getHeuristic() > current_best.getHeuristic()) current_best = node;
+            best_node = current_best;
+        }
     }
 
     /**

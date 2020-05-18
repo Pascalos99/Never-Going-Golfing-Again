@@ -3,6 +3,7 @@ package com.mygdx.game.bots;
 import com.mygdx.game.Ball;
 import com.mygdx.game.Player;
 import com.mygdx.game.bots.tree_search.*;
+import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
 import java.util.List;
@@ -17,6 +18,10 @@ public class AI_Finder extends AI_controller {
         setupTreeSearch(player.getBall());
     }
 
+    private static int MAX_TICKS = 8000;
+    private static double STEP_SIZE = 0.001;
+    private static double CHILD_IMPROVEMENT = 0.4;
+
     private SimulationTreeSearch tree_search;
     private HeuristicFunction heuristic;
     private StopCondition stopCondition;
@@ -28,14 +33,20 @@ public class AI_Finder extends AI_controller {
 
         heuristic = n -> {
             GolfNode node = (GolfNode)n;
-            if (!node.simulation_successful) return Double.MIN_VALUE;
-            // TODO
-            return 0;
+            if (!node.simulation_successful || node.resulting_ball.isStuck()) return Double.MIN_VALUE;
+            Vector2d current = new Vector2d(node.resulting_ball.getPosition().get_x(), node.resulting_ball.getPosition().get_z());
+            Vector2d goal = Variables.WORLD.flag_position;
+            double current_distance = current.distance(goal);
+            if (node.getDepth() <= 1) return -current_distance;
+            double parent = node.getParent().getHeuristic() * (1 + CHILD_IMPROVEMENT);
+            Vector2d previous = new Vector2d(node.start_ball.getPosition().get_x(), node.start_ball.getPosition().get_z());
+            double previous_distance = previous.distance(goal);
+            return parent + previous_distance - current_distance;
         };
 
         stopCondition = n -> {
             GolfNode node = (GolfNode)n;
-            // TODO
+
             return false;
         };
 
@@ -50,7 +61,7 @@ public class AI_Finder extends AI_controller {
     private GolfNode initial_node(Ball current) {
         return new GolfNode(0, current, new Vector2d(0,0), 0) {
             protected double simulate() {
-                simulation_successful = true;
+                simulation_successful = false;
                 resulting_ball = start_ball;
                 return 0;
             }
@@ -58,9 +69,6 @@ public class AI_Finder extends AI_controller {
     }
 
     class GolfNode extends Node {
-
-        private final int MAX_TICKS = 8000;
-        private final double STEP_SIZE = 0.001;
 
         Ball start_ball;
         Ball resulting_ball = null;
