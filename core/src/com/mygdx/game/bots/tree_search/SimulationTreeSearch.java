@@ -184,7 +184,7 @@ public class SimulationTreeSearch {
      * @return a LinkedList that automatically sorts incoming elements
      */
     private LinkedList<Node> auto_sorted_node_list() {
-        return new LinkedList<>() {
+        return new LinkedList<Node>() {
             @Override
             public boolean add(Node node) {
                 ListIterator<Node> iter = ((LinkedList)endorsed_nodes).listIterator();
