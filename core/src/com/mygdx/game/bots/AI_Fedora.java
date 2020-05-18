@@ -23,6 +23,9 @@ public class AI_Fedora extends AI_controller {
     private static class Fedora {}
     public Fedora the_fedora;
 
+    private static class SunGlasses {}
+    public SunGlasses the_shades;
+
     @Override
     public String getName() {
         return "Fedora Bot";
