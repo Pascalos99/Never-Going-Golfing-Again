@@ -5,19 +5,20 @@ import java.util.stream.Collectors;
 
 import static com.mygdx.game.utils.Variables.*;
 import static com.mygdx.game.bots.AIUtils.*;
+
+import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.Player;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.Ball;
 import java.util.AbstractMap.SimpleEntry;
 
 public class AI_Fedora extends AI_controller {
-    private int VECTOR_COUNT = 100;
-    private double VELOCITY_PARTITIONS = 100d;
+    private int VECTOR_COUNT = 360; //1000
+    private double VELOCITY_PARTITIONS = 100d; //100
     private int MAX_TICKS = 8000;
 
     private List<TestDataHolder> tests;
     private Vector2d old_ball_position;
-    private boolean do_not_play = false;
 
     private static class Fedora {}
     public Fedora the_fedora;
@@ -38,73 +39,93 @@ public class AI_Fedora extends AI_controller {
     @Override
     public void calculate(Player player) {
 
-        if(!do_not_play && (old_ball_position == null || (old_ball_position.get_x() != player.getBall().x && old_ball_position.get_y() != player.getBall().y))) {
+        if(old_ball_position == null || (old_ball_position.get_x() != player.getBall().x && old_ball_position.get_y() != player.getBall().y)) {
+            double start = System.currentTimeMillis() * 0.001;
+
             old_ball_position = new Vector2d(player.getBall().x, player.getBall().y);
             List<Vector2d> vectors = cast_vectors(player.getBall());
+            System.out.println("Using " + vectors.size() + " of " + VECTOR_COUNT + " vectors.");
             tests = new ArrayList<TestDataHolder>(vectors.size());
 
-            System.out.println(getWorld().get_flag_position());
-            System.out.println("Vectors: " + vectors.size());
+            for(Vector2d v : vectors) {
+                TestDataHolder test = get_test_data(player.getBall(), v);
 
-            for (Vector2d v : vectors) {
-                TestDataHolder test_data = get_test_data(player.getBall(), v);
-
-                if (test_data != null)
-                    tests.add(test_data);
+                if(test != null)
+                    tests.add(test);
 
             }
 
-            System.out.println("Tests: " + tests.size());
+            Collections.sort(tests, new Comparator<TestDataHolder>() {
+                @Override
+                public int compare(TestDataHolder a, TestDataHolder b) {
 
-            if(!tests.isEmpty()) {
-                TestDataHolder head = find_closest_to_flag(tests);
-                System.out.println("Closest to flag: " + head.toString());
+                    if(a.weight > b.weight)
+                        return 1;
 
-                if(some_are_touching_flag(tests))
-                    tests = discard_some_tests(tests);
+                    if(a.weight < b.weight)
+                        return -1;
 
-                sort_test_data(tests);
-            }
+                    return 0;
+                }
+            });
 
-            else{
-                System.out.println("No solution found.");
-                do_not_play = true;
-            }
-
+            double end = System.currentTimeMillis() * 0.001;
+            System.out.println("[FEDORA] Time span: " + (end - start));
         }
 
         if(!tests.isEmpty()){
-            TestDataHolder best = tests.get(0);
-            tests.remove(0);
+            TestDataHolder select = tests.get(tests.size() - 1);
+            tests.remove(tests.size() - 1);
+            setShotVelocity(select.speed);
+            setShotAngle(select.direction.angle());
+            System.out.println("[FEDORA] Select: " + select.weight);
+        }
 
-            setShotAngle(best.direction.angle());
-            setShotVelocity(best.speed);
+        else{
+            System.out.println("[FEDORA] No options left.");
         }
 
     }
 
     public void clear(){
         old_ball_position = null;
-        do_not_play = false;
-
-        if(tests != null)
-            tests.clear();
-
     }
 
     private List<Vector2d> cast_vectors(Ball ball){
         Vector2d real_ball_position = new Vector2d(ball.x, ball.y);
         List<Vector2d> points = new ArrayList<Vector2d>(VECTOR_COUNT);
-        Vector2d anchor = new Vector2d(getWorld().get_flag_position().distance(real_ball_position), 0);
+        Vector2d to_flag = getWorld().get_flag_position().sub(real_ball_position).normalize();
+        Vector2d anchor = (new Vector2d(getWorld().get_flag_position().distance(real_ball_position), 0)).rotate(to_flag.angle());
 
         for(int i = 0; i < VECTOR_COUNT; i++) {
             Vector2d ray = anchor.rotate(((double) (i)) * 2d * Math.PI / ((double) VECTOR_COUNT));
 
-            if(isClearPath(real_ball_position, real_ball_position.add(ray), getWorld().get_height(), OPTIMAL_RESOLUTION, getWorld().get_hole_tolerance()))
+            if(
+                    isClearPath(
+                            real_ball_position,
+                            real_ball_position.add(ray),
+                            getWorld().get_height(),
+                            OPTIMAL_RESOLUTION,
+                            getWorld().get_hole_tolerance()
+                    ) && (ray.normalize().dot(to_flag) > 0)
+            )
                 points.add(ray.normalize());
 
         }
 
+        Collections.sort(points, new Comparator<Vector2d>() {
+            @Override
+            public int compare(Vector2d a, Vector2d b) {
+
+                if(a.dot(to_flag) > b.dot(to_flag))
+                    return 1;
+
+                if(a.dot(to_flag) < b.dot(to_flag))
+                    return -1;
+
+                return 0;
+            }
+        });
         return points;
     }
 
@@ -112,74 +133,37 @@ public class AI_Fedora extends AI_controller {
         double VELOCITY_INCREASE = MAX_SHOT_VELOCITY / VELOCITY_PARTITIONS;
         TestDataHolder output = null;
 
-        for(double speed_i = MAX_SHOT_VELOCITY; speed_i > 0; speed_i -= VELOCITY_INCREASE){
-            Ball simulated_ball = ball.simulateHit(direction, speed_i, MAX_TICKS, DELTA);
-            TestDataHolder test = new TestDataHolder(simulated_ball, direction, speed_i);
+        for(double speed_i = VELOCITY_INCREASE; speed_i <= MAX_SHOT_VELOCITY; speed_i += VELOCITY_INCREASE){
+            Ball test_ball = ball.simulateHit(direction, speed_i, MAX_TICKS, DELTA);
 
-            if(output == null)
+            double displacement = (new Vector2d(test_ball.x, test_ball.y)).distance(new Vector2d(ball.x, ball.y));
+            double old_distance_to_flag = getWorld().get_flag_position().distance(new Vector2d(ball.x, ball.y));
+            double new_distance_to_flag = getWorld().get_flag_position().distance(new Vector2d(test_ball.x, test_ball.y));
+
+            if(
+                    (!test_ball.isTouchingFlag() && test_ball.isStuck())
+                    || (displacement <= BALL_RADIUS)
+            ){
+                continue;
+            }
+
+            double displacement_test = -Math.pow(displacement - old_distance_to_flag, 2) + 1;
+            double change_in_distance = -Math.pow(new_distance_to_flag, 2) + 1;
+            double tick_test = 1 - (((double)test_ball.ticks) / ((double)MAX_TICKS));
+            double flag_test = test_ball.isTouchingFlag()? 1:0;
+            double travel_test = -Math.pow(test_ball.travel_distance - old_distance_to_flag, 2) + 1;
+            double total = displacement_test + change_in_distance + tick_test + flag_test + travel_test;
+            total = total / 5d;
+
+            TestDataHolder test = new TestDataHolder(direction, speed_i, total);
+
+            if(output == null || test.weight > output.weight) {
                 output = test;
 
-           if(simulated_ball.isStuck() && !simulated_ball.isTouchingFlag())
-               continue;
+                if(output.weight == 1d)
+                    return output;
 
-           if((simulated_ball.isTouchingFlag() && !output.ball.isTouchingFlag()) || (test.distance_to_flag <= output.distance_to_flag))
-               output = test;
-
-        }
-
-        return output;
-    }
-
-
-    private TestDataHolder find_closest_to_flag(List<TestDataHolder> tests){
-        TestDataHolder head = null;
-
-        for(TestDataHolder t : tests){
-
-            if(head == null || t.distance_to_flag < head.distance_to_flag)
-                head = t;
-
-        }
-
-        return head;
-    }
-
-    private List<TestDataHolder> filter_test_data(List<TestDataHolder> tests, TestDataHolder head, double tolerance){
-        List<TestDataHolder> output = new ArrayList<TestDataHolder>(tests.size());
-
-        for(TestDataHolder t : tests){
-
-            if(Math.abs(head.distance_to_flag - t.distance_to_flag) <= tolerance)
-                output.add(t);
-
-        }
-
-        return output;
-    }
-
-    private void sort_test_data(List<TestDataHolder> tests){
-        tests.sort(Comparator.comparingDouble(TestDataHolder::measure));
-    }
-
-    private boolean some_are_touching_flag(List<TestDataHolder> tests){
-
-        for(TestDataHolder t : tests){
-
-            if(t.ball.isTouchingFlag())
-                return true;
-
-        }
-
-        return false;
-    }
-
-    private List<TestDataHolder> discard_some_tests(List<TestDataHolder> tests){
-        List<TestDataHolder> output = new ArrayList<TestDataHolder>(tests.size());
-
-        for(TestDataHolder t : tests){
-
-            if(t.ball.isTouchingFlag())
-                output.add(t);
+            }
 
         }
 
@@ -189,26 +173,18 @@ public class AI_Fedora extends AI_controller {
     class TestDataHolder{
         public Vector2d direction;
         public double speed;
-        public double distance_to_flag;
-        public Ball ball;
+        public double weight;
 
-        TestDataHolder(Ball ball, Vector2d direction, double speed){
-            this.ball = ball;
+        TestDataHolder(Vector2d direction, double speed, double weight){
             this.direction = direction;
             this.speed = speed;
-
-            Vector2d ball_position = new Vector2d(ball.x, ball.y);
-            this.distance_to_flag = ball_position.distance(getWorld().get_flag_position());
+            this.weight = weight;
         }
 
-        public double measure(){
-            return this.distance_to_flag;
+        public double getWeight(){
+            return this.weight;
         }
 
-        @Override
-        public String toString() {
-            return direction.toString() + " | " + "Speed(" + speed + ") | " + "Distance(" + distance_to_flag + ")" + " | " + ball.isTouchingFlag();
-        }
     }
 
 }

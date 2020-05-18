@@ -67,4 +67,8 @@ public class Vector2d {
 
 	public double angle() { return Math.atan2(get_y(), get_x()); }
 
+	public static Vector2d from_angle(double angle){
+		return  new Vector2d(Math.cos(angle), Math.sin(angle));
+	}
+
 }

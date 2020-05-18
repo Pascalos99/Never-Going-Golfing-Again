@@ -174,7 +174,6 @@ public class CrazyPutting  implements ApplicationListener {
                         (new Vector2d(CAMERA.direction.x, CAMERA.direction.z)).normalize(),
                         SHOT_VELOCITY
                 );
-                System.out.println("Shot speed: " + SHOT_VELOCITY);
             }
 
         }
