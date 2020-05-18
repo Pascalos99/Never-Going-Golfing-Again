@@ -55,7 +55,10 @@ public class SettingsScreen implements Screen {
         Table tabler = new Table();
         //left hand side
         Table tablel = new Table();
-
+        TABLE_BKG.setColor(0,0,0,100);
+        tablel.setBackground(TABLE_BKG);
+        BLANK_BKG.setColor(0,0,0,100);
+        tabler.setBackground(BLANK_BKG);
         table.setFillParent(true);
         table.add(tabler).expandY().expandX();
         table.add(tablel).expandY().expandX();
@@ -155,6 +158,8 @@ public class SettingsScreen implements Screen {
        /* tablel.row().pad(margine, 0, 0, 0);
         tabler.row().pad(margine, 0, 0, 0);
 */
+        tablel.padRight(margine);
+        tabler.padRight(margine);
         addToTable(tabler, g,gravity,margine,0,margine,0);
         addToTable(tabler, bm,ballMass,0,0,margine,0);
         addToTable(tabler,cf,coefff,0,0,margine,0);

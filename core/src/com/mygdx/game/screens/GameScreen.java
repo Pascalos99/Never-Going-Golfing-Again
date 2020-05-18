@@ -47,7 +47,7 @@ public class GameScreen implements Screen {
     CrazyPutting game;
     public boolean allowNextTurn=true;
     public boolean endGame=false;
-    private final String inAction= "P to force end\nW & S to zoom in/out\nUP & DOWN to increase/decrease\nLEFT & RIGHT rotate camera";
+    private final String inAction= "P to force end\nW & S to zoom in/out\nUP & DOWN to increase/decrease initial velocity\nLEFT & RIGHT rotate camera";
     private final String inWater="R is your only option";
     public ArrayList<Player> winners;
     private ArrayList<Label> playerLabels=new ArrayList<>();
