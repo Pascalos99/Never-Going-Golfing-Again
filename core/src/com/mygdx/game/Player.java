@@ -107,7 +107,7 @@ public abstract class Player {
     }
 
     public String toString(){
-        return "["+id+"] "+name+" ("+ballColor+")";
+        return "["+id+"] "+name+" ("+getTypeName()+")";
     }
 
     public Ball getBall(){
