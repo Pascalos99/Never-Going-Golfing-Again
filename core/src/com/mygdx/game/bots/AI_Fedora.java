@@ -1,9 +1,6 @@
 package com.mygdx.game.bots;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.mygdx.game.utils.Variables.*;
@@ -15,12 +12,13 @@ import java.util.AbstractMap.SimpleEntry;
 
 public class AI_Fedora extends AI_controller {
     private int VECTOR_COUNT = 1000;
-    private double VELOCITY_PARTITIONS = 20d;
+    private double VELOCITY_PARTITIONS = 100d;
     private int MAX_TICKS = 8000;
+    private double DELTA = 0.001d;
 
-    private List<Vector2d> points;
-
+    private List<TestDataHolder> tests;
     private Vector2d old_ball_position;
+    private boolean do_not_play = false;
 
     private static class Fedora {}
     public Fedora the_fedora;
@@ -32,159 +30,176 @@ public class AI_Fedora extends AI_controller {
 
     @Override
     public String getDescription() {
-        return "Heuristic selection with route sampling AI.";
+        return "Heuristic selection with route sampling.";
     }
 
     @Override
     public void calculate(Player player) {
-        Vector2d real_ball_position = new Vector2d(player.getBall().x, player.getBall().y);
+        Vector2d direction = getWorld().get_flag_position().sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
+        System.out.println("Direction: " + direction.toString());
 
-        if(old_ball_position != null && old_ball_position.get_x() != player.getBall().x && old_ball_position.get_y() != player.getBall().y){
-            points = null;
-        }
+        double VELOCITY_INCREASE = MAX_SHOT_VELOCITY / VELOCITY_PARTITIONS;
+        TestDataHolder output = null;
 
-        if(points == null){
-            points = new ArrayList<Vector2d>(VECTOR_COUNT);
-            Vector2d anchor = new Vector2d(getWorld().get_flag_position().distance(real_ball_position), 0);
+        for(double speed_i = VELOCITY_INCREASE; speed_i <= MAX_SHOT_VELOCITY; speed_i += VELOCITY_INCREASE){
+            Ball simulated_ball = player.getBall().simulateHit(direction, speed_i, MAX_TICKS, DELTA);
+            TestDataHolder test = new TestDataHolder(simulated_ball, direction, speed_i);
 
-            for(int i = 0; i < VECTOR_COUNT; i++) {
-                Vector2d ray = anchor.rotate(((double) (i)) * 2d * Math.PI / ((double) VECTOR_COUNT));
+            if(simulated_ball.isTouchingFlag())
+                System.out.println("Idiot! pick this one motherfucker!!!" + speed_i);
 
-                if(isClearPath(real_ball_position, ray, getWorld().get_height(), OPTIMAL_RESOLUTION))
-                    points.add(ray);
+            if(output == null)
+                output = test;
 
-            }
+            else if(simulated_ball.isStuck() && !simulated_ball.isTouchingFlag())
+                continue;
 
-        }
+            else if(simulated_ball.isTouchingFlag())
+                output = test;
 
-        Vector2d selection = null;
-        double selection_speed = 0d;
-        double selection_test = 0d;
-
-        double selection_flag = 0d;
-        double selection_dist = 0d;
-        double selection_ticks = 0d;
-        double selection_travel = 0d;
-
-        outer_for: for (int point_i = points.size() - 1; point_i >= 0; point_i--){
-            Vector2d p = points.get(point_i);
-            Vector2d ball_to_point = p.sub(real_ball_position).normalize();
-
-            for(double speed_i = MAX_SHOT_VELOCITY / VELOCITY_PARTITIONS; speed_i <= MAX_SHOT_VELOCITY; speed_i += MAX_SHOT_VELOCITY / VELOCITY_PARTITIONS) {
-                Ball simulated_ball = player.getBall().simulateHit(ball_to_point, speed_i, MAX_TICKS, 0.01);
-                Vector2d sim_ball_position = new Vector2d(simulated_ball.x, simulated_ball.y);
-
-                double sim_ball_to_flag = getWorld().get_flag_position().distance(sim_ball_position);
-                double real_ball_to_flag = getWorld().get_flag_position().distance(real_ball_position);
-
-                double w1 = 1.5d;
-                double w2 = 1d;
-                double w3 = 1d / ((double)MAX_TICKS);
-                double w4 = 1d;
-
-                double flag = 0d;
-                double old_dist = real_ball_to_flag;
-                double new_dist = sim_ball_to_flag;
-                double ticks = simulated_ball.ticks;
-                double travel = simulated_ball.travel_distance;
-
-                if(simulated_ball.isTouchingFlag())
-                    flag = 1d;
-
-                else if(simulated_ball.isStuck()) {
-                    continue;
-                }
-
-                if(travel == 0d)
-                    continue;
-
-                double flag_test = flag * w1;
-                double dist_test = (old_dist - new_dist) * w2;
-                double tick_test = (((double)MAX_TICKS) - ticks) * w3;
-                double trav_test = Math.sqrt(travel) * w4;
-
-                double total_test = flag_test + dist_test + tick_test - trav_test;
-
-                if(selection == null || selection_test <= total_test){
-                    selection = p;
-                    selection_speed = speed_i;
-                    selection_test = total_test;
-
-                    selection_flag = flag_test;
-                    selection_dist = dist_test;
-                    selection_ticks = tick_test;
-                    selection_travel = trav_test;
-                }
-
-                System.out.println("\t(" + point_i + ")" + " Testing speed = " + speed_i + " | Testing angle = " + ball_to_point.angle());
-                System.out.println("\t\tTest = " + total_test);
-            }
+            else if(test.distance_to_flag <= output.distance_to_flag)
+                output = test;
 
         }
 
-        if(selection != null) {
-            System.out.println("Selected point ID is " + points.indexOf(selection));
-            points.remove(selection);
+        if(output != null) {
+            System.out.println("Output: " + output.toString());
 
-            if(points.isEmpty())
-                points = null;
-
+            setShotVelocity(output.speed);
+            setShotAngle(output.direction.angle());
         }
 
-        else if(selection == null){
-            System.out.println("Fedora did not find a solution. Doing direct shot.");
-            selection = getWorld().get_flag_position();
-            selection_speed = MAX_SHOT_VELOCITY;
-        }
-
-        System.out.println("Decided shot velocity is " + selection_speed);
-
-        Vector2d direction = selection.sub(new Vector2d(player.getBall().x, player.getBall().y)).normalize();
-        double shot_angle = direction.angle();
-        System.out.println("Decided shot angle is " + shot_angle);
-        System.out.println("\t\tflag = " + selection_flag);
-        System.out.println("\t\tdistance = " + selection_dist);
-        System.out.println("\t\tticks = " + selection_ticks);
-        System.out.println("\t\ttravel = " + selection_travel);
-        System.out.println("Final assesment is " + selection_test);
-
-        old_ball_position = real_ball_position;
-
-        setShotAngle(shot_angle);
-        setShotVelocity(selection_speed);
     }
 
-    @Override
     public void clear(){
-        points = null;
+        old_ball_position = null;
+        do_not_play = false;
+
+        if(tests != null)
+            tests.clear();
+
     }
 
-    class SimulationData{
-        private Vector2d vector;
-        private Ball simulated_ball;
+    private List<Vector2d> cast_vectors(Ball ball){
+        Vector2d real_ball_position = new Vector2d(ball.x, ball.y);
+        List<Vector2d> points = new ArrayList<Vector2d>(VECTOR_COUNT);
+        Vector2d anchor = new Vector2d(getWorld().get_flag_position().distance(real_ball_position), 0);
 
-        SimulationData(Vector2d vector, Ball simulated_ball){
-            this.vector = vector;
-            this.simulated_ball = simulated_ball;
+        for(int i = 0; i < VECTOR_COUNT; i++) {
+            Vector2d ray = anchor.rotate(((double) (i)) * 2d * Math.PI / ((double) VECTOR_COUNT));
+
+            if(isClearPath(real_ball_position, real_ball_position.add(ray), getWorld().get_height(), OPTIMAL_RESOLUTION, getWorld().get_hole_tolerance()))
+                points.add(ray.normalize());
+
         }
 
-        public double distance_to_flag(){
-            Vector2d ball_pos = new Vector2d(simulated_ball.x, simulated_ball.y);
-            return getWorld().get_flag_position().distance(ball_pos);
+        return points;
+    }
+
+    private TestDataHolder get_test_data(Ball ball, Vector2d direction){
+        double VELOCITY_INCREASE = MAX_SHOT_VELOCITY / VELOCITY_PARTITIONS;
+        TestDataHolder output = null;
+
+        for(double speed_i = MAX_SHOT_VELOCITY; speed_i > 0; speed_i -= VELOCITY_INCREASE){
+            Ball simulated_ball = ball.simulateHit(direction, speed_i, MAX_TICKS, DELTA);
+            TestDataHolder test = new TestDataHolder(simulated_ball, direction, speed_i);
+
+            if(output == null)
+                output = test;
+
+           if(simulated_ball.isStuck() && !simulated_ball.isTouchingFlag())
+               continue;
+
+           if((simulated_ball.isTouchingFlag() && !output.ball.isTouchingFlag()) || (test.distance_to_flag <= output.distance_to_flag))
+               output = test;
+
         }
 
-        public double touching_flag(){
-            return 0d;
+        return output;
+    }
+
+
+    private TestDataHolder find_closest_to_flag(List<TestDataHolder> tests){
+        TestDataHolder head = null;
+
+        for(TestDataHolder t : tests){
+
+            if(head == null || t.distance_to_flag < head.distance_to_flag)
+                head = t;
+
         }
 
-        public double distance_improvement(){
-            return 0d;
+        return head;
+    }
+
+    private List<TestDataHolder> filter_test_data(List<TestDataHolder> tests, TestDataHolder head, double tolerance){
+        List<TestDataHolder> output = new ArrayList<TestDataHolder>(tests.size());
+
+        for(TestDataHolder t : tests){
+
+            if(Math.abs(head.distance_to_flag - t.distance_to_flag) <= tolerance)
+                output.add(t);
+
         }
 
-        public double ticks(){
-            return 0d;
+        return output;
+    }
+
+    private void sort_test_data(List<TestDataHolder> tests){
+        tests.sort(Comparator.comparingDouble(TestDataHolder::measure));
+    }
+
+    private boolean some_are_touching_flag(List<TestDataHolder> tests){
+
+        for(TestDataHolder t : tests){
+
+            if(t.ball.isTouchingFlag())
+                return true;
+
         }
 
+        return false;
+    }
+
+    private List<TestDataHolder> discard_some_tests(List<TestDataHolder> tests){
+        List<TestDataHolder> output = new ArrayList<TestDataHolder>(tests.size());
+
+        for(TestDataHolder t : tests){
+
+            if(t.ball.isTouchingFlag())
+                output.add(t);
+
+        }
+
+        return output;
+    }
+
+    class TestDataHolder{
+        public Vector2d direction;
+        public double speed;
+        public double distance_to_flag;
+        public Ball ball;
+
+        TestDataHolder(Ball ball, Vector2d direction, double speed){
+            this.ball = ball;
+            this.direction = direction;
+            this.speed = speed;
+
+            Vector2d ball_position = new Vector2d(ball.x, ball.y);
+            this.distance_to_flag = ball_position.distance(getWorld().get_flag_position());
+        }
+
+        public double measure(){
+            Vector2d ray = this.direction;
+            Vector2d flag = getWorld().get_flag_position().sub(new Vector2d(this.ball.x, this.ball.y));
+
+            return ray.normalize().dot(flag.normalize());
+        }
+
+        @Override
+        public String toString() {
+            return direction.toString() + " | " + "Speed(" + speed + ") | " + "Distance(" + distance_to_flag + ")" + " | " + ball.isTouchingFlag();
+        }
     }
 
 }

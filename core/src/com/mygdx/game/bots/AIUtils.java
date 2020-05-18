@@ -153,7 +153,7 @@ public final class AIUtils {
         return  heights;
     }
 
-    public static boolean isClearPath(Vector2d start, Vector2d end, Function2d h, int steps){
+    public static boolean isClearPath(Vector2d start, Vector2d end, Function2d h, int steps, double tolerance){
 
         for(double i = 1d/((double) steps); i <= 1d; i += 1d/((double) steps)){
             Vector2d current = new Vector2d(
@@ -161,7 +161,7 @@ public final class AIUtils {
                     linearInterpolate(start.get_y(), end.get_y(), i)
             );
 
-            if(h.evaluate(current) <= 0)
+            if(h.evaluate(current) <= 0 && current.distance(end) > tolerance)
                 return false;
 
         }

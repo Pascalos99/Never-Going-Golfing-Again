@@ -20,11 +20,11 @@ public abstract class AI_controller {
     protected PuttingCourse world;
 
     AI_controller(PuttingCourse world){
-        this.world = null;
+        this.world = world;
     }
 
     AI_controller(){
-        this(WORLD);
+        this(null);
     }
 
     protected PuttingCourse getWorld(){

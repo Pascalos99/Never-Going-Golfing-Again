@@ -99,6 +99,7 @@ public class CrazyPutting  implements ApplicationListener {
 
         //initialize physics
         world_physics = new PuttingCoursePhysics();
+        //world_physics.useFixedDelta(true, 0.001d);
         previous_time = System.currentTimeMillis() / 1000.0;
 
         //setup players
@@ -164,7 +165,6 @@ public class CrazyPutting  implements ApplicationListener {
 
         if(currentPlayer.requestedHit() && currentPlayer.getBall().turn_state == TURN_STATE_START) {
             currentPlayer.saveCamera();
-            double standard_factor = Math.sqrt(3)/Math.sqrt(2);
 
             if (currentPlayer instanceof Player.Human)
                 SHOT_VELOCITY=gameScreen.getInputVelocity();
@@ -172,11 +172,8 @@ public class CrazyPutting  implements ApplicationListener {
             if (!currentPlayer.getBall().is_moving) {
                 currentPlayer.getBall().hit(
                         (new Vector2d(CAMERA.direction.x, CAMERA.direction.z)).normalize(),
-                        SHOT_VELOCITY * standard_factor
+                        SHOT_VELOCITY
                 );
-
-                Vector2d vec = (new Vector2d(CAMERA.direction.x, CAMERA.direction.z)).normalize();
-                System.out.println("Hit direction is " + vec.angle());
             }
 
         }
@@ -277,12 +274,14 @@ public class CrazyPutting  implements ApplicationListener {
                     currentPlayer.getBall().hit_count += 2;
                     currentPlayer.getBall().turn_state = TURN_STATE_START;
                     currentPlayer.notifyStartOfTurn();
+                    currentPlayer.loadCamera();
                 }
 
             }
 
             else if(currentPlayer.getBall().turn_state == TURN_STATE_WAIT){
                 currentPlayer.getBall().turn_state = TURN_STATE_END;
+                currentPlayer.saveCamera();
                 currentPlayer = getNextPlayer();
                 currentPlayer.getBall().turn_state = TURN_STATE_START;
                 currentPlayer.notifyStartOfTurn();

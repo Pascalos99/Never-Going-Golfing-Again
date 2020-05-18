@@ -37,7 +37,6 @@ public class Ball implements TopDownPhysicsObject {
     public double travel_distance;
     public double rolling_distance;
     public int ticks;
-    public double error;
     public Vector3 frozen_direction;
 
     Ball(double x_pos, double y_pos, ModelInstance model, Player owner) {
@@ -161,12 +160,11 @@ public class Ball implements TopDownPhysicsObject {
             }
 
         }
-        tick_count++;
+
     }
 
-    private int tick_count = 0;
     public int getTick_count() {
-        return tick_count;
+        return ticks;
     }
 
     private boolean ballVsFenceCollision(){
@@ -394,7 +392,6 @@ public class Ball implements TopDownPhysicsObject {
         Ball ball = (Ball) this.dupe();
         phy.addBody(ball);
         phy.useFixedDelta(true, h);
-
         ball.hit(direction, speed);
 
         for(int i = 0; i < ticks; i++){
@@ -429,10 +426,6 @@ public class Ball implements TopDownPhysicsObject {
     public void setWorld(PuttingCourse world, PhysicsEngine engine){
         this.world = world;
         this.engine = (PuttingCoursePhysics) engine;
-    }
-
-    private double euler_error(double h, double n){
-        return 0;
     }
 
 }
