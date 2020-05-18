@@ -242,6 +242,9 @@ public class Ball implements TopDownPhysicsObject {
 
         return vec;
     }
+    public Vector2d topDownPosition() {
+        return new Vector2d(toWorldScale(x), toWorldScale(y));
+    }
 
     @Override
     public ModelInstance getModel() {
