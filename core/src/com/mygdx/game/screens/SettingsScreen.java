@@ -159,7 +159,9 @@ public class SettingsScreen implements Screen {
         tabler.row().pad(margine, 0, 0, 0);
 */
         tablel.padRight(margine);
+        tablel.padLeft((margine));
         tabler.padRight(margine);
+        tabler.padLeft(margine);
         addToTable(tabler, g,gravity,margine,0,margine,0);
         addToTable(tabler, bm,ballMass,0,0,margine,0);
         addToTable(tabler,cf,coefff,0,0,margine,0);
