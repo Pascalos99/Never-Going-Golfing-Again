@@ -182,7 +182,7 @@ public class TerrainBuilder {
         ModelInstance[] terrainInstance = new ModelInstance[25];
         ModelBuilder modelBuilder = new ModelBuilder();
         MeshPartBuilder builder;
-        AtomFunction2d func = new AtomFunction2d(FunctionParser.parse("sin(x)+cos(y)"));
+        AtomFunction2d func = new AtomFunction2d("sin(x)+cos(y)");
         double y_scalar = WORLD_SCALING;
 
         try {
