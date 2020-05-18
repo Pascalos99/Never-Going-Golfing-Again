@@ -17,7 +17,7 @@ public abstract class Node {
         children = new LinkedList<>();
     }
 
-    final void setHeuristic(HeuristicFunction heuristic) {
+    protected final void setHeuristic(HeuristicFunction heuristic) {
         this.heuristic = heuristic;
     }
 
@@ -56,7 +56,14 @@ public abstract class Node {
     public final void computeSimulation() {
         cost = simulate();
         simulated = true;
+        updateHeuristic();
+    }
+    public final void updateHeuristic() {
         heuristic_value = heuristic.calculate(this);
+    }
+    void setDepth(int depth) {
+        this.depth = depth;
+        for (Node child : children) child.setDepth(depth + 1);
     }
     public final boolean isSimulated() {
         return simulated;

@@ -31,8 +31,8 @@ public class SimulationTreeSearch {
         this.heuristic = heuristic;
         this.suite_maker = suite_maker;
         this.stop_condition = stop_condition;
-        endorsed_nodes = auto_sorted_node_list();
-        suggested_nodes = new ArrayList<>();
+        endorsed_nodes = new ArrayList<>();
+        suggested_nodes = auto_sorted_node_list();
         root_node = initial_node;
         total_cost = 0;
         simulateNode(root_node, true);
@@ -46,23 +46,40 @@ public class SimulationTreeSearch {
         this(initial_node, heuristic, suite_maker, n -> false);
     }
 
-    public Node completeTreeSearch(double max_cost, double minimum_improvement, SuiteMaker suite_maker) {
+    public Node completeTreeSearch(double max_cost, double minimum_improvement) {
         startTreeSearch(max_cost, minimum_improvement);
         return best_node;
     }
 
     public void rebase(Node new_root) {
         root_node = new_root;
-        // TODO could be more intricate
-        clear();
+        new_root.setDepth(0);
+        if (endorsed_nodes.contains(new_root)) {
+            clear(false);
+            addAllChildren(new_root);
+        } else clear(true);
     }
 
-    public void clear() {
+    private void addAllChildren(Node from) {
+        from.updateHeuristic();
+        for (Node child : from.children) {
+            if (child.isSimulated() && child.getHeuristic() >= from.getHeuristic() + minimum_improvement) {
+                endorsed_nodes.add(child);
+                addAllChildren(child);
+            } else if (!child.isSimulated()) {
+                suggested_nodes.add(child);
+            }
+        }
+    }
+    public void reset() {
+        clear(true);
+    }
+    public void clear(boolean makeNewSuiteAtRoot) {
         best_node = root_node;
         endorsed_nodes.clear();
         suggested_nodes.clear();
         resetCost();
-        simulateNode(root_node, true);
+        simulateNode(root_node, makeNewSuiteAtRoot);
     }
 
     /**
@@ -187,7 +204,7 @@ public class SimulationTreeSearch {
         return new LinkedList<Node>() {
             @Override
             public boolean add(Node node) {
-                ListIterator<Node> iter = ((LinkedList)endorsed_nodes).listIterator();
+                ListIterator<Node> iter = this.listIterator();
                 boolean is_inserted = false;
                 while (iter.hasNext()) {
                     Node current = iter.next();
