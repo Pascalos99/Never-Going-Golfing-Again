@@ -262,6 +262,8 @@ public class Ball implements TopDownPhysicsObject {
         out.height_velocity = this.height_velocity;
         out.height = this.height;
         out.frozen_direction = this.frozen_direction;
+        out.engine = (PuttingCoursePhysics) engine.dupe();
+        out.world = world;
 
         return out;
     }

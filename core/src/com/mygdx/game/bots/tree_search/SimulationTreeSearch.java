@@ -60,6 +60,10 @@ public class SimulationTreeSearch {
         } else clear(true);
     }
 
+    public Node getRoot() {
+        return root_node;
+    }
+
     private void addAllChildren(Node from) {
         from.updateHeuristic();
         for (Node child : from.children) {

@@ -9,8 +9,8 @@ import com.mygdx.game.utils.Vector2d;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AI_Finder extends AI_controller {
-    public String getName() { return "Finder bot"; }
+public class AI_Sherlock extends AI_controller {
+    public String getName() { return "Sherlock bot"; }
 
     public String getDescription() { return "Heuristic bot that uses A* and MCTS based tree search to find the optimal set of shots"; }
 
@@ -19,10 +19,16 @@ public class AI_Finder extends AI_controller {
     protected void calculate(Player player) {
         if (last_node == null) last_node = initial_node((Ball)player.getBall().dupe());
         setupTreeSearch(last_node);
-        last_node = tree_search.completeTreeSearch(MAX_TICKS, 0);
+        last_node = getFirstShotToNode(tree_search.completeTreeSearch(MAX_TICKS, 0));
         GolfNode shot = (GolfNode)last_node;
         setShotAngle(shot.direction.angle());
         setShotVelocity(shot.velocity);
+    }
+
+    private Node getFirstShotToNode(Node node) {
+        Node to_return = node;
+        while (to_return.getDepth() > 1) to_return = to_return.getParent();
+        return to_return;
     }
 
     private static int TICK_INTERVAL = 1000;
@@ -35,7 +41,7 @@ public class AI_Finder extends AI_controller {
     private StopCondition stopCondition;
     private GolfSuite suiteMaker;
 
-    public AI_Finder() {
+    public AI_Sherlock() {
 
         suiteMaker = new GolfSuite();
 
@@ -45,10 +51,14 @@ public class AI_Finder extends AI_controller {
             Vector2d current = node.resulting_ball.topDownPosition();
             Vector2d goal = getWorld().flag_position;
             double current_distance = current.distance(goal);
+            System.out.println("node depth = "+node.getDepth());
             if (node.getDepth() <= 1) return -current_distance;
             double parent = node.getParent().getHeuristic() * (1 + CHILD_IMPROVEMENT);
             Vector2d previous = node.start_ball.topDownPosition();
             double previous_distance = previous.distance(goal);
+            System.out.println(String.format("parent h = %.2f\nafter applying factor = %.2f\ndistance improvement = %.2f\nh-value = %.2f",
+                    node.getParent().getHeuristic(), parent, previous_distance - current_distance,
+                    parent + previous_distance - current_distance));
             return parent + previous_distance - current_distance;
         };
 
@@ -68,7 +78,7 @@ public class AI_Finder extends AI_controller {
     private GolfNode initial_node(Ball current) {
         return new GolfNode(0, current, new Vector2d(0,0), 0) {
             protected double simulate() {
-                simulation_successful = false;
+                simulation_successful = true;
                 resulting_ball = start_ball;
                 return 0;
             }
