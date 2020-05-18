@@ -45,6 +45,8 @@ public class MainMenuScreen implements Screen {
 
         phys.add(physicsSelect);
         table.add(phys);
+        TABLE_BKG.setColor(0,0,0,100);
+        phys.setBackground(TABLE_BKG);
         table.row().pad(margin, 0, 0, 0);
         table.add(chosePlayers).fillX().uniformX();
         table.row().pad(margin, 0, margin, 0);

@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 public class BackgroundColor implements Drawable {
-//Source https://www.snip2code.com/Snippet/2615417
+//Public script from the Source https://www.snip2code.com/Snippet/2615417
     private Float x;
     private Float y;
     private Float width;

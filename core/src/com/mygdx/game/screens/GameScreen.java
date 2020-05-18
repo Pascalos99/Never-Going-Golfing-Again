@@ -47,7 +47,7 @@ public class GameScreen implements Screen {
     CrazyPutting game;
     public boolean allowNextTurn=true;
     public boolean endGame=false;
-    private final String inAction= "P to force end\nW & S to zoom in/out\nUP & DOWN to increase/decrease\nLEFT & RIGHT rotate camera";
+    private final String inAction= "P to force end\nW & S to zoom in/out\nUP & DOWN to increase/decrease initial velocity\nLEFT & RIGHT rotate camera";
     private final String inWater="R is your only option";
     public ArrayList<Player> winners;
     private ArrayList<Label> playerLabels=new ArrayList<>();
@@ -81,7 +81,7 @@ public class GameScreen implements Screen {
             playerOverview.add(p);
             playerOverview.row();
         }
-        TABLE_BKG.setColor(255, 179, 228, 200); // r, g, b, a
+        TABLE_BKG.setColor(0, 0, 0, 200); // r, g, b, a
         BLANK_BKG.setColor(0, 0, 0, 0); // r, g, b, a
 
 

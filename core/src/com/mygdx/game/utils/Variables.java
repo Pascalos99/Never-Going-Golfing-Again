@@ -111,8 +111,8 @@ public final class Variables {
 		}
 	}
 
-	public static BackgroundColor TABLE_BKG=new BackgroundColor("Red.png");
-	public static BackgroundColor BLANK_BKG= new BackgroundColor("Red.png");
+	public static BackgroundColor TABLE_BKG=new BackgroundColor("highlight.png");
+	public static BackgroundColor BLANK_BKG= new BackgroundColor("highlight.png");
 	public static BackgroundColor MENU_BKG= new BackgroundColor("MenuBKG.png");
 
 	//PHYSICS

@@ -392,6 +392,7 @@ public class Ball implements TopDownPhysicsObject {
         Ball ball = (Ball) this.dupe();
         phy.addBody(ball);
         phy.useFixedDelta(true, h);
+
         ball.hit(direction, speed);
 
         for(int i = 0; i < ticks; i++){
