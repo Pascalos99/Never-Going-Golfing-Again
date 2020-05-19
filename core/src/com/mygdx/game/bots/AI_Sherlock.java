@@ -146,8 +146,13 @@ public class AI_Sherlock extends AI_controller {
                 double angle_mod = interval * (i/nums) - angle_range/2d;
                 double angle = toFlag.angle() + angle_mod;
                 double speed = speed_factors[i%nums] * toFlag.get_length();
+                if (speed > getWorld().maximum_velocity) {
+                    speed = getWorld().maximum_velocity;
+                    i += nums - i%nums;
+                }
                 Vector2d direction = Vector2d.X.rotate(angle);
-                boolean path_is_clear = AIUtils.isClearPath(parent.start_ball.topDownPosition(), getWorld().flag_position,
+                boolean path_is_clear = AIUtils.isClearPath(parent.start_ball.topDownPosition(),
+                        parent.start_ball.topDownPosition().add(direction.scale(speed)),
                         getWorld().height_function, 500, getWorld().hole_tolerance);
                 double estimate = createEstimate(parent, angle_mod);
                 if (path_is_clear) nodes.add(new GolfNode(estimate, parent.resulting_ball, direction, speed));

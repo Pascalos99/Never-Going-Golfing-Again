@@ -132,6 +132,7 @@ public class SimulationTreeSearch {
      *          suggested nodes to select from.
      */
     private Node selectSuggestedNode() {
+        if (suggested_nodes.size() <= 0) makeSuite(root_node);
         return suggested_nodes.get(0);
     }
 
@@ -198,6 +199,7 @@ public class SimulationTreeSearch {
     private void makeSuite(Node from) {
         List<Node> suite = suite_maker.makeSuite(from, this, from.current_suite_count++);
         for (Node node : suite) suggested_nodes.add(node);
+        System.out.println("size = "+suite.size());
     }
 
     /**
