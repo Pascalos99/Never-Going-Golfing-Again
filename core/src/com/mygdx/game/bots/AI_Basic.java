@@ -8,7 +8,7 @@ import static com.mygdx.game.utils.Variables.DELTA;
 import static com.mygdx.game.utils.Variables.MAX_SHOT_VELOCITY;
 
 public class AI_Basic extends AI_controller {
-    private double VELOCITY_PARTITIONS = 100d; //100
+    private double VELOCITY_PARTITIONS = 150d; //100
     private int MAX_TICKS = 500;
     double VELOCITY_INCREASE = MAX_SHOT_VELOCITY / VELOCITY_PARTITIONS;
 
@@ -25,10 +25,12 @@ public class AI_Basic extends AI_controller {
         Vector2d toFlag = getWorld().flag_position.sub(currentPos).normalize();
         double angle = toFlag.angle();
         double velocity = 0d;
-        Ball best = player.getBall();
+        Ball best = null;
 
         for(double speed_i = VELOCITY_INCREASE; speed_i <= MAX_SHOT_VELOCITY; speed_i += VELOCITY_INCREASE){
             Ball test_ball = player.getBall().simulateHit(toFlag, speed_i, MAX_TICKS, DELTA);
+
+            if (best==null) best = test_ball;
 
             double old_distance = best.topDownPosition().distance(getWorld().get_flag_position());
             double new_distance = test_ball.topDownPosition().distance(getWorld().get_flag_position());
