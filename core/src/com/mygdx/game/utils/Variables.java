@@ -116,7 +116,7 @@ public final class Variables {
 	public static BackgroundColor MENU_BKG= new BackgroundColor("MenuBKG.png");
 
 	//PHYSICS
-	public static double GRADIENT_CUTTOFF = 1d; // no clue what unit this is
+	public static final double GRADIENT_CUTTOFF = 1d; // no clue what unit this is
 	public static double MAX_SHOT_VELOCITY = 6d;
 	public static double SHOT_VELOCITY = MAX_SHOT_VELOCITY/2d;
 	public static double SHOT_VELOCITY_INCREASE() { return 0.01 * MAX_SHOT_VELOCITY; }
@@ -125,9 +125,9 @@ public final class Variables {
 	public static double YAW = Math.PI * 0.75;
 	public static double VIEW_ZOOM = 7;
 
-	public static double SPEED_CORRECTION = 1d / 50d; // in m/s
-	public static double AIR_FRICTION = 0.5d;
-	public static double VELOCITY_CUTTOFF = 0.1d * SPEED_CORRECTION; // in m/s
+	public static final double SPEED_CORRECTION = 1d / 50d; // in m/s
+	public static final double AIR_FRICTION = 0.5d;
+	public static final double VELOCITY_CUTTOFF = 0.1d * SPEED_CORRECTION; // in m/s
 
 	public static PhysicsSetting CURRENT_PHYSICS_SETTING = Verlet;
 
@@ -142,9 +142,9 @@ public final class Variables {
 	public static double AI_SHOT_ANGLE_BOUND = 0.03;
 	public static AI_controller[] AVAILABLE_BOTS = {new AI_Basic(), new AI_SimpleLearner(), new AI_Fedora(), new AI_Sherlock()};
 
-	public static int TURN_STATE_START = 0;
-	public static int TURN_STATE_WAIT = 1;
-	public static int TURN_STATE_END = 2;
+	public static final int TURN_STATE_START = 0;
+	public static final int TURN_STATE_WAIT = 1;
+	public static final int TURN_STATE_END = 2;
 
 	public static CrazyPutting GAME = null;
 	public static boolean ALLOW_FLIGHT = true;
