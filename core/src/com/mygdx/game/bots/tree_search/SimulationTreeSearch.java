@@ -105,7 +105,7 @@ public class SimulationTreeSearch {
             Node next_simulation = selectSuggestedNode();
             simulateNode(next_simulation, true);
         }
-        validateBestNode();
+        //validateBestNode();
     }
 
     public double getTotalCost() {
@@ -142,7 +142,6 @@ public class SimulationTreeSearch {
      * parent, but will only do so if it has already marked itself as simulated)
      */
     private void updateParentSuggestedChildrenCount(Node child) {
-        if (!child.isSimulated()) return;
         Node parent = child.parent;
         if (parent == null) return;
         parent.suggested_children_count--;
@@ -170,6 +169,7 @@ public class SimulationTreeSearch {
         if (makeSuite) makeSuite(node);
     }
 
+    // TODO this is not working
     public void validateBestNode() {
         if (stop_simulation) return; // the 'best_node' satisfies the stop condition, so it does not have to be validated
         Node original_best = best_node;

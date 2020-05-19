@@ -18,7 +18,7 @@ public class AI_Sherlock extends AI_controller {
 
     protected void calculate(Player player) {
         if (last_node == null) last_node = initial_node(player.getBall());
-        setupTreeSearch(last_node);
+        setupTreeSearch(initial_node(player.getBall()));
         last_node = getFirstShotToNode(tree_search.completeTreeSearch(MAX_TICKS, 0));
         GolfNode shot = (GolfNode)last_node;
         setShotAngle(shot.direction.angle());
@@ -49,7 +49,7 @@ public class AI_Sherlock extends AI_controller {
             GolfNode node = (GolfNode)n;
             System.out.println("node depth = "+node.getDepth());
             System.out.println("simulation started");
-            if (!node.simulation_successful || node.resulting_ball.isStuck()) return Double.MIN_VALUE;
+            if (!node.simulation_successful || node.resulting_ball.isStuck()) return -Double.MAX_VALUE;
             System.out.println("simulation succeeds");
             Vector2d current = node.resulting_ball.topDownPosition();
             Vector2d goal = getWorld().flag_position;
@@ -73,11 +73,11 @@ public class AI_Sherlock extends AI_controller {
 
     private boolean first_tree = true;
     private void setupTreeSearch(Node root) {
-        if (first_tree) tree_search = new SimulationTreeSearch(root, heuristic, suiteMaker, stopCondition);
-        else {
+        /*if (first_tree)*/ tree_search = new SimulationTreeSearch(root, heuristic, suiteMaker, stopCondition);
+        /*else {
             tree_search.rebase(root);
             tree_search.resetCost();
-        }
+        }*/
     }
 
     private GolfNode initial_node(Ball current) {

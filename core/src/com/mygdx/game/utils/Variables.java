@@ -150,5 +150,5 @@ public final class Variables {
 	public static boolean ALLOW_FLIGHT = true;
 	public static boolean CAST_SHADOWS = false;
 
-	public static double DELTA = 0.01d;
+	public static final double DELTA = 0.01d;
 }
