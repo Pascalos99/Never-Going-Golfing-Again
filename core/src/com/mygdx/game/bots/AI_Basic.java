@@ -25,7 +25,7 @@ public class AI_Basic extends AI_controller {
         Vector2d toFlag = getWorld().flag_position.sub(currentPos).normalize();
         double angle = toFlag.angle();
         double velocity = 0d;
-        Ball best = null;
+        Ball best = player.getBall();
 
         for(double speed_i = VELOCITY_INCREASE; speed_i <= MAX_SHOT_VELOCITY; speed_i += VELOCITY_INCREASE){
             Ball test_ball = player.getBall().simulateHit(toFlag, speed_i, MAX_TICKS, DELTA);
