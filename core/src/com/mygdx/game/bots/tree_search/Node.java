@@ -1,6 +1,6 @@
 package com.mygdx.game.bots.tree_search;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Node {
@@ -14,7 +14,7 @@ public abstract class Node {
     protected Node(double estimate_quality) {
         current_suite_count = 0;
         estimate_heuristic = estimate_quality;
-        children = new LinkedList<>();
+        children = new ArrayList<>();
     }
 
     protected final void setHeuristic(HeuristicFunction heuristic) {
@@ -25,7 +25,7 @@ public abstract class Node {
         this.parent = parent;
         if (parent==null) depth = 0;
         else {
-            depth = parent.depth + 1;
+            setDepth(parent.depth + 1);
             parent.children.add(this);
             if (!simulated) parent.suggested_children_count++;
         }
