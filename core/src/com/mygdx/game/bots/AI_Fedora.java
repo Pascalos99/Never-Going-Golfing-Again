@@ -13,9 +13,9 @@ import com.mygdx.game.Ball;
 import java.util.AbstractMap.SimpleEntry;
 
 public class AI_Fedora extends AI_controller {
-    private int VECTOR_COUNT = 360; //1000
-    private double VELOCITY_PARTITIONS = 100d; //100
-    private int MAX_TICKS = 8000;
+    private final int VECTOR_COUNT = 360; //1000
+    private final double VELOCITY_PARTITIONS = 100d; //100
+    private final int MAX_TICKS = 8000;
 
     private List<TestDataHolder> tests;
     private Vector2d old_ball_position;
@@ -179,10 +179,6 @@ public class AI_Fedora extends AI_controller {
             this.direction = direction;
             this.speed = speed;
             this.weight = weight;
-        }
-
-        public double getWeight(){
-            return this.weight;
         }
 
     }

@@ -17,7 +17,7 @@ import static com.mygdx.game.utils.Variables.*;
 public class Ball implements TopDownPhysicsObject {
     public Vector2d velocity;
     public double x, y, old_x, old_y, init_x, init_y;
-    public double mass = 0.005;
+    public double mass = 0.05;
     private ModelInstance model;
     public boolean is_moving = false;
     public Player owner;
@@ -40,6 +40,8 @@ public class Ball implements TopDownPhysicsObject {
     public Vector3 frozen_direction;
 
     Ball(double x_pos, double y_pos, ModelInstance model, Player owner) {
+        this.mass = GAME_ASPECTS.getMassofBall() * 0.001;
+
         x = x_pos;
         y = y_pos;
         velocity = new Vector2d(0, 0);
