@@ -199,7 +199,6 @@ public class SimulationTreeSearch {
     private void makeSuite(Node from) {
         List<Node> suite = suite_maker.makeSuite(from, this, from.current_suite_count++);
         for (Node node : suite) suggested_nodes.add(node);
-        System.out.println("size = "+suite.size());
     }
 
     /**
