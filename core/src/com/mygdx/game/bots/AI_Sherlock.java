@@ -32,9 +32,9 @@ public class AI_Sherlock extends AI_controller {
     }
 
     private static int TICK_INTERVAL = 1000;
-    private static int MAX_TICKS = 20000;
+    private static int MAX_TICKS = 1000000;
     private static double STEP_SIZE = Variables.DELTA;
-    private static double CHILD_IMPROVEMENT = 0.4;
+    private static double CHILD_IMPROVEMENT = 0.8;
 
     private SimulationTreeSearch tree_search;
     private HeuristicFunction heuristic;
@@ -47,10 +47,7 @@ public class AI_Sherlock extends AI_controller {
 
         heuristic = n -> {
             GolfNode node = (GolfNode)n;
-            System.out.println("node depth = "+node.getDepth());
-            System.out.println("simulation started");
             if (!node.simulation_successful || node.resulting_ball.isStuck()) return -Double.MAX_VALUE;
-            System.out.println("simulation succeeds");
             Vector2d current = node.resulting_ball.topDownPosition();
             Vector2d goal = getWorld().flag_position;
             double current_distance = current.distance(goal);
@@ -58,9 +55,6 @@ public class AI_Sherlock extends AI_controller {
             double parent = node.getParent().getHeuristic() * (1 + CHILD_IMPROVEMENT);
             Vector2d previous = node.start_ball.topDownPosition();
             double previous_distance = previous.distance(goal);
-            System.out.println(String.format("parent h = %.2f\nafter applying factor = %.2f\ndistance improvement = %.2f\nh-value = %.2f",
-                    node.getParent().getHeuristic(), parent, previous_distance - current_distance,
-                    parent + previous_distance - current_distance));
             return parent + previous_distance - current_distance;
         };
 
@@ -110,25 +104,17 @@ public class AI_Sherlock extends AI_controller {
         @Override
         protected synchronized double simulate() {
             double max_allowed_cost = tree_search.getMaximumCost() - tree_search.getTotalCost();
-            max_allowed_cost = 3000;
-            System.out.println("max allowed cost = "+max_allowed_cost);
             resulting_ball = start_ball.simulateHit(direction, velocity, TICK_INTERVAL, STEP_SIZE);
-            System.out.println("resulting ball is "+(resulting_ball.is_moving?"moving":"not moving"));
-            System.out.println("resulting ball is "+(resulting_ball.isStuck()?"stuck":"fine"));
             double cost = resulting_ball.ticks;
-            System.out.println("simulation cost = "+cost);
             boolean done_calculating = true;
             if (resulting_ball.is_moving) {
                 done_calculating = false;
                 while (cost < max_allowed_cost && !done_calculating) {
-                    System.out.println("extending calculation...");
                     resulting_ball = resulting_ball.resumeSimulatedHit(TICK_INTERVAL, STEP_SIZE);
                     cost += resulting_ball.ticks;
                     if (!resulting_ball.is_moving) done_calculating = true;
                 }
             } simulation_successful = done_calculating;
-            System.out.println("total cost = "+cost);
-            System.out.println((done_calculating?"calculation concluded":"calculation failed")+"\n");
             return cost;
         }
 
@@ -149,25 +135,28 @@ public class AI_Sherlock extends AI_controller {
             GolfNode parent = (GolfNode)p;
             // TODO improve size selection and speed factors
             int size = 10;
-            double[] speed_factors = {0.7, 1.2};
+            double[] speed_factors = AIUtils.linearSpacing(0.1, 1.2, 10);
             int nums = speed_factors.length;
             List<Node> nodes = new ArrayList<Node>(size);
             double angle_range = Math.PI/2d + seed * 0.45;
             double interval = angle_range / size;
+
             for (int i=0; i < size * nums; i++) {
                 Vector2d toFlag = getWorld().flag_position.sub(parent.start_ball.topDownPosition());
                 double angle_mod = interval * (i/nums) - angle_range/2d;
                 double angle = toFlag.angle() + angle_mod;
                 double speed = speed_factors[i%nums] * toFlag.get_length();
                 Vector2d direction = Vector2d.X.rotate(angle);
+                boolean path_is_clear = AIUtils.isClearPath(parent.start_ball.topDownPosition(), getWorld().flag_position,
+                        getWorld().height_function, 500, getWorld().hole_tolerance);
                 double estimate = createEstimate(parent, angle_mod);
-                nodes.add(new GolfNode(estimate, parent.resulting_ball, direction, speed));
+                if (path_is_clear) nodes.add(new GolfNode(estimate, parent.resulting_ball, direction, speed));
             }
             return nodes;
         }
 
         public double createEstimate(GolfNode node, double angle_mod) {
-            return Math.random() * 3 + node.getDepth() - Math.abs(angle_mod);
+            return Math.random() * 3 - node.getDepth() - 2*Math.abs(angle_mod);
         }
 
     }

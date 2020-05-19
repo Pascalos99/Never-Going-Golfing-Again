@@ -14,6 +14,14 @@ public final class AIUtils {
         return a + (b - a) * t;
     }
 
+    public static double[] linearSpacing(double start, double end, int length) {
+        double[] result = new double[length];
+        double interval = (end - start)/((double)length);
+        for (int i=0; i < result.length; i++)
+            result[i] = start + i * interval;
+        return result;
+    }
+
     public static Vector2d findLowestGradient(Function2d h, int parts){
         Vector2d xy = null;
         double total_gradient = 0;
