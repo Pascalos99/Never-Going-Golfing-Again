@@ -17,7 +17,7 @@ public class AI_Basic extends AI_controller {
         Vector2d currentPos = new Vector2d(player.getBall().x, player.getBall().y);
         Vector2d toFlag = getWorld().flag_position.sub(currentPos);
         double angle = toFlag.angle();
-        double velocity = toFlag.get_length() * 0.75 + 0.5;
+        double velocity = toFlag.get_length() * .6;
         // TODO perfect this mess
         setShotAngle(angle);
         setShotVelocity(velocity);
