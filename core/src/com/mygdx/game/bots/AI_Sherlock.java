@@ -17,7 +17,7 @@ public class AI_Sherlock extends AI_controller {
     Node last_node = null;
 
     protected void calculate(Player player) {
-        if (last_node == null) last_node = initial_node((Ball)player.getBall().dupe());
+        if (last_node == null) last_node = initial_node(player.getBall());
         setupTreeSearch(last_node);
         last_node = getFirstShotToNode(tree_search.completeTreeSearch(MAX_TICKS, 0));
         GolfNode shot = (GolfNode)last_node;
@@ -32,7 +32,7 @@ public class AI_Sherlock extends AI_controller {
     }
 
     private static int TICK_INTERVAL = 1000;
-    private static int MAX_TICKS = 8000;
+    private static int MAX_TICKS = 20000;
     private static double STEP_SIZE = Variables.DELTA;
     private static double CHILD_IMPROVEMENT = 0.4;
 
@@ -47,11 +47,13 @@ public class AI_Sherlock extends AI_controller {
 
         heuristic = n -> {
             GolfNode node = (GolfNode)n;
+            System.out.println("node depth = "+node.getDepth());
+            System.out.println("simulation started");
             if (!node.simulation_successful || node.resulting_ball.isStuck()) return Double.MIN_VALUE;
+            System.out.println("simulation succeeds");
             Vector2d current = node.resulting_ball.topDownPosition();
             Vector2d goal = getWorld().flag_position;
             double current_distance = current.distance(goal);
-            System.out.println("node depth = "+node.getDepth());
             if (node.getDepth() <= 1) return -current_distance;
             double parent = node.getParent().getHeuristic() * (1 + CHILD_IMPROVEMENT);
             Vector2d previous = node.start_ball.topDownPosition();
@@ -72,7 +74,10 @@ public class AI_Sherlock extends AI_controller {
     private boolean first_tree = true;
     private void setupTreeSearch(Node root) {
         if (first_tree) tree_search = new SimulationTreeSearch(root, heuristic, suiteMaker, stopCondition);
-        else tree_search.rebase(root);
+        else {
+            tree_search.rebase(root);
+            tree_search.resetCost();
+        }
     }
 
     private GolfNode initial_node(Ball current) {
@@ -105,18 +110,35 @@ public class AI_Sherlock extends AI_controller {
         @Override
         protected synchronized double simulate() {
             double max_allowed_cost = tree_search.getMaximumCost() - tree_search.getTotalCost();
+            max_allowed_cost = 3000;
+            System.out.println("max allowed cost = "+max_allowed_cost);
             resulting_ball = start_ball.simulateHit(direction, velocity, TICK_INTERVAL, STEP_SIZE);
+            System.out.println("resulting ball is "+(resulting_ball.is_moving?"moving":"not moving"));
+            System.out.println("resulting ball is "+(resulting_ball.isStuck()?"stuck":"fine"));
             double cost = resulting_ball.ticks;
+            System.out.println("simulation cost = "+cost);
             boolean done_calculating = true;
             if (resulting_ball.is_moving) {
                 done_calculating = false;
                 while (cost < max_allowed_cost && !done_calculating) {
+                    System.out.println("extending calculation...");
                     resulting_ball = resulting_ball.resumeSimulatedHit(TICK_INTERVAL, STEP_SIZE);
                     cost += resulting_ball.ticks;
                     if (!resulting_ball.is_moving) done_calculating = true;
                 }
             } simulation_successful = done_calculating;
+            System.out.println("total cost = "+cost);
+            System.out.println((done_calculating?"calculation concluded":"calculation failed")+"\n");
             return cost;
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("node at depth ").append(getDepth()).append(" {\n");
+            sb.append("start = "+start_ball.topDownPosition()).append("\n");
+            sb.append("angle = "+direction.angle()).append("\n");
+            sb.append("speed = "+velocity).append("\n}");
+            return sb.toString();
         }
     }
 
