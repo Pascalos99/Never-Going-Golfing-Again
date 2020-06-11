@@ -2,6 +2,7 @@ package com.mygdx.game.physics;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.mygdx.game.courses.PuttingCourse;
+import com.mygdx.game.obstacles.AxisAllignedBoundingBox;
 import com.mygdx.game.utils.Vector3d;
 
 public interface TopDownPhysicsObject {
@@ -11,5 +12,7 @@ public interface TopDownPhysicsObject {
     ModelInstance getModel();
     TopDownPhysicsObject dupe();
     void setWorld(PuttingCourse world, PhysicsEngine engine);
+
+    public abstract AxisAllignedBoundingBox getBoundingBox();
 
 }

@@ -4,7 +4,7 @@ import com.mygdx.game.utils.Vector3d;
 
 public class AxisAllignedBoundingBox {
 
-    /** The point at the lowest x, y and z coordinates of this box. */
+    /** The point at the lowest x, y and z coordinates of this box */
     Vector3d origin;
     /** The physics-scale length of this box in the x-direction */
     double width;
