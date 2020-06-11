@@ -14,4 +14,9 @@ public abstract class Obstacle implements TopDownPhysicsObject {
 
     protected abstract boolean isShapeColliding(Ball ball);
 
+    @Override
+    public TopDownPhysicsObject dupe(){
+        return (TopDownPhysicsObject)this;
+    }
+
 }
