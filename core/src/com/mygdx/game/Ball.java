@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.courses.PuttingCourse;
+import com.mygdx.game.obstacles.AxisAllignedBoundingBox;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.physics.PhysicsEngine;
 import com.mygdx.game.physics.PuttingCoursePhysics;
@@ -434,6 +435,11 @@ public class Ball implements TopDownPhysicsObject {
     public void setWorld(PuttingCourse world, PhysicsEngine engine){
         this.world = world;
         this.engine = (PuttingCoursePhysics) engine;
+    }
+
+    public AxisAllignedBoundingBox getBoundingBox() {
+        // TODO implementation
+        return null;
     }
 
 }
