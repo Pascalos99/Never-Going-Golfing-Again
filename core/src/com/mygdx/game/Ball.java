@@ -68,8 +68,9 @@ public class Ball implements TopDownPhysicsObject {
         if(is_moving) {
             Function2d h = world.get_height();
             Vector2d gradient = h.gradient(new Vector2d(x, y));
-            double test_x = x;
-            double test_y = y;
+            double initial_x = x;
+            double initial_y = y;
+            double initial_height = h.evaluate(initial_x, initial_y);
             ticks += 1;
 
             if(flight_state == ROLL) {
@@ -90,8 +91,16 @@ public class Ball implements TopDownPhysicsObject {
                 boolean fence_check = ballVsFenceCollision();
                 height = h.evaluate(x, y);
 
-                double height_difference = h.evaluate(x, y) - h.evaluate(test_x, test_y);
-                height_velocity = height_difference + delta * (-mass * flightGravity());
+                double x_diff = x - initial_x;
+                double y_diff = y - initial_y;
+
+                Vector2d gradients = h.gradient(initial_x, initial_y);
+                double predicted_height = initial_height + gradients.get_x()*x_diff + gradients.get_y()*y_diff;
+
+                double final_height = h.evaluate(x, y);
+
+                height_velocity = predicted_height - final_height - mass*world.get_gravity()*delta;
+                System.out.println(height_velocity);
 
                 frozen_direction = new Vector3((float)velocity.get_x(), (float)height_velocity, (float)velocity.get_y());
 
@@ -110,7 +119,7 @@ public class Ball implements TopDownPhysicsObject {
 
                 if (ALLOW_FLIGHT) {
 
-                    if (height_velocity > 0 && gradientTest(h, new Vector2d(test_x, test_y), new Vector2d(x, y)) && velocity.get_length() > 0d)
+                    if (height_velocity > 0 && gradientTest(h, new Vector2d(initial_x, initial_y), new Vector2d(x, y)) && velocity.get_length() > 0d)
                         flight_state = LAUNCH;
 
                 }
@@ -145,7 +154,7 @@ public class Ball implements TopDownPhysicsObject {
 
             }
 
-            Vector2d start = new Vector2d(test_x, test_y);
+            Vector2d start = new Vector2d(initial_x, initial_y);
             Vector2d end = new Vector2d(x, y);
             int steps = 3;
 
