@@ -7,7 +7,7 @@ public class Wall extends Static3DphysicsObject {
     private Vector3d[] points;
 
     public AxisAllignedBoundingBox getBoundingBox() {
-        return new AxisAllignedBoundingBox();
+        return new AxisAllignedBoundingBox(this);
     }
 
 
