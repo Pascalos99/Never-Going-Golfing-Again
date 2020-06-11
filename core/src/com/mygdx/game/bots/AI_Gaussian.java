@@ -41,14 +41,13 @@ public class AI_Gaussian extends AI_controller {
             for(double speed_i = vel_increase; speed_i <= getWorld().maximum_velocity; speed_i += vel_increase){
                 Ball test_ball = player.getBall().simulateHit(direction, speed_i, MAX_TICKS, DELTA);
 
-                if(best == null || (!test_ball.isStuck() && best.topDownPosition().distance
+                if(best == null || (test_ball.ticks != MAX_TICKS && !test_ball.isStuck() && best.topDownPosition().distance
                         (getWorld().get_flag_position()) > test_ball.
                         topDownPosition().distance(getWorld().get_flag_position()))) {
                     best = test_ball;
                     chosen_velocity = speed_i;
                     chosen_angle = direct_angle + angle_partition[k];
                 }
-
             }
         }
         setShotAngle(chosen_angle);
