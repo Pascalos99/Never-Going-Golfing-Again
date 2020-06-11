@@ -3,7 +3,7 @@ package com.mygdx.game.utils;
 import com.badlogic.gdx.math.Vector3;
 
 public class Vector3d {
-    private double x, y, z;
+    private final double x, y, z;
     public Vector3d(double x, double y, double z) {
         this.x = x;
         this.y = y;
@@ -22,10 +22,8 @@ public class Vector3d {
         return Math.sqrt(x * x + y * y + z * z);
     }
 
-    public void add(Vector3d v){
-        x += v.get_x();
-        y += v.get_y();
-        z += v.get_z();
+    public Vector3d add(Vector3d v){
+        return new Vector3d(x + v.get_x(),y + v.get_y(),z + v.get_z());
     }
 
     public String toString() {

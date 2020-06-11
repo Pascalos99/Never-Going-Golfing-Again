@@ -6,10 +6,10 @@ import com.mygdx.game.utils.Vector3d;
 
 public interface TopDownPhysicsObject {
 
-    public Vector3d getPosition();
-    public double getOrientation();
-    public ModelInstance getModel();
-    public TopDownPhysicsObject dupe();
-    public void setWorld(PuttingCourse world, PhysicsEngine engine);
+    Vector3d getPosition();
+    double getOrientation();
+    ModelInstance getModel();
+    TopDownPhysicsObject dupe();
+    void setWorld(PuttingCourse world, PhysicsEngine engine);
 
 }
