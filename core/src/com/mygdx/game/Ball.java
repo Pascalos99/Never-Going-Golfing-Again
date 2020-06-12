@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.courses.MapDrawer;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.obstacles.AxisAllignedBoundingBox;
 import com.mygdx.game.parser.Function2d;
@@ -66,7 +67,7 @@ public class Ball implements TopDownPhysicsObject {
     public void step(double delta, List<TopDownPhysicsObject> ents) {
 
         if(is_moving) {
-            Function2d h = world.get_height();
+            Function2d h = world.height_function;
             Vector2d gradient = h.gradient(new Vector2d(x, y));
             double initial_x = x;
             double initial_y = y;
@@ -99,7 +100,7 @@ public class Ball implements TopDownPhysicsObject {
 
                 double final_height = h.evaluate(x, y);
 
-                height_velocity = predicted_height - final_height - mass*world.get_gravity()*delta;
+                height_velocity = predicted_height - final_height - mass*world.gravity*delta;
                 System.out.println(height_velocity);
 
                 frozen_direction = new Vector3((float)velocity.get_x(), (float)height_velocity, (float)velocity.get_y());
@@ -245,7 +246,7 @@ public class Ball implements TopDownPhysicsObject {
     public Vector3d getPosition() {
         Vector3d vec = new Vector3d(
                 toWorldScale(x),
-                toWorldScale(world.get_height().evaluate(x, y) + BALL_RADIUS),
+                toWorldScale(world.height_function.evaluate(x, y) + BALL_RADIUS),
                 toWorldScale(y)
         );
 
@@ -286,9 +287,9 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     public boolean isTouchingFlag() {
-        Vector2d flag = world.get_flag_position();
+        Vector2d flag = world.flag_position;
         Vector2d ballPos = new Vector2d(x,y);
-        double _r = world.get_hole_tolerance();
+        double _r = world.hole_tolerance;
         if(flag.distance(ballPos) < _r) {
           return true;
         }
@@ -328,8 +329,8 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     private Vector2d f(Vector2d pos, Vector2d vel){
-        Function2d h = world.get_height();
-        double gravity = world.get_gravity();
+        Function2d h = world.height_function;
+        double gravity = world.gravity;
         double friction = world.get_friction_coefficient();
 
         if(isOnWater()){
@@ -397,7 +398,7 @@ public class Ball implements TopDownPhysicsObject {
     }
 
     public double flightGravity(){
-        return world.get_gravity() * 8d;
+        return world.gravity * 8d;
     }
 
     public static Vector2d correctHitVector(Vector2d direction, double speed){
@@ -449,6 +450,10 @@ public class Ball implements TopDownPhysicsObject {
     public AxisAllignedBoundingBox getBoundingBox() {
         // TODO implementation
         return null;
+    }
+
+    public void visit(MapDrawer mapDrawer) {
+        mapDrawer.draw(this);
     }
 
 }

@@ -44,12 +44,12 @@ public class TerrainBuilder {
         builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.RED)));
         builder.box(0.5f, 3.1f, 0, 1f, 0.7f, 0.03f);
         Model flag = modelBuilder.end();
-        ModelInstance poleInstance = new ModelInstance(pole, (float) course.get_flag_position().get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.get_flag_position().get_x(), course.get_flag_position().get_y())), (float) course.get_flag_position().get_y() * WORLD_SCALING);
-        ModelInstance flagInstance = new ModelInstance(flag, (float) course.get_flag_position().get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.get_flag_position().get_x(), course.get_flag_position().get_y())), (float) course.get_flag_position().get_y() * WORLD_SCALING);
+        ModelInstance poleInstance = new ModelInstance(pole, (float) course.flag_position.get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.flag_position.get_x(), course.flag_position.get_y())), (float) course.flag_position.get_y() * WORLD_SCALING);
+        ModelInstance flagInstance = new ModelInstance(flag, (float) course.flag_position.get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.flag_position.get_x(), course.flag_position.get_y())), (float) course.flag_position.get_y() * WORLD_SCALING);
         float side = (float) (2 * GAME_ASPECTS.getTolerance()) * WORLD_SCALING;
         Model poleRange = modelBuilder.createCylinder(side, FLAGPOLE_HEIGHT, side, 40, new Material(ColorAttribute.createDiffuse(new Color(1, 0.4f, 1, 1f)), new BlendingAttribute(0.3f)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        ModelInstance  flagRangeInstance = new ModelInstance(poleRange, (float) course.get_flag_position().get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.get_flag_position().get_x(), (float) course.get_flag_position().get_y())), (float) course.get_flag_position().get_y() * WORLD_SCALING);
+        ModelInstance  flagRangeInstance = new ModelInstance(poleRange, (float) course.flag_position.get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.flag_position.get_x(), (float) course.flag_position.get_y())), (float) course.flag_position.get_y() * WORLD_SCALING);
         ModelInstance []flagInstances=new ModelInstance []{poleInstance,flagInstance,flagRangeInstance};
         return flagInstances;
     }

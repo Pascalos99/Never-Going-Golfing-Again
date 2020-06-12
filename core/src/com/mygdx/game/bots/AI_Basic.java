@@ -32,7 +32,7 @@ public class AI_Basic extends AI_controller {
 
             if(
                     best == null
-                    || best.topDownPosition().distance(getWorld().get_flag_position()) > test_ball.topDownPosition().distance(getWorld().get_flag_position())){
+                    || best.topDownPosition().distance(getWorld().flag_position) > test_ball.topDownPosition().distance(getWorld().flag_position)){
                 best = test_ball;
                 velocity = speed_i;
             }

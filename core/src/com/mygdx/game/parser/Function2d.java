@@ -17,18 +17,23 @@ public interface Function2d {
 	double evaluate(double x, double y);
 	
 	static Function2d getConstant(double value) {
-		return new Function2d() {
-			public double evaluate(double x, double y) {
-				return value;
-			}
-			public Vector2d gradient(double x, double y) {
-				return new Vector2d(0, 0);
-			}
-		};
+		return new ConstantFunction(value);
 	}
 
 	default double directionalDerivative(double x, double y, Vector2d direction) {
 		return direction.normalize().dot(gradient(x, y));
 	}
-	
+
+	class ConstantFunction implements Function2d {
+		public ConstantFunction(double constant) {
+			value = constant;
+		}
+		public final double value;
+		public double evaluate(double x, double y) {
+			return value;
+		}
+		public Vector2d gradient(double x, double y) {
+			return new Vector2d(0, 0);
+		}
+	}
 }
