@@ -135,17 +135,17 @@ public class MapGenUtils {
 	}
 	
 	@SuppressWarnings("serial")
-	public static JFrame displayCourse(PuttingCourse course) {
+	public static JFrame displayCourse(PuttingCourse course, double course_width, double course_height, double stepsize) {
 		double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
 		if (gradient_display) {
-			for (int i=0; i < course.course_width; i++)
-				for (int j=0; j < course.course_height; j++) {
+			for (double i=0; i < course_width; i+=stepsize)
+				for (double j=0; j < course_height; j+=stepsize) {
 					if (course.getHeightAt(i, j) > max) max = course.getHeightAt(i, j);
 					if (course.getHeightAt(i, j) < min) min = course.getHeightAt(i, j);
 				}
 		}
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		int width = course.courseWidth(), height = course.courseHeight();
+		int width = (int)(course_width / stepsize), height = (int)(course_height / stepsize);
 		int scale_down = 1, scale_up = 1;
 		if (width > screenSize.width || height > screenSize.height)
 			while (width / scale_down > screenSize.width || height / scale_down > screenSize.height) scale_down++;
@@ -161,14 +161,14 @@ public class MapGenUtils {
 					} else paintmatrix[x][y] = course.getMaterialAt(x * scale_down, y * scale_down).map_color;
 				}
 		} else {
-			for (int y=0; y < course.courseHeight(); y++)
-				for (int x=0; x < course.courseWidth(); x++) {
+			for (int y=0; y < height; y++)
+				for (int x=0; x < width; x++) {
 					for (int i=0; i < scale_up; i++)
 						for (int j=0; j < scale_up; j++)
 							if (gradient_display) {
-								double value = (course.getHeightAt(x, y) - min)/(max - min);
+								double value = (course.getHeightAt(x*stepsize, y*stepsize) - min)/(max - min);
 								paintmatrix[x * scale_up + i][y * scale_up + j] = new Color((int)(50 * value),(int)(255 * value),(int)(200 * (1-value)));
-							} else paintmatrix[x * scale_up + i][y * scale_up + j] = course.getMaterialAt(x, y).map_color;
+							} else paintmatrix[x * scale_up + i][y * scale_up + j] = course.getMaterialAt(x*stepsize, y*stepsize).map_color;
 				}
 		}
 		final int scaleup = scale_up;
@@ -213,7 +213,7 @@ public class MapGenUtils {
 	}
 	
 	public static void generationTesterFrame(PuttingCourseGenerator gen, int desired_size, int smoothing_factor, double roughness_height, double roughness_friction, double hole_tolerance, double maximum_velocity, double gravity) {
-		JFrame frame = displayCourse(gen.fractalGeneratedCourse(desired_size, smoothing_factor, roughness_height, roughness_friction, hole_tolerance, maximum_velocity, gravity));
+		JFrame frame = displayCourse(gen.fractalGeneratedCourse(desired_size, smoothing_factor, roughness_height, roughness_friction, hole_tolerance, maximum_velocity, gravity), BOUNDED_WORLD_SIZE, BOUNDED_WORLD_SIZE, 0.05);
 		frame.addKeyListener(new KeyAdapter() {
 			boolean pressed = false;
 			public void keyPressed(KeyEvent e) {
@@ -303,19 +303,19 @@ public class MapGenUtils {
 		return GRASS.index;
 	}
 
-	/* public static void main(String[] args) {
+	public static void main(String[] args) {
 		boolean use_function = false;
 		boolean tester_frame = !use_function;
 		gradient_display	 = false;
 		long seed = System.currentTimeMillis();
-		FunctionalFunction2d function = (x, y) -> {return Math.sin(x) + Math.sin(y);};
+		FunctionalFunction2d function = (x, y) -> Math.sin(x) + Math.sin(y);
 		PuttingCourseGenerator gen = new PuttingCourseGenerator(seed);
 		gen.setPathPreference(true);
 		PuttingCourse test;
 		if (!use_function) test = gen.fractalGeneratedCourse(50, 1, 0.4, 0.6, 10, 50, 9.812);
-		else test = gen.functionGeneratedCourse(function, Function2d.getConstant(0.134), 50, 50, 1, 50, 9.812);
-		System.out.println("course is "+test.courseWidth()+"x"+test.courseHeight()+", generated with seed "+seed);
+		else test = gen.pureFunctionGeneratedCourse(function, Function2d.getConstant(0.134), 20, 20, 1, 50, 9.812);
+		System.out.println("course is "+BOUNDED_WORLD_SIZE+"x"+BOUNDED_WORLD_SIZE+", generated with seed "+seed);
 		if (tester_frame) generationTesterFrame(gen, 50, 1, 0.4, 0.6, 1, 50, 9.812);
-		else displayCourse(test);
-	} */
+		else displayCourse(test, BOUNDED_WORLD_SIZE, BOUNDED_WORLD_SIZE, 0.05);
+	}
 }

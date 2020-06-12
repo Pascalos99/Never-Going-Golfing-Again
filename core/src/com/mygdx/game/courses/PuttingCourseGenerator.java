@@ -55,7 +55,7 @@ public class PuttingCourseGenerator {
 		Vector2d[] pos = determineFlagAndStartPositions(heightmap, frictionmap);
 		Function2d height = MapGenUtils.functionFromArray(heightmap, OUT_OF_BOUNDS_HEIGHT);
 		Function2d friction = MapGenUtils.functionFromArray(frictionmap, OUT_OF_BOUNDS_FRICTION);
-		return new PuttingCourse(height, friction, heightmap.length, heightmap[0].length, pos[0], pos[1], hole_tolerance, maximum_velocity, gravity);
+		return new PuttingCourse(height, friction, pos[0], pos[1], hole_tolerance, maximum_velocity, gravity);
 	}
 	
 	public PuttingCourse fractalGeneratedCourse(MapGenUtils.FractalGenerationSettings settings) {
@@ -77,23 +77,11 @@ public class PuttingCourseGenerator {
 		return result;
 	} */
 
-	public PuttingCourse pureFunctionGeneratedCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, double hole_tolerance, double maximum_velocity, double gravity) {
-		return new PuttingCourse(height, friction, course_width_cm, course_height_cm,
-				new Vector2d(random.nextDouble() * course_width_cm, random.nextDouble() * course_height_cm),
-				new Vector2d(random.nextDouble() * course_width_cm, random.nextDouble() * course_height_cm),
+	public PuttingCourse pureFunctionGeneratedCourse(Function2d height, Function2d friction, int course_width, int course_height, double hole_tolerance, double maximum_velocity, double gravity) {
+		return new PuttingCourse(height, friction,
+				new Vector2d(random.nextDouble() * course_width, random.nextDouble() * course_height),
+				new Vector2d(random.nextDouble() * course_width, random.nextDouble() * course_height),
 			hole_tolerance, maximum_velocity, gravity);
-	}
-	
-	private double[][][] generate_height_and_friction_maps(PuttingCourse course) {
-		double[][][] result = new double[2][course.course_width][course.course_height];
-		Function2d height = course.get_height();
-		Function2d friction = course.get_friction();
-		for (int x=0; x < result[0].length; x++)
-			for (int y=0; y < result[0][x].length; y++) {
-				result[0][x][y] = height.evaluate(x, y);
-				result[1][x][y] = friction.evaluate(x, y);
-			}
-		return result;
 	}
 	
 	private Vector2d[] determineFlagAndStartPositions(double[][] heightmap, double[][] frictionmap) {

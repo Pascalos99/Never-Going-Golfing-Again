@@ -88,7 +88,7 @@ public class GameScreen implements Screen {
         generator.setPathPreference(true);
         if(gameAspects!=null){
           //  figure out how to make function 2D
-            course = new PuttingCourse(new AtomFunction2d(gameAspects.getHeightFunction()) , Function2d.getConstant(gameAspects.getFriction()) ,size,size,gameAspects.getGoal(),gameAspects.getStart()
+            course = new PuttingCourse(new AtomFunction2d(gameAspects.getHeightFunction()) , Function2d.getConstant(gameAspects.getFriction()),gameAspects.getGoal(),gameAspects.getStart()
                     ,gameAspects.getTolerance(),gameAspects.getMaxV() ,gameAspects.getGravity());
         }else{
             course = generator.fractalGeneratedCourse(size, 1,0.8,0.7,size/200,3,9.81);
