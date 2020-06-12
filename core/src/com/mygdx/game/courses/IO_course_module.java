@@ -22,7 +22,7 @@ public class IO_course_module {
     private String[] preprocess() throws IOException {
         String result = "";
         while (reader.ready())
-            result += reader.readLine() + "\n";
+            result += reader.readLine().strip() + "\n";
         result = result.replaceAll("//.*\n?", ";");
         return result.split(" *[;\n] *");
     }
@@ -113,7 +113,7 @@ public class IO_course_module {
         PrintWriter writer;
         try {
             writer = new PrintWriter(new FileWriter(file));
-            writer.format(" g = %s; m = %s; mu = %s; vmax = %s; tol = %s;\nstart = %s; goal = %s;\nheight = %s ",
+            writer.format("g = %s; m = %s; mu = %s; vmax = %s; tol = %s;\nstart = %s; goal = %s;\nheight = %s ",
                     g, m, mu, vmax, tol, start_str, goal_str, height);
             writer.close();
         } catch (IOException e) {

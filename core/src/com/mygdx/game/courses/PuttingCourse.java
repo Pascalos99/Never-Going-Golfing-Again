@@ -7,11 +7,11 @@ import static com.mygdx.game.utils.Variables.*;
 
 public class PuttingCourse {
 
-	public Function2d height_function;
-	public Function2d friction_function;
+	public final Function2d height_function;
+	public final Function2d friction_function;
 	
-	public Vector2d flag_position;
-	public Vector2d start_position;
+	public final Vector2d flag_position;
+	public final Vector2d start_position;
 
 	public final double hole_tolerance;
 	public final double maximum_velocity;

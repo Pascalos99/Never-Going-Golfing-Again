@@ -66,7 +66,7 @@ public class PuttingCourseGenerator {
 	}
 	
 	/** Generates a course from a function.<br>This method also adjusts the course to be more playable. */
-	public PuttingCourse functionGeneratedCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, double hole_tolerance, double maximum_velocity, double gravity) {
+	/* public PuttingCourse functionGeneratedCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, double hole_tolerance, double maximum_velocity, double gravity) {
 		PuttingCourse result = new PuttingCourse(height, friction, course_width_cm, course_height_cm, new Vector2d(0, 0), new Vector2d(0, 0), hole_tolerance, maximum_velocity, gravity);
 		double[][][] maps = generate_height_and_friction_maps(result);
 		Vector2d[] pos = determineFlagAndStartPositions(maps[0], maps[1]);
@@ -75,7 +75,7 @@ public class PuttingCourseGenerator {
 		result.height_function = MapGenUtils.functionFromArray(maps[0], height);
 		result.friction_function = MapGenUtils.functionFromArray(maps[1], friction);
 		return result;
-	}
+	} */
 
 	public PuttingCourse pureFunctionGeneratedCourse(Function2d height, Function2d friction, int course_width_cm, int course_height_cm, double hole_tolerance, double maximum_velocity, double gravity) {
 		return new PuttingCourse(height, friction, course_width_cm, course_height_cm,
