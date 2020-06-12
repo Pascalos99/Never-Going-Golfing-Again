@@ -63,8 +63,8 @@ public class SettingsScreen implements Screen {
         table.add(tabler).expandY().expandX();
         table.add(tablel).expandY().expandX();
         TextButton play=new TextButton("PLAY", MENU_SKIN);
-        TextButton input = new TextButton("Save course to file", MENU_SKIN);
-        TextButton output = new TextButton("Load course from file", MENU_SKIN);
+        TextButton save = new TextButton("Save course to file", MENU_SKIN);
+        TextButton load = new TextButton("Load course from file", MENU_SKIN);
         TextButton backButton= new TextButton("BACK",MENU_SKIN);
         backButton.align(Align.bottomLeft);
         backButton.addListener(new ChangeListener(){
@@ -75,16 +75,37 @@ public class SettingsScreen implements Screen {
             }
         });
         table.add(play);
-        TextField inputPath= new TextField("", MENU_SKIN);
-        TextField outputPath =new TextField("", MENU_SKIN);
+        TextField savePath= new TextField("", MENU_SKIN);
+        TextField loadPath =new TextField("", MENU_SKIN);
 
-        input.addListener(new ChangeListener() {
+        save.addListener(new ChangeListener() {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                File f = new File(inputPath.getText());
+
+                try{
+                    File f = new File(savePath.getText());
+                    if (!f.createNewFile()) {
+                        f.delete();
+                        f.createNewFile();
+                    }
+                    setCoords();
+                    io.outputFile(f, getGravity(),getMassofBall(),getFrictionc(),getMaxV(),getTolerance(),
+                            new Vector2d(start_x, start_y),new Vector2d(goal_x, goal_y), height.getText());
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        load.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                File f = new File(loadPath.getText());
                 if(f.exists()) {
-                    io = new IO_course_module(inputPath.getText());
+                    io = new IO_course_module(f.getPath());
                     gravity.setText("" + io.getGravity());
                     ballMass.setText("" + io.getMassofBall());
                     coefff.setText(("" + io.getFrictionc()));
@@ -95,26 +116,6 @@ public class SettingsScreen implements Screen {
                     goalX.setText(""+io.getGoalX());
                     goalY.setText(""+io.getGoalY());
                     height.setText(""+io.getHeightFunction());
-                }
-
-            }
-        });
-        output.addListener(new ChangeListener() {
-
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-
-                try{
-                    File f = new File(outputPath.getText());
-                    if (!f.createNewFile()) {
-                        f.delete();
-                        f.createNewFile();
-                    }
-                    io.outputFile(f, getGravity(),getMassofBall(),getFrictionc(),getMaxV(),getTolerance(),
-                            new Vector2d( getStartX(),getStartY()),new Vector2d(getGoalX(),getGoalY()), getHeightFunction());
-
-                }catch(Exception e){
-                    e.printStackTrace();
                 }
 
             }
@@ -175,11 +176,11 @@ public class SettingsScreen implements Screen {
 
 
         table.row().pad(0, 0, 10, 0);
-        table.add(input);
-        table.add(inputPath);
+        table.add(save);
+        table.add(savePath);
         table.row().pad(0, 0, 10, 0);
-        table.add(output);
-        table.add(outputPath);
+        table.add(load);
+        table.add(loadPath);
 
 
         stage.addActor(backButton);

@@ -303,7 +303,7 @@ public class MapGenUtils {
 		return GRASS.index;
 	}
 
-	public static void main(String[] args) {
+	/* public static void main(String[] args) {
 		boolean use_function = false;
 		boolean tester_frame = !use_function;
 		gradient_display	 = false;
@@ -317,5 +317,5 @@ public class MapGenUtils {
 		System.out.println("course is "+test.courseWidth()+"x"+test.courseHeight()+", generated with seed "+seed);
 		if (tester_frame) generationTesterFrame(gen, 50, 1, 0.4, 0.6, 1, 50, 9.812);
 		else displayCourse(test);
-	}
+	} */
 }
