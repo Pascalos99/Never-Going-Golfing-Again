@@ -71,7 +71,6 @@ public class AI_Gaussian extends AI_controller {
             while ((val > Math.PI || val < -Math.PI) && (n < 10000)) { val = random.nextGaussian() * sigma; n++; }
             angle_partition[i] = val;
         }
-        System.out.println("angle partition: "+java.util.Arrays.toString(angle_partition));
         return angle_partition;
     }
 
