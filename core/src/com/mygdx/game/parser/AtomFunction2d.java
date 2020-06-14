@@ -21,6 +21,18 @@ public class AtomFunction2d implements Function2d {
 		map = new HashMap<>();
 	}
 
+	@Override
+	public Function2d add(Function2d func) {
+		if (func instanceof AtomFunction2d) {
+			SumAtom at = new SumAtom(this.function, ((AtomFunction2d) func).function);
+			return new AtomFunction2d(at);
+		} else if (func instanceof ConstantFunction) {
+			SumAtom at = new SumAtom(this.function, new ConstantAtom(((ConstantFunction) func).value));
+			return new AtomFunction2d(at);
+		}
+		return raw_add(func);
+	}
+
 	public static String randomPolynomial(long seed) {
 		Random rand = new Random(seed);
 		final double[] poly_f_mins = {0.02, 0.005, 0.001};

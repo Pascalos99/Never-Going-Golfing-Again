@@ -25,12 +25,10 @@ public final class Variables {
 	public static final double 	HILL_HEIGHT = 1;
 
 	// DEFAULT CONSTRUCTOR OF PUTTINGCOURSE SETTINGS
-	public static final double 	DEFAULT_FRICTION = 0.131; // ? TODO decide unit of friction
-	public static final int 	DEFAULT_WIDTH = 20 * 100; //cm
-	public static final int 	DEFAULT_HEIGHT = 20 * 100; //cm
-	public static final double	DEFAULT_HOLE_TOLERANCE = 0.02; //cm
-	public static final double 	DEFAULT_MAXIMUM_VELOCITY = 20; // cm/s ? <- physics people have to decide this
-	public static final double	DEFAULT_GRAVITY = 9.812; // m/s^2
+	public static final double 	DEFAULT_FRICTION = 0.131;
+	public static final double	DEFAULT_HOLE_TOLERANCE = 0.02;
+	public static final double 	DEFAULT_MAXIMUM_VELOCITY = 20;
+	public static final double	DEFAULT_GRAVITY = 9.812;
 	public static final double	DEFAULT_MASS = 50;
 
 	public static final String	FLAG_TEXTURE = ".\\textures\\Flag.png";

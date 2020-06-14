@@ -3,6 +3,7 @@ package com.mygdx.game.utils;
 public class Vector2d {
 	private double x, y;
 
+	public static Vector2d ZERO = new Vector2d(0, 0);
 	public static Vector2d X = new Vector2d(1, 0);
 	public static Vector2d Y = new Vector2d(0, 1);
 

@@ -55,7 +55,7 @@ public class PuttingCourseGenerator {
 		Vector2d[] pos = determineFlagAndStartPositions(heightmap, frictionmap);
 		Function2d height = MapGenUtils.functionFromArray(heightmap, OUT_OF_BOUNDS_HEIGHT);
 		Function2d friction = MapGenUtils.functionFromArray(frictionmap, OUT_OF_BOUNDS_FRICTION);
-		return new PuttingCourse(height, friction, pos[0], pos[1], hole_tolerance, maximum_velocity, gravity);
+		return new CourseBuilder(height, friction, pos[0], pos[1], hole_tolerance, maximum_velocity, gravity).get();
 	}
 	
 	public PuttingCourse fractalGeneratedCourse(MapGenUtils.FractalGenerationSettings settings) {
@@ -78,10 +78,10 @@ public class PuttingCourseGenerator {
 	} */
 
 	public PuttingCourse pureFunctionGeneratedCourse(Function2d height, Function2d friction, int course_width, int course_height, double hole_tolerance, double maximum_velocity, double gravity) {
-		return new PuttingCourse(height, friction,
+		return new CourseBuilder(height, friction,
 				new Vector2d(random.nextDouble() * course_width, random.nextDouble() * course_height),
 				new Vector2d(random.nextDouble() * course_width, random.nextDouble() * course_height),
-			hole_tolerance, maximum_velocity, gravity);
+			hole_tolerance, maximum_velocity, gravity).get();
 	}
 	
 	private Vector2d[] determineFlagAndStartPositions(double[][] heightmap, double[][] frictionmap) {

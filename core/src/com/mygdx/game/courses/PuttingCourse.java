@@ -1,6 +1,8 @@
 package com.mygdx.game.courses;
 
 import com.mygdx.game.obstacles.Obstacle;
+import com.mygdx.game.parser.SandFunction2d;
+import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.parser.Function2d;
 
@@ -23,6 +25,8 @@ public class PuttingCourse {
 	public final double gravity;
 
 	List<Obstacle> obstacles;
+
+	private Double default_friction;
 	
 	/**
 	 * @param height
@@ -41,6 +45,8 @@ public class PuttingCourse {
 		this.maximum_velocity = maximum_velocity;
 		this.gravity = gravity;
 		obstacles = new ArrayList<>();
+
+		if (friction instanceof Function2d.ConstantFunction) default_friction = ((Function2d.ConstantFunction) friction).value;
 	}
 
 	/** Identical to the call {@code height_function.evaluate(x, y)}*/
@@ -62,6 +68,12 @@ public class PuttingCourse {
 	/** @return an unmodifiable list of all obstacles in this course. */
 	public List<Obstacle> getObstacles() {
 		return Collections.unmodifiableList(obstacles);
+	}
+
+	public boolean isSandAt(double x, double y) {
+		if (friction_function instanceof SandFunction2d) return ((SandFunction2d) friction_function).isSandAt(x, y);
+		else if (default_friction != null) return getFrictionAt(x, y) > default_friction;
+		else return getFrictionAt(x, y) > DEFAULT_FRICTION;
 	}
 
 }

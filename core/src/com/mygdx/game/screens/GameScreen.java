@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.*;
 import com.mygdx.game.bots.AI_controller;
+import com.mygdx.game.courses.CourseBuilder;
 import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.courses.PuttingCourseGenerator;
@@ -88,8 +89,8 @@ public class GameScreen implements Screen {
         generator.setPathPreference(true);
         if(gameAspects!=null){
           //  figure out how to make function 2D
-            course = new PuttingCourse(new AtomFunction2d(gameAspects.getHeightFunction()) , Function2d.getConstant(gameAspects.getFriction()),gameAspects.getGoal(),gameAspects.getStart()
-                    ,gameAspects.getTolerance(),gameAspects.getMaxV() ,gameAspects.getGravity());
+            course = new CourseBuilder(new AtomFunction2d(gameAspects.getHeightFunction()) , Function2d.getConstant(gameAspects.getFriction()),gameAspects.getGoal(),gameAspects.getStart()
+                    ,gameAspects.getTolerance(),gameAspects.getMaxV() ,gameAspects.getGravity()).get();
         }else{
             course = generator.fractalGeneratedCourse(size, 1,0.8,0.7,size/200,3,9.81);
         }
