@@ -101,7 +101,7 @@ public class Ball implements TopDownPhysicsObject {
                 double final_height = h.evaluate(x, y);
 
                 height_velocity = predicted_height - final_height - mass*world.gravity*delta;
-                System.out.println(height_velocity);
+//                System.out.println(height_velocity);
 
                 frozen_direction = new Vector3((float)velocity.get_x(), (float)height_velocity, (float)velocity.get_y());
 

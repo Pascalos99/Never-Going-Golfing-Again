@@ -79,7 +79,7 @@ public abstract class Player {
         return pre.add(new Vector3((float) add.get_x(), (float) add.get_y(), (float) add.get_z()));
     }
 
-    public void init(PuttingCoursePhysics world_physics){
+    public void init(PuttingCoursePhysics world_physics) {
         ModelBuilder modelBuilder = new ModelBuilder();
         Vector2d start = GAME_ASPECTS.getStart();
         double x = start.get_x();

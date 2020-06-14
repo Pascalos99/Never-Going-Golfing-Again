@@ -39,7 +39,7 @@ public class GameScreen implements Screen {
     static double hole_tolerance = 10;
     static double max_speed = 20;
     static double gravity = 9.812;
-    static PuttingCourse course = generator.randomCourse(size, hole_tolerance, max_speed, gravity);
+    static PuttingCourse course = null;
     Label currentPlayerLabel;
     Label currentPlayerShotNum;
     Label currentPlayerType;
@@ -88,9 +88,11 @@ public class GameScreen implements Screen {
 
         generator.setPathPreference(true);
         if(gameAspects!=null){
-          //  figure out how to make function 2D
-            course = new CourseBuilder(new AtomFunction2d(gameAspects.getHeightFunction()) , Function2d.getConstant(gameAspects.getFriction()),gameAspects.getGoal(),gameAspects.getStart()
-                    ,gameAspects.getTolerance(),gameAspects.getMaxV() ,gameAspects.getGravity()).get();
+            CourseBuilder cb = new CourseBuilder(gameAspects);
+            cb.applyHeightScaling(1/WORLD_SCALING);
+            cb.addShift(WORLD_SHIFT);
+            course = cb.get();
+            course.updateGameAspects(gameAspects);
         }else{
             course = generator.fractalGeneratedCourse(size, 1,0.8,0.7,size/200,3,9.81);
         }

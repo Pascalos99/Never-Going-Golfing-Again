@@ -1,6 +1,6 @@
 package com.mygdx.game.parser;
 
-public class SandFunction2d extends Function2d.ConstantFunction {
+public class SandFunction2d extends Function2d.ConstantFunction2d {
 
     public final double sand_friction;
     private Function2d main;

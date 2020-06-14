@@ -16,8 +16,8 @@ public interface Function2d {
 
 	double evaluate(double x, double y);
 	
-	static ConstantFunction getConstant(double value) {
-		return new ConstantFunction(value);
+	static ConstantFunction2d getConstant(double value) {
+		return new ConstantFunction2d(value);
 	}
 
 	default double directionalDerivative(double x, double y, Vector2d direction) {
@@ -48,17 +48,17 @@ public interface Function2d {
 		return raw_add(func);
 	}
 
-	default Function2d raw_shift(Vector2d shift) {
-		return new ShiftedFunction(this, shift);
-	}
-
 	default Function2d shift(Vector2d shift) {
-		return raw_shift(shift);
+		return new ShiftedFunction2d(this, shift);
 	}
 
-	class ConstantFunction implements Function2d {
+	default Function2d scale(double scaling) {
+		return new ScaledFunction2d(this, scaling);
+	}
 
-		public ConstantFunction(double constant) {
+	class ConstantFunction2d implements Function2d {
+
+		public ConstantFunction2d(double constant) {
 			value = constant;
 		}
 		public final double value;
@@ -71,8 +71,8 @@ public interface Function2d {
 
 		@Override
 		public Function2d add(Function2d func) {
-			if (func instanceof ConstantFunction)
-				return Function2d.getConstant(value + ((ConstantFunction)func).value);
+			if (func instanceof ConstantFunction2d)
+				return Function2d.getConstant(value + ((ConstantFunction2d)func).value);
 			else if (func instanceof AtomFunction2d)
 				return func.add(this);
 			return raw_add(func);
@@ -82,25 +82,48 @@ public interface Function2d {
 		}
 	}
 
-	class ShiftedFunction implements Function2d {
+	class ShiftedFunction2d implements Function2d {
+
 		public final Function2d original;
 		public final Vector2d shift;
-		public ShiftedFunction(Function2d original, Vector2d shift) {
+		public ShiftedFunction2d(Function2d original, Vector2d shift) {
 			this.original = original;
 			this.shift = shift;
 		}
 		@Override
 		public Vector2d gradient(double x, double y) {
-			return original.gradient(x+shift.get_x(), y+shift.get_y());
+			return original.gradient(x-shift.get_x(), y-shift.get_y());
 		}
 
 		@Override
 		public double evaluate(double x, double y) {
-			return original.evaluate(x+shift.get_x(), y+shift.get_y());
+			return original.evaluate(x-shift.get_x(), y-shift.get_y());
 		}
 
 		public String toString() {
 			return "Function2d of "+original+", shifted by "+shift;
+		}
+	}
+
+	class ScaledFunction2d implements Function2d {
+		public final Function2d original;
+		public final double factor;
+		public ScaledFunction2d(Function2d original, double factor) {
+			this.original = original;
+			this.factor = factor;
+		}
+		@Override
+		public Vector2d gradient(double x, double y) {
+			return original.gradient(x, y);
+		}
+
+		@Override
+		public double evaluate(double x, double y) {
+			return original.evaluate(x, y) * factor;
+		}
+
+		public String toString() {
+			return "Function2d of "+original+", multiplied by "+factor;
 		}
 	}
 }

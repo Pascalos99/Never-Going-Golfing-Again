@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Random;
 
 public class AtomFunction2d implements Function2d {
-	Atom function;
-	Atom derivative_x;
-	Atom derivative_y;
+	public final Atom function;
+	public final Atom derivative_x;
+	public final Atom derivative_y;
 	Map<String, Double> map;
 
 	public AtomFunction2d(String function) {
@@ -26,11 +26,15 @@ public class AtomFunction2d implements Function2d {
 		if (func instanceof AtomFunction2d) {
 			SumAtom at = new SumAtom(this.function, ((AtomFunction2d) func).function);
 			return new AtomFunction2d(at);
-		} else if (func instanceof ConstantFunction) {
-			SumAtom at = new SumAtom(this.function, new ConstantAtom(((ConstantFunction) func).value));
+		} else if (func instanceof ConstantFunction2d) {
+			SumAtom at = new SumAtom(this.function, new ConstantAtom(((ConstantFunction2d) func).value));
 			return new AtomFunction2d(at);
 		}
 		return raw_add(func);
+	}
+
+	public AtomFunction2d multiply(double factor) {
+		return new AtomFunction2d(new ProductAtom(function, new ConstantAtom(factor)));
 	}
 
 	public static String randomPolynomial(long seed) {

@@ -278,26 +278,26 @@ public class SettingsScreen implements Screen {
 
     public double getStartX(){
         shiftCalculation();
-        return start_x + WORLD_SHIFT.get_x();
+        return start_x;
     }
 
     public double getStartY(){
         shiftCalculation();
-        return start_y + WORLD_SHIFT.get_y();
+        return start_y;
     }
 
     public double getGoalX(){
         shiftCalculation();
-        return goal_x + WORLD_SHIFT.get_x();
+        return goal_x;
     }
     public double getGoalY(){
         shiftCalculation();
-        return goal_y + WORLD_SHIFT.get_y();
+        return goal_y;
     }
 
     public String getHeightFunction() {
         shiftCalculation();
-        return "("+applyWorldShift(height.getText())+")/"+WORLD_SCALING;
+        return height.getText();
     }
 
     private boolean calculated_world_shift = false;
@@ -316,19 +316,6 @@ public class SettingsScreen implements Screen {
         double new_min_y = world_range/2 - delta_y/2;
         WORLD_SHIFT = new Vector2d(new_min_x - min_x, new_min_y - min_y);
         calculated_world_shift = true;
-    }
-
-    public String applyWorldShift(String function) {
-        double dx = WORLD_SHIFT.get_x();
-        double dy = WORLD_SHIFT.get_y();
-        StringBuilder sb = new StringBuilder();
-        for (int i=0; i < function.length(); i++) {
-            char c = function.charAt(i);
-            if (c=='x') sb.append(String.format("(x-%.6f)", dx));
-            else if (c=='y') sb.append(String.format("(y-%.6f)", dy));
-            else sb.append(c);
-        }
-        return sb.toString();
     }
 
     public static class ColorSelection {

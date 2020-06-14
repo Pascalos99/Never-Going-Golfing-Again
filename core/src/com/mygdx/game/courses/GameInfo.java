@@ -77,7 +77,8 @@ public class GameInfo {
         return goalY;
     }
 
-    public  String getHeightFunction(){
+    /** should not be used for any other purpose than initializing the world, and thus is not supposed to be public */
+    String getHeightFunction(){
         return heightFunction;
     }
 

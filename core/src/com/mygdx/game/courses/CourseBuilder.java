@@ -1,5 +1,6 @@
 package com.mygdx.game.courses;
 
+import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.utils.Vector2d;
 
@@ -30,6 +31,12 @@ public class CourseBuilder {
         setHoleTolerance(hole_tolerance);
         setMaximumVelocity(maximum_velocity);
         setGravity(gravity);
+    }
+
+    public CourseBuilder(GameInfo aspects) {
+        this(new AtomFunction2d(aspects.getHeightFunction()),
+                Function2d.getConstant(aspects.getFriction()), aspects.getGoal(), aspects.getStart(),
+                aspects.getTolerance(), aspects.getMaxV(), aspects.getGravity());
     }
 
     public void addHeight(Function2d func) {
@@ -65,6 +72,12 @@ public class CourseBuilder {
         gravity = Double.valueOf(value);
     }
 
+    public void applyHeightScaling(double multiplicative_factor) {
+        if (height_function instanceof AtomFunction2d)
+            height_function = ((AtomFunction2d)height_function).multiply(multiplicative_factor);
+        else height_function = height_function.scale(multiplicative_factor);
+    }
+
     public PuttingCourse get() throws MissingFormatArgumentException {
         if (height_function == null || friction_function == null ||
             start == null || goal == null || hole_tolerance == null ||
@@ -79,11 +92,10 @@ public class CourseBuilder {
         }
         PuttingCourse course = new PuttingCourse(height_function, friction_function,
                 goal, start, hole_tolerance, maximum_velocity, gravity);
+        System.out.println(start+" and "+goal+" and "+height_function);
         return course;
     }
-
-    // TODO make courseBuilder capable of handling all current course building activities
-    // TODO refactor all current calls to constructing putting courses to this class
+    
     // TODO add functionality of adding obstacles to the course
     // (add functionality of generating start and goal positions based on course)
     // (add functionality of generating path between start and goal)

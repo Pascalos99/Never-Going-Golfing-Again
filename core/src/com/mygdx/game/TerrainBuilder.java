@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.parser.AtomFunction2d;
+import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.parser.FunctionParser;
 import com.mygdx.game.utils.Vector2d;
 
@@ -182,11 +183,11 @@ public class TerrainBuilder {
         ModelInstance[] terrainInstance = new ModelInstance[25];
         ModelBuilder modelBuilder = new ModelBuilder();
         MeshPartBuilder builder;
-        AtomFunction2d func = new AtomFunction2d("sin(x)+cos(y)");
+        Function2d func = new AtomFunction2d("sin(x)+cos(y)");
         double y_scalar = WORLD_SCALING;
 
         try {
-            func = new AtomFunction2d(GAME_ASPECTS.getHeightFunction());
+            func = WORLD.height_function;
         } catch (Error e) {
             System.out.println(e);
         }

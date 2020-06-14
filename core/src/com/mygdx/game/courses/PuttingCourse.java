@@ -2,7 +2,6 @@ package com.mygdx.game.courses;
 
 import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.parser.SandFunction2d;
-import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.parser.Function2d;
 
@@ -25,8 +24,6 @@ public class PuttingCourse {
 	public final double gravity;
 
 	List<Obstacle> obstacles;
-
-	private Double default_friction;
 	
 	/**
 	 * @param height
@@ -36,7 +33,7 @@ public class PuttingCourse {
 	 * @param hole_tolerance
 	 * @param maximum_velocity
 	 */
-	public PuttingCourse(Function2d height, Function2d friction, Vector2d flag, Vector2d start, double hole_tolerance, double maximum_velocity, double gravity) {
+	PuttingCourse(Function2d height, Function2d friction, Vector2d flag, Vector2d start, double hole_tolerance, double maximum_velocity, double gravity) {
 		height_function = height;
 		friction_function = friction;
 		flag_position = flag;
@@ -45,8 +42,6 @@ public class PuttingCourse {
 		this.maximum_velocity = maximum_velocity;
 		this.gravity = gravity;
 		obstacles = new ArrayList<>();
-
-		if (friction instanceof Function2d.ConstantFunction) default_friction = ((Function2d.ConstantFunction) friction).value;
 	}
 
 	/** Identical to the call {@code height_function.evaluate(x, y)}*/
@@ -60,8 +55,8 @@ public class PuttingCourse {
 	}
 	
 	public double get_friction_coefficient() {
-		if (friction_function instanceof Function2d.ConstantFunction)
-			return ((Function2d.ConstantFunction)friction_function).value;
+		if (friction_function instanceof Function2d.ConstantFunction2d)
+			return ((Function2d.ConstantFunction2d)friction_function).value;
 		return friction_function.evaluate(0, 0);
 	}
 
@@ -72,8 +67,18 @@ public class PuttingCourse {
 
 	public boolean isSandAt(double x, double y) {
 		if (friction_function instanceof SandFunction2d) return ((SandFunction2d) friction_function).isSandAt(x, y);
-		else if (default_friction != null) return getFrictionAt(x, y) > default_friction;
 		else return getFrictionAt(x, y) > DEFAULT_FRICTION;
+	}
+
+	public void updateGameAspects(GameInfo aspects) {
+		aspects.friction = get_friction_coefficient();
+		aspects.goalX = flag_position.get_x();
+		aspects.goalY = flag_position.get_y();
+		aspects.startX = start_position.get_x();
+		aspects.startY = start_position.get_y();
+		aspects.gravity = gravity;
+		aspects.maxVelocity = maximum_velocity;
+		aspects.tol = hole_tolerance;
 	}
 
 }
