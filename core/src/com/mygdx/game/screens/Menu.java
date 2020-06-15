@@ -33,7 +33,7 @@ public class Menu extends Game {
 	protected PlayerScreen players;
 	private GameSelectScreen gameSelect;
 	private GameScreen gameScreen;
-
+	private ObstacleSelect obstacleScreen;
 	private GameInfo gameInfo;
 
 	public static final int MAIN_MENU=0;
@@ -43,6 +43,7 @@ public class Menu extends Game {
 	public static final int PLAYER_SELECT=4;
 	public static final int GAME_SELECT=5;
 	public static final int PLAY =6;
+	public static final int CUSTOMIZE_OBSTACLES=7;
 
 
 
@@ -88,6 +89,11 @@ public class Menu extends Game {
 				System.out.println(gameInfo);
 				gameScreen = new GameScreen(this, gameInfo);
 				this.setScreen(gameScreen);
+				break;
+			case CUSTOMIZE_OBSTACLES:
+				System.out.println("Customize obstacles");
+				obstacleScreen= new ObstacleSelect(this);
+				this.setScreen(obstacleScreen);
 				break;
 		}
 	}

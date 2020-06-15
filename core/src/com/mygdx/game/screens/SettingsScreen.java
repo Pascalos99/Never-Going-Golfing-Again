@@ -64,6 +64,7 @@ public class SettingsScreen implements Screen {
         table.add(tablel).expandY().expandX();
         TextButton play=new TextButton("PLAY", MENU_SKIN);
         TextButton save = new TextButton("Save course to file", MENU_SKIN);
+        TextButton customizeObstacles = new TextButton("Customize Obstacles", MENU_SKIN);
         TextButton load = new TextButton("Load course from file", MENU_SKIN);
         TextButton backButton= new TextButton("BACK",MENU_SKIN);
         backButton.align(Align.bottomLeft);
@@ -74,10 +75,18 @@ public class SettingsScreen implements Screen {
                 parent.changeScreen(Menu.GAME_SELECT);
             }
         });
-        table.add(play);
+
         TextField savePath= new TextField("", MENU_SKIN);
         TextField loadPath =new TextField("", MENU_SKIN);
 
+        customizeObstacles.addListener(new ChangeListener() {
+
+               @Override
+               public void changed(ChangeEvent event, Actor actor) {
+                   MAX_SHOT_VELOCITY = getMaxV();
+                   parent.changeScreen(Menu.CUSTOMIZE_OBSTACLES);
+               }
+       });
         save.addListener(new ChangeListener() {
 
             @Override
@@ -159,8 +168,9 @@ public class SettingsScreen implements Screen {
        /* tablel.row().pad(margine, 0, 0, 0);
         tabler.row().pad(margine, 0, 0, 0);
 */
+        table.setDebug(true);
         tablel.padRight(margine);
-        tablel.padLeft((margine));
+        tablel.padLeft(margine);
         tabler.padRight(margine);
         tabler.padLeft(margine);
         addToTable(tabler, g,gravity,margine,0,margine,0);
@@ -175,6 +185,9 @@ public class SettingsScreen implements Screen {
         addToTable(tablel,h,height,0,0,margine,0);
 
 
+        table.row().pad(0, 0, 10, 0);
+        table.add(play);
+        table.add(customizeObstacles);
         table.row().pad(0, 0, 10, 0);
         table.add(save);
         table.add(savePath);
