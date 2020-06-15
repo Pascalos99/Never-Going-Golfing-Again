@@ -20,8 +20,6 @@ import com.mygdx.game.courses.CourseBuilder;
 import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.courses.PuttingCourseGenerator;
-import com.mygdx.game.parser.AtomFunction2d;
-import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.utils.Variables;
 
 import java.awt.geom.Rectangle2D;
@@ -88,10 +86,8 @@ public class GameScreen implements Screen {
 
         generator.setPathPreference(true);
         if(gameAspects!=null){
-            CourseBuilder cb = new CourseBuilder(gameAspects);
-            cb.applyHeightScaling(1/WORLD_SCALING);
-            cb.addShift(WORLD_SHIFT);
-            course = cb.get();
+            CourseBuilder cb =SettingsScreen.cb;
+            course = cb.getModified();
             course.updateGameAspects(gameAspects);
         }else{
             course = generator.fractalGeneratedCourse(size, 1,0.8,0.7,size/200,3,9.81);
