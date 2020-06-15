@@ -92,7 +92,10 @@ public class Menu extends Game {
 				break;
 			case CUSTOMIZE_OBSTACLES:
 				System.out.println("Customize obstacles");
-				obstacleScreen= new ObstacleSelect(this);
+				gameInfo = new GameInfo(players.getPlayers(),settings.getGravity(),settings.getMassofBall(),
+						settings.getFrictionc(),settings.getMaxV(),settings.getTolerance(),settings.getStartX(),
+						settings.getStartY(),settings.getGoalX(),settings.getGoalY(),settings.getHeightFunction());
+				obstacleScreen= new ObstacleSelect(this, gameInfo);
 				this.setScreen(obstacleScreen);
 				break;
 		}

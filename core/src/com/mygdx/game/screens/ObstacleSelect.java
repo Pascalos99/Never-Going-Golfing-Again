@@ -3,30 +3,41 @@ package com.mygdx.game.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.game.CrazyPutting;
+import com.mygdx.game.courses.CourseBuilder;
+import com.mygdx.game.courses.GameInfo;
+import com.mygdx.game.courses.MiniMapDrawer;
+import com.mygdx.game.courses.PuttingCourse;
+import com.mygdx.game.utils.Vector2d;
+
 import static com.mygdx.game.utils.Variables.*;
 public class ObstacleSelect implements Screen {
     private Stage stage;
     private Menu parent;
+    static PuttingCourse course = null;
 
-    public ObstacleSelect(Menu menu){
+    public ObstacleSelect(Menu menu, GameInfo asp){
         parent=menu;
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         Table overall= new Table();
         overall.setFillParent(true);
         overall.setBackground(MENU_BKG);
-        stage.addActor(overall);
+        //stage.addActor(overall);
 
 
 
         TextButton play= play=new TextButton("PLAY", MENU_SKIN);
+
 
         play.addListener(new ChangeListener() {
 
@@ -35,8 +46,17 @@ public class ObstacleSelect implements Screen {
                 parent.changeScreen(Menu.PLAY);
             }
         });
+        CourseBuilder cb = new CourseBuilder(asp);
+        cb.applyHeightScaling(1/WORLD_SCALING);
+        cb.addShift(WORLD_SHIFT);
+        course = cb.get();
+        course.updateGameAspects(asp);
 
-        overall.add(play);
+
+        Image map = new Image(MiniMapDrawer.defaultMiniMap(100,100,10,course,new Vector2d(0,0)));
+        map.setFillParent(true);
+        stage.addActor(map);
+        //overall.add(play);
 
         TextButton backButton= new TextButton("BACK",MENU_SKIN);
         backButton.align(Align.bottomLeft);
@@ -50,7 +70,7 @@ public class ObstacleSelect implements Screen {
 
 
 
-        stage.addActor(backButton);
+        //stage.addActor(backButton);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
     }

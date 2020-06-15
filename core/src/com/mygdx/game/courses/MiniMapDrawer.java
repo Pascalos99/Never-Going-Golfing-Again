@@ -1,5 +1,6 @@
 package com.mygdx.game.courses;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.mygdx.game.Ball;
@@ -10,7 +11,7 @@ import com.mygdx.game.physics.TopDownPhysicsObject;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
-import java.awt.*;
+//import java.awt.*;
 
 public abstract class MiniMapDrawer {
 
@@ -18,6 +19,7 @@ public abstract class MiniMapDrawer {
     protected final int width, height;
     private Pixmap pm;
     private Vector2d anchor;
+
 
     public static Texture defaultMiniMap(int width, int height, double zoom, PuttingCourse course, Vector2d bottom_left_corner) {
         MiniMapDrawer mmd = new DefaultMiniMap(width, height, width / zoom, height / zoom);
@@ -43,7 +45,7 @@ public abstract class MiniMapDrawer {
 
     public void draw(PuttingCourse course) {
         drawHeight(course.height_function, pm);
-        if (course.friction_function instanceof SandFunction2d) drawSand((SandFunction2d) course.friction_function, pm);
+        //if (course.friction_function instanceof SandFunction2d) drawSand((SandFunction2d) course.friction_function, pm);
         for (Drawable draw : course.obstacles) draw.visit(this, pm);
     }
 
@@ -71,15 +73,21 @@ public abstract class MiniMapDrawer {
 
         @Override
         public void drawHeight(Function2d h, Pixmap pm) {
+            double heightBarrier=15;
             for (int i=0; i < width; i++) {
                 double x = i / scale_X + getAnchor().get_x();
                 for (int j=0; j < height; j++) {
                     double y = j / scale_Y + getAnchor().get_y();
-                    Color color;
-                    if (h.evaluate(x, y) <= 0) color = new Color(0, 0, 200);
-                    else if (h.evaluate(x, y) <= 20) color = new Color(20, (int)Math.round(50 + 150 * (h.evaluate(x, y)/20d)), 20);
-                    else color = new Color(25,40,25);
-                    pm.drawPixel(i, j, color.getRGB());
+                    Color color= null;
+                    if (h.evaluate(x, y) <= 0) color = Color.BLUE;
+                    else if (h.evaluate(x, y) <= heightBarrier){
+                        color = new Color(20/255f, (float)((200-150* (h.evaluate(x, y)/heightBarrier))/255d), 20/255f,1f);
+                    } else {
+                        color = new Color(25/255f,40/255f,25/255f,1f);
+
+                    }
+                    pm.setColor(color);
+                    pm.drawPixel(i, j);
                 }
             }
         }
@@ -90,8 +98,8 @@ public abstract class MiniMapDrawer {
                 double x = i / scale_X + getAnchor().get_x();
                 for (int j=0; j < height; j++) {
                     double y = j / scale_Y + getAnchor().get_x();
-                    if (s.isSandAt(x, y))
-                        pm.drawPixel(i, j, new Color(180,180,0).getRGB());
+                   // if (s.isSandAt(x, y))
+                   //     pm.drawPixel(i, j, new Color(180,180,0).getRGB());
                 }
             }
         }
