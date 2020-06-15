@@ -453,8 +453,9 @@ public class Ball implements TopDownPhysicsObject {
         return null;
     }
 
-    public void visit(MiniMapDrawer mapDrawer, com.badlogic.gdx.graphics.Pixmap pm) {
-        mapDrawer.draw(this, pm);
+    @Override
+    public void visit(MiniMapDrawer mapDrawer) {
+        mapDrawer.draw(this);
     }
 
 }

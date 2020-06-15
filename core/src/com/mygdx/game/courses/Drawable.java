@@ -4,6 +4,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 
 public interface Drawable {
 
-    public void visit(MiniMapDrawer mapDrawer, Pixmap pm);
+    public void visit(MiniMapDrawer mapDrawer);
 
 }
