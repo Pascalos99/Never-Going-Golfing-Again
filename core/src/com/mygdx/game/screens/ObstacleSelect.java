@@ -20,6 +20,7 @@ import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.utils.Vector2d;
 
 import static com.mygdx.game.utils.Variables.*;
+
 public class ObstacleSelect implements Screen {
     private Stage stage;
     private Menu parent;
@@ -29,23 +30,8 @@ public class ObstacleSelect implements Screen {
         parent=menu;
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
-        Table overall= new Table();
-        overall.setFillParent(true);
-        overall.setBackground(MENU_BKG);
-        //stage.addActor(overall);
 
 
-
-        TextButton play= play=new TextButton("PLAY", MENU_SKIN);
-
-
-        play.addListener(new ChangeListener() {
-
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(Menu.PLAY);
-            }
-        });
         CourseBuilder cb = new CourseBuilder(asp);
         cb.applyHeightScaling(1/WORLD_SCALING);
         cb.addShift(WORLD_SHIFT);
@@ -56,10 +42,24 @@ public class ObstacleSelect implements Screen {
         Image map = new Image(MiniMapDrawer.defaultMiniMap(20,20,10,course,new Vector2d(0,0)));
         map.setFillParent(true);
         stage.addActor(map);
-        //overall.add(play);
+
+
+
+        Table buttons = new Table();
+        buttons.align(Align.bottomLeft);
+
+
+
+        TextButton play= play=new TextButton("PLAY", MENU_SKIN);
+        play.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                parent.changeScreen(Menu.PLAY);
+            }
+        });
 
         TextButton backButton= new TextButton("BACK",MENU_SKIN);
-        backButton.align(Align.bottomLeft);
         backButton.addListener(new ChangeListener(){
 
             @Override
@@ -69,11 +69,13 @@ public class ObstacleSelect implements Screen {
         });
 
 
+        buttons.add(backButton,play);
 
-        //stage.addActor(backButton);
+        stage.addActor(buttons);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
     }
+
     @Override
     public void show() {
 
