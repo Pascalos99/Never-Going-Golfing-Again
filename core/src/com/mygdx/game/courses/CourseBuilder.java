@@ -3,6 +3,7 @@ package com.mygdx.game.courses;
 import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.parser.Function2d;
+import com.mygdx.game.parser.SandFunction2d;
 import com.mygdx.game.utils.Vector2d;
 
 import java.util.ArrayList;
@@ -47,7 +48,17 @@ public class CourseBuilder {
     public void addHeight(Function2d func) {
         if (height_function==null) height_function = func;
         else height_function = height_function.add(func);
+        if (friction_function instanceof SandFunction2d) {
+            SandFunction2d s = (SandFunction2d)friction_function;
+            friction_function = new SandFunction2d(s.value, s.sand_friction, height_function, s.sand);
+        }
     }
+
+    public void setSandFunction(Function2d func, double friction, double sand_friction) {
+        if (height_function == null) height_function = Function2d.getConstant(0);
+        friction_function = new SandFunction2d(friction, sand_friction, height_function, func);
+    }
+
     public void addFriction(Function2d func) {
         if (friction_function==null) friction_function = func;
         else friction_function = friction_function.add(func);

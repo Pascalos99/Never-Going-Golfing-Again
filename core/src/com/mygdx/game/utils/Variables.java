@@ -26,8 +26,8 @@ public final class Variables {
 
 	// DEFAULT CONSTRUCTOR OF PUTTINGCOURSE SETTINGS
 	public static final double 	DEFAULT_FRICTION = 0.131;
-	public static final double	DEFAULT_HOLE_TOLERANCE = 0.02;
-	public static final double 	DEFAULT_MAXIMUM_VELOCITY = 20;
+	public static final double	DEFAULT_HOLE_TOLERANCE = 0.3;
+	public static final double 	DEFAULT_MAXIMUM_VELOCITY = 6;
 	public static final double	DEFAULT_GRAVITY = 9.812;
 	public static final double	DEFAULT_MASS = 50;
 
