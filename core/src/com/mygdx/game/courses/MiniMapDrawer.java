@@ -20,11 +20,21 @@ public abstract class MiniMapDrawer {
     private Pixmap pm;
     private Vector2d anchor;
 
-
-    public static Texture defaultMiniMap(double course_width, double course_height, int pixels_per_unit, PuttingCourse course, Vector2d bottom_left_corner) {
+    public static MiniMapDrawer defaultDrawer(double course_width, double course_height, int pixels_per_unit, Vector2d bottom_left_corner) {
         MiniMapDrawer mmd = new DefaultMiniMap(
                 (int)(course_width*pixels_per_unit), (int)(course_height*pixels_per_unit), course_width, course_height);
         mmd.setAnchor(bottom_left_corner);
+        return mmd;
+    }
+
+    public static Texture defaultMiniMap(double course_width, double course_height, int pixels_per_unit, PuttingCourse course, Vector2d bottom_left_corner) {
+        MiniMapDrawer mmd = defaultDrawer(course_width, course_height, pixels_per_unit, bottom_left_corner);
+        mmd.draw(course);
+        return mmd.getTexture();
+    }
+
+    public static Texture defaultMiniMap(double course_width, double course_height, int pixels_per_unit, CourseBuilder course, Vector2d bottom_left_corner) {
+        MiniMapDrawer mmd = defaultDrawer(course_width, course_height, pixels_per_unit, bottom_left_corner);
         mmd.draw(course);
         return mmd.getTexture();
     }
@@ -46,7 +56,12 @@ public abstract class MiniMapDrawer {
 
     public void draw(PuttingCourse course) {
         drawHeight(course.height_function, pm);
-        //if (course.friction_function instanceof SandFunction2d) drawSand((SandFunction2d) course.friction_function, pm);
+        if (course.friction_function instanceof SandFunction2d) drawSand((SandFunction2d) course.friction_function, pm);
+        for (Drawable draw : course.obstacles) draw.visit(this, pm);
+    }
+    public void draw(CourseBuilder course) {
+        if (course.height_function != null) drawHeight(course.height_function, pm);
+        if (course.friction_function instanceof SandFunction2d) drawSand((SandFunction2d) course.friction_function, pm);
         for (Drawable draw : course.obstacles) draw.visit(this, pm);
     }
 

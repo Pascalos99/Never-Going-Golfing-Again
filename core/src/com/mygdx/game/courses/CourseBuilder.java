@@ -12,18 +12,18 @@ import java.util.MissingFormatArgumentException;
 
 public class CourseBuilder {
 
-    private Function2d height_function;
-    private Function2d friction_function;
+    Function2d height_function;
+    Function2d friction_function;
 
-    private Vector2d start;
-    private Vector2d goal;
+    Vector2d start;
+    Vector2d goal;
 
-    public Double hole_tolerance;
-    public Double maximum_velocity;
-    public Double gravity;
+    Double hole_tolerance;
+    Double maximum_velocity;
+    Double gravity;
 
-    private Vector2d shift;
-    private List<Obstacle> obstacles;
+    Vector2d shift;
+    List<Obstacle> obstacles;
 
     public CourseBuilder() {
         shift = Vector2d.ZERO;
@@ -55,8 +55,9 @@ public class CourseBuilder {
     }
 
     public void setSandFunction(Function2d func, double friction, double sand_friction) {
-        if (height_function == null) height_function = Function2d.getConstant(0);
-        friction_function = new SandFunction2d(friction, sand_friction, height_function, func);
+        Function2d main = height_function;
+        if (height_function == null) main = Function2d.getConstant(0);
+        friction_function = new SandFunction2d(friction, sand_friction, main, func);
     }
 
     public void addFriction(Function2d func) {
@@ -104,11 +105,13 @@ public class CourseBuilder {
         else height_function = height_function.scale(multiplicative_factor);
     }
 
-    public PuttingCourse get() throws MissingFormatArgumentException {
-        if (height_function == null || friction_function == null ||
-            start == null || goal == null || hole_tolerance == null ||
-            maximum_velocity == null || gravity == null)
-            throw new MissingFormatArgumentException("Not all required arguments have been given a value");
+    boolean isEverythingSpecified() {
+        return !(height_function == null || friction_function == null ||
+                start == null || goal == null || hole_tolerance == null ||
+                maximum_velocity == null || gravity == null);
+    }
+
+    void applyShift() {
         if (!shift.equals(Vector2d.ZERO)) {
             start = start.add(shift);
             goal = goal.add(shift);
@@ -117,6 +120,12 @@ public class CourseBuilder {
             for (Obstacle o : obstacles) o.setAnchorPoint(o.getAnchorPoint().add(shift));
             shift = Vector2d.ZERO;
         }
+    }
+
+    public PuttingCourse get() throws MissingFormatArgumentException {
+        if (!isEverythingSpecified()) throw new MissingFormatArgumentException(
+                "Not all required arguments have been given a value");
+        applyShift();
         PuttingCourse course = new PuttingCourse(height_function, friction_function,
                 goal, start, hole_tolerance, maximum_velocity, gravity);
         for (Obstacle o : obstacles) course.obstacles.add(o);
