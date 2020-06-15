@@ -83,7 +83,7 @@ public class PlayerScreen implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                //TODO: if anyone can figure out a better way to turn the table to players, go for it
+
                 int id = -1;
                 String name = "";
                 String playerType = "";

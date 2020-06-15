@@ -61,7 +61,6 @@ public class Menu extends Game {
 				changeScreen(PLAY);
 				break;
 			case CUSTOM_GAME:
-				//TODO:replace this test code with game generation code
 				System.out.println("Custom GAME");
 				settings = new SettingsScreen(this);
 				this.setScreen(settings);

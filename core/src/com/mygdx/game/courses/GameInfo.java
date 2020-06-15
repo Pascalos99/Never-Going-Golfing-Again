@@ -6,6 +6,7 @@ import com.mygdx.game.utils.Vector2d;
 import java.util.ArrayList;
 
 public class GameInfo {
+
     public ArrayList<Player> players;
     public double gravity;
     public double ballMass;
