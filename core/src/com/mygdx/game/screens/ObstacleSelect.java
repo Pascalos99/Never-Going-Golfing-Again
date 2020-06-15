@@ -23,8 +23,8 @@ import static com.mygdx.game.utils.Variables.*;
 public class ObstacleSelect implements Screen {
     private Stage stage;
     private Menu parent;
-
     Texture txt;
+    MiniMapDrawer m;
 
     public ObstacleSelect(Menu menu){
         parent=menu;
@@ -41,13 +41,11 @@ public class ObstacleSelect implements Screen {
         m.draw(cb);
         txt= m.getTexture();
 
-       Image map = new Image(txt);
+        Image map = new Image(txt);
         overall.add(map);
-
 
         Table buttons = new Table();
         buttons.align(Align.bottomLeft);
-
 
         TextButton play=new TextButton("PLAY", MENU_SKIN);
         play.addListener(new ChangeListener() {
@@ -57,7 +55,52 @@ public class ObstacleSelect implements Screen {
                 parent.changeScreen(Menu.PLAY);
             }
         });
+        TextButton smallTree= new TextButton("Small Tree", MENU_SKIN);
+        TextButton medTree= new TextButton("Medium Tree", MENU_SKIN);
+        TextButton largeTree= new TextButton("Large Tree", MENU_SKIN);
+        TextButton wall= new TextButton("Wall", MENU_SKIN);
+        Table obstacleT= new Table();
+        obstacleT.pad(10,10,0,10);
+        obstacleT.add(smallTree);
+        obstacleT.row().pad(10,10,0,10);
+        obstacleT.add(medTree);
+        obstacleT.row().pad(10,10,0,10);
+        obstacleT.add(largeTree);
+        obstacleT.row().pad(10,10,0,10);;
+        obstacleT.add(wall);;
+        obstacleT.row().pad(10,10,0,10);;
 
+        smallTree.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+            }
+        });
+
+        medTree.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+            }
+        });
+
+        largeTree.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+            }
+        });
+
+        wall.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+            }
+        });
+
+        overall.add(obstacleT);
 
         buttons.add(play);
         stage.addActor(overall);
@@ -75,6 +118,7 @@ public class ObstacleSelect implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        txt.draw(m.getPixmap(),0,0);
         stage.act(delta);
         stage.draw();
     }
