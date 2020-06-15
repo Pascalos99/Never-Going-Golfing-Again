@@ -44,6 +44,7 @@ public class CourseBuilder {
         this(new AtomFunction2d(aspects.getHeightFunction()),
                 Function2d.getConstant(aspects.getFriction()), aspects.getGoal(), aspects.getStart(),
                 aspects.getTolerance(), aspects.getMaxV(), aspects.getGravity());
+        setSandFunction(new AtomFunction2d(aspects.getFrictionFunction()), aspects.friction, aspects.sandFriciton);
     }
 
     public void addHeight(Function2d func) {

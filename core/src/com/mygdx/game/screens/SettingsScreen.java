@@ -14,6 +14,7 @@ import com.mygdx.game.courses.CourseBuilder;
 import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.courses.IO_course_module;
+import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
 import java.io.File;
@@ -179,7 +180,7 @@ public class SettingsScreen implements Screen {
         Label sf= new Label("Sand function: ", MENU_SKIN);
 
 
-        sandFriciton = new TextField("1.131", MENU_SKIN);
+        sandFriciton = new TextField(""+ DEFAULT_SAND_FRICTION, MENU_SKIN);
         Label sandCoeff =new Label("Coefficient of friction for sand: ", MENU_SKIN);
         int margine =10;
        /* tablel.row().pad(margine, 0, 0, 0);
