@@ -36,6 +36,8 @@ public class SettingsScreen implements Screen {
     private TextField goalY;
 
     private TextField height;
+    private TextField sandFunction;
+    private TextField sandFriciton;
 
     IO_course_module io;
 
@@ -163,7 +165,12 @@ public class SettingsScreen implements Screen {
         height = new TextField("-0.01x+0.003x^2+0.04y", MENU_SKIN);
         Label h =new Label("Height function: ", MENU_SKIN);
 
+        sandFunction= new TextField("sin(x)+cos(y)", MENU_SKIN);
+        Label sf= new Label("Sand function: ", MENU_SKIN);
 
+
+        sandFriciton = new TextField("1.131", MENU_SKIN);
+        Label sandCoeff =new Label("Coefficient of friction for sand: ", MENU_SKIN);
         int margine =10;
        /* tablel.row().pad(margine, 0, 0, 0);
         tabler.row().pad(margine, 0, 0, 0);
@@ -177,12 +184,14 @@ public class SettingsScreen implements Screen {
         addToTable(tabler, bm,ballMass,0,0,margine,0);
         addToTable(tabler,cf,coefff,0,0,margine,0);
         addToTable(tabler,vm,vMax,0,0,margine,0);
-        addToTable(tabler,t,tolerance,margine,0,margine,0);
+        addToTable(tabler,t,tolerance,0,0,margine,0);
+        addToTable(tabler,sandCoeff,sandFriciton,margine,0,margine,0);
         addToTable(tablel,sX,startX,margine,0,margine,0);
         addToTable(tablel,sY,startY,0,0,margine,0);
         addToTable(tablel,gX,goalX,0,0,margine,0);
         addToTable(tablel,gY,goalY,0,0,margine,0);
         addToTable(tablel,h,height,0,0,margine,0);
+        addToTable(tablel,sf,sandFunction,0,0,margine,0);
 
 
         table.row().pad(0, 0, 10, 0);
@@ -277,6 +286,7 @@ public class SettingsScreen implements Screen {
         return Double.parseDouble(tolerance.getText());
     }
 
+
     private double start_x, start_y, goal_x, goal_y;
     private boolean calculated_coords = false;
 
@@ -312,6 +322,17 @@ public class SettingsScreen implements Screen {
         shiftCalculation();
         return height.getText();
     }
+
+    public String getSandFunction(){
+        shiftCalculation();
+        return sandFunction.getText();
+    }
+
+    public double getSandFriction(){
+        return Double.parseDouble(sandFriciton.getText());
+    }
+
+
 
     private boolean calculated_world_shift = false;
 

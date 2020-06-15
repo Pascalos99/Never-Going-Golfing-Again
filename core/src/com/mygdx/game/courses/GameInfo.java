@@ -17,12 +17,13 @@ public class GameInfo {
     public double startY;
     public double goalX;
     public double goalY;
-
+    public double sandFriciton;
+    private String sandFunction;
     private String heightFunction;
 
 
     public GameInfo(ArrayList<Player> players, double gravity, double ballMass,double friction, double maxVelocity,
-                    double tol, double startX, double startY, double goalX,double goalY,String heightFunction)
+                    double tol, double startX, double startY, double goalX,double goalY,String heightFunction, double sandFriction,String sandFunction)
     {
         this.players=players;
         this.gravity=gravity;
@@ -35,6 +36,8 @@ public class GameInfo {
         this.goalX=goalX;
         this.goalY=goalY;
         this.heightFunction= heightFunction;
+        this.sandFriciton=sandFriction;
+        this.sandFunction=sandFunction;
 
     }
 
@@ -78,6 +81,10 @@ public class GameInfo {
         return goalY;
     }
 
+    public String getFrictionFunction(){ return sandFunction; }
+    public double getSandFriction(){ return sandFriciton; }
+
+
     /** should not be used for any other purpose than initializing the world, and thus is not supposed to be public */
     String getHeightFunction(){
         return heightFunction;
@@ -86,7 +93,7 @@ public class GameInfo {
     public String toString(){
         String res="Game with Players :"+ players+"\nGravity:"+gravity+"\nballMass:"+ballMass+"\nBall Friction:"+
                 friction+"\nMaximumVelocity:"+maxVelocity+"\nHole tolerance:"+tol+"\nStart(x,y):("+startX+","+startY+
-                ")\nGoal(x,y):("+goalX+","+goalY+")\nHeight Function:"+heightFunction;
+                ")\nGoal(x,y):("+goalX+","+goalY+")\nHeight Function:"+heightFunction+"\nSand Function: "+sandFunction+"\nSandFriction: "+sandFriciton;
         return res;
     }
 }

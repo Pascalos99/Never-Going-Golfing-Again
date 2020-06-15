@@ -85,7 +85,8 @@ public class Menu extends Game {
 				System.out.println("PLAY");
 				gameInfo = new GameInfo(players.getPlayers(),settings.getGravity(),settings.getMassofBall(),
 						settings.getFrictionc(),settings.getMaxV(),settings.getTolerance(),settings.getStartX(),
-						settings.getStartY(),settings.getGoalX(),settings.getGoalY(),settings.getHeightFunction());
+						settings.getStartY(),settings.getGoalX(),settings.getGoalY(),settings.getHeightFunction(),
+						settings.getSandFriction(),settings.getSandFunction());
 				System.out.println(gameInfo);
 				gameScreen = new GameScreen(this, gameInfo);
 				this.setScreen(gameScreen);
@@ -94,7 +95,8 @@ public class Menu extends Game {
 				System.out.println("Customize obstacles");
 				gameInfo = new GameInfo(players.getPlayers(),settings.getGravity(),settings.getMassofBall(),
 						settings.getFrictionc(),settings.getMaxV(),settings.getTolerance(),settings.getStartX(),
-						settings.getStartY(),settings.getGoalX(),settings.getGoalY(),settings.getHeightFunction());
+						settings.getStartY(),settings.getGoalX(),settings.getGoalY(),settings.getHeightFunction(),
+						settings.getSandFriction(),settings.getSandFunction());
 				obstacleScreen= new ObstacleSelect(this, gameInfo);
 				this.setScreen(obstacleScreen);
 				break;
