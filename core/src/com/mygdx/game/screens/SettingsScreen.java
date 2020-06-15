@@ -101,8 +101,8 @@ public class SettingsScreen implements Screen {
                         f.createNewFile();
                     }
                     setCoords();
-                    io.outputFile(f, getGravity(),getMassofBall(),getFrictionc(),getMaxV(),getTolerance(),
-                            new Vector2d(start_x, start_y),new Vector2d(goal_x, goal_y), height.getText());
+                    io.outputFile(f, getGravity(),getMassofBall(),getFrictionc(), getSandFriction(),getMaxV(),getTolerance(),
+                            new Vector2d(start_x, start_y),new Vector2d(goal_x, goal_y), height.getText(), sandFunction.getText());
 
                 }catch(Exception e){
                     e.printStackTrace();
@@ -115,11 +115,14 @@ public class SettingsScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 File f = new File(loadPath.getText());
-                if(f.exists()) {
+                if (!f.exists() && IO_course_module.isDefaultCourseName(loadPath.getText()))
+                    f = new File(IO_course_module.default_courses_path + loadPath.getText());
+                if (f.exists()) {
                     io = new IO_course_module(f.getPath());
                     gravity.setText("" + io.getGravity());
                     ballMass.setText("" + io.getMassofBall());
                     coefff.setText(("" + io.getFrictionc()));
+                    sandFriciton.setText("" + io.getSandFrictionc());
                     vMax.setText(""+io.getMaxV());
                     tolerance.setText(""+io.getTolerance());
                     startX.setText(""+io.getStartX());
@@ -127,8 +130,8 @@ public class SettingsScreen implements Screen {
                     goalX.setText(""+io.getGoalX());
                     goalY.setText(""+io.getGoalY());
                     height.setText(""+io.getHeightFunction());
+                    sandFunction.setText("" + io.getSandFunction());
                 }
-
             }
         });
         play.addListener(new ChangeListener() {

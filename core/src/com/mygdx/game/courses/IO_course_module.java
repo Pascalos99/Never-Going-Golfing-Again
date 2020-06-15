@@ -19,6 +19,16 @@ public class IO_course_module {
         }
     }
 
+    public static String default_courses_path = "core//testCourses//";
+
+    public static boolean isDefaultCourseName(String courseName) {
+        File folder = new File(default_courses_path);
+        File[] files = folder.listFiles();
+        for (int i=0; i < files.length; i++) {
+            if (files[i].getName().equals(courseName)) return true;
+        } return false;
+    }
+
     private String[] preprocess() throws IOException {
         String result = "";
         while (reader.ready())
@@ -36,11 +46,13 @@ public class IO_course_module {
             if (name.equals("g")) g = Double.parseDouble(value);
             if (name.equals("m")) m = Double.parseDouble(value);
             if (name.equals("mu")) mu = Double.parseDouble(value);
+            if (name.equals("mu_sand")) mu_sand = Double.parseDouble(value);
             if (name.equals("vmax")) vmax = Double.parseDouble(value);
             if (name.equals("tol")) tol = Double.parseDouble(value);
             if (name.equals("start")) start = parseVector2d(value);
             if (name.equals("goal")) goal = parseVector2d(value);
             if (name.equals("height")) height = value;
+            if (name.equals("sand")) sand = value;
         }
     }
 
@@ -54,14 +66,17 @@ public class IO_course_module {
     private double g = DEFAULT_GRAVITY;
     private double m = DEFAULT_MASS;
     private double mu = DEFAULT_FRICTION;
+    private double mu_sand = DEFAULT_SAND_FRICTION;
     private double vmax = DEFAULT_MAXIMUM_VELOCITY;
     private double tol = DEFAULT_HOLE_TOLERANCE;
     private Vector2d start = new Vector2d(0, 0);
     private Vector2d goal = new Vector2d(5, 5);
     private String height = "sin(x) + cos(y)";
+    private String sand = "sin(x-1) + cos(y-1)";
 
     public String toString() {
-        return String.format("g = %s\nm = %s\nmu = %s\nvmax = %s\ntol = %s\nstart = %s\ngoal = %s\nheight = %s", g, m, mu, vmax, tol, start, goal, height);
+        return String.format("g = %s\nm = %s\nmu = %s\nmu_sand = %s\nvmax = %s\ntol = %s\nstart = %s\ngoal = %s\nheight = %s\nsand = %s",
+                g, m, mu, mu_sand, vmax, tol, start, goal, height, sand);
     }
 
     public double getGravity(){
@@ -75,6 +90,8 @@ public class IO_course_module {
     public double getFrictionc(){
         return mu;
     }
+
+    public double getSandFrictionc() { return mu_sand; }
 
     public double getMaxV(){
         return vmax;
@@ -103,18 +120,20 @@ public class IO_course_module {
         return height;
     }
 
+    public String getSandFunction() { return sand;}
+
     public static String vector_to_string(Vector2d v) {
         return "("+v.get_x()+", "+v.get_y()+")";
     }
 
-    public static void outputFile(File file, double g, double m, double mu, double vmax, double tol, Vector2d start, Vector2d goal, String height) {
+    public static void outputFile(File file, double g, double m, double mu, double mu_sand, double vmax, double tol, Vector2d start, Vector2d goal, String height, String sand) {
         String start_str = vector_to_string(start);
         String goal_str = vector_to_string(goal);
         PrintWriter writer;
         try {
             writer = new PrintWriter(new FileWriter(file));
-            writer.format("g = %s; m = %s; mu = %s; vmax = %s; tol = %s;\nstart = %s; goal = %s;\nheight = %s ",
-                    g, m, mu, vmax, tol, start_str, goal_str, height);
+            writer.format("g = %s; m = %s; mu = %s; mu_sand = %s; vmax = %s; tol = %s;\nstart = %s; goal = %s;\nheight = %s; sand = %s ",
+                    g, m, mu, mu_sand, vmax, tol, start_str, goal_str, height, sand);
             writer.close();
         } catch (IOException e) {
             System.err.println("Given file is invalid");

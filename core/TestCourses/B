@@ -5,4 +5,5 @@ vmax = 3.0;
 tol = 0.5;
 start = (.01, .01);
 goal = (0.0, 10.0);
-height = -0.01x+0.003x^2+0.04y
+height = -0.01x+0.003x^2+0.04y;
+sand = sin(x) + cos(y);
