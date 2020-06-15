@@ -3,15 +3,14 @@ package com.mygdx.game.obstacles;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.mygdx.game.Ball;
 import com.mygdx.game.courses.MapDrawer;
-import com.mygdx.game.courses.PuttingCourse;
-import com.mygdx.game.physics.PhysicsEngine;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
+import static com.mygdx.game.utils.Variables.*;
 
 public class Wall extends Obstacle {
-    Vector2d[] points;
-    Vector2d start, end;
-    double thickness, angle;
+    final Vector2d[] points;
+    final Vector2d start, end;
+    final double thickness, angle;
 
     Wall(Vector2d a, Vector2d b, double thickness){
         Vector2d center = a.add(b).div(new Vector2d(2, 2));
@@ -41,32 +40,30 @@ public class Wall extends Obstacle {
     }
 
     @Override
-    protected boolean isShapeColliding(Ball ball) {
-        return false;
-    }
-
-    @Override
-    public Vector3d getPosition() {
-        throw new AssertionError("Wall has no unique position.");
-    }
-
-    @Override
-    public double getOrientation() {
-        throw new AssertionError("Wall has no unique orientation.");
-    }
-
-    @Override
-    public ModelInstance getModel() {
+    protected CollisionData isShapeColliding(Ball ball) {
         return null;
     }
 
     @Override
-    public void setWorld(PuttingCourse world, PhysicsEngine engine) {
-        throw new AssertionError("Obstacle holds no reference to World.");
+    public Vector3d getPosition() {
+        Vector2d vec = start.add(end).div(new Vector2d(2, 2));
+        return new Vector3d(toWorldScale(vec.get_x()), WALL_BASE, toWorldScale(vec.get_y()));
+    }
+
+    @Override
+    public double getOrientation() {
+        return end.sub(start).angle();
+    }
+
+    @Override
+    public ModelInstance getModel() {
+        //TODO Samuele's
+        return null;
     }
 
     @Override
     public AxisAllignedBoundingBox getBoundingBox() {
+        //TODO Dennis'
         return null;
     }
 
