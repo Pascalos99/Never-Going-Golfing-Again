@@ -54,6 +54,10 @@ public abstract class MiniMapDrawer {
         return anchor;
     }
 
+    public Pixmap getPixmap() {
+        return pm;
+    }
+
     public void draw(PuttingCourse course) {
         drawHeight(course.height_function, pm);
         if (course.friction_function instanceof SandFunction2d) drawSand((SandFunction2d) course.friction_function, pm);
