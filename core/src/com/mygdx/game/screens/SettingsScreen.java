@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.game.courses.CourseBuilder;
+import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.courses.IO_course_module;
 import com.mygdx.game.utils.Vector2d;
@@ -38,6 +40,7 @@ public class SettingsScreen implements Screen {
     private TextField height;
     private TextField sandFunction;
     private TextField sandFriciton;
+    static CourseBuilder cb;
 
     IO_course_module io;
 
@@ -86,6 +89,7 @@ public class SettingsScreen implements Screen {
                @Override
                public void changed(ChangeEvent event, Actor actor) {
                    MAX_SHOT_VELOCITY = getMaxV();
+                   cb=new CourseBuilder(getGameInfo());
                    parent.changeScreen(Menu.CUSTOMIZE_OBSTACLES);
                }
        });
@@ -131,11 +135,14 @@ public class SettingsScreen implements Screen {
 
             }
         });
+
         play.addListener(new ChangeListener() {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 MAX_SHOT_VELOCITY = getMaxV();
+                GameInfo g = getGameInfo();
+                cb=new CourseBuilder(g);
                 parent.changeScreen(Menu.PLAY);
             }
         });
@@ -334,6 +341,7 @@ public class SettingsScreen implements Screen {
 
 
 
+
     private boolean calculated_world_shift = false;
 
     private void shiftCalculation() {
@@ -352,6 +360,13 @@ public class SettingsScreen implements Screen {
         calculated_world_shift = true;
     }
 
+
+    public GameInfo getGameInfo(){
+        return new GameInfo(parent.players.getPlayers(),getGravity(),getMassofBall(),
+                getFrictionc(),getMaxV(),getTolerance(),getStartX(),
+                getStartY(),getGoalX(),getGoalY(),getHeightFunction(),
+                getSandFriction(),getSandFunction());
+    }
     public static class ColorSelection {
         public String name;
         public Color color;

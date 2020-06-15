@@ -2,6 +2,7 @@ package com.mygdx.game.screens;
 
 
 import com.badlogic.gdx.Game;
+import com.mygdx.game.courses.CourseBuilder;
 import com.mygdx.game.courses.GameInfo;
 
 
@@ -59,6 +60,8 @@ public class Menu extends Game {
 			case DEFAULT_GAME:
 				System.out.println("Default GAME");
 				settings = new SettingsScreen(this);
+				GameInfo g = settings.getGameInfo();
+				SettingsScreen.cb=new CourseBuilder(g);
 				changeScreen(PLAY);
 				break;
 			case CUSTOM_GAME:
@@ -83,21 +86,14 @@ public class Menu extends Game {
 				break;
 			case PLAY:
 				System.out.println("PLAY");
-				gameInfo = new GameInfo(players.getPlayers(),settings.getGravity(),settings.getMassofBall(),
-						settings.getFrictionc(),settings.getMaxV(),settings.getTolerance(),settings.getStartX(),
-						settings.getStartY(),settings.getGoalX(),settings.getGoalY(),settings.getHeightFunction(),
-						settings.getSandFriction(),settings.getSandFunction());
+				gameInfo = settings.getGameInfo();
 				System.out.println(gameInfo);
 				gameScreen = new GameScreen(this, gameInfo);
 				this.setScreen(gameScreen);
 				break;
 			case CUSTOMIZE_OBSTACLES:
 				System.out.println("Customize obstacles");
-				gameInfo = new GameInfo(players.getPlayers(),settings.getGravity(),settings.getMassofBall(),
-						settings.getFrictionc(),settings.getMaxV(),settings.getTolerance(),settings.getStartX(),
-						settings.getStartY(),settings.getGoalX(),settings.getGoalY(),settings.getHeightFunction(),
-						settings.getSandFriction(),settings.getSandFunction());
-				obstacleScreen= new ObstacleSelect(this, gameInfo);
+				obstacleScreen= new ObstacleSelect(this);
 				this.setScreen(obstacleScreen);
 				break;
 		}
