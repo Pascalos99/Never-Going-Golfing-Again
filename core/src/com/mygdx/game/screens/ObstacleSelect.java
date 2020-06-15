@@ -53,7 +53,7 @@ public class ObstacleSelect implements Screen {
         course.updateGameAspects(asp);
 
 
-        Image map = new Image(MiniMapDrawer.defaultMiniMap(100,100,10,course,new Vector2d(0,0)));
+        Image map = new Image(MiniMapDrawer.defaultMiniMap(20,20,10,course,new Vector2d(0,0)));
         map.setFillParent(true);
         stage.addActor(map);
         //overall.add(play);

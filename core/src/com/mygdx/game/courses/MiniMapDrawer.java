@@ -21,8 +21,9 @@ public abstract class MiniMapDrawer {
     private Vector2d anchor;
 
 
-    public static Texture defaultMiniMap(int width, int height, double zoom, PuttingCourse course, Vector2d bottom_left_corner) {
-        MiniMapDrawer mmd = new DefaultMiniMap(width, height, width / zoom, height / zoom);
+    public static Texture defaultMiniMap(double course_width, double course_height, int pixels_per_unit, PuttingCourse course, Vector2d bottom_left_corner) {
+        MiniMapDrawer mmd = new DefaultMiniMap(
+                (int)(course_width*pixels_per_unit), (int)(course_height*pixels_per_unit), course_width, course_height);
         mmd.setAnchor(bottom_left_corner);
         mmd.draw(course);
         return mmd.getTexture();
@@ -73,6 +74,7 @@ public abstract class MiniMapDrawer {
 
         @Override
         public void drawHeight(Function2d h, Pixmap pm) {
+            System.out.println(h);
             double heightBarrier=15;
             for (int i=0; i < width; i++) {
                 double x = i / scale_X + getAnchor().get_x();
