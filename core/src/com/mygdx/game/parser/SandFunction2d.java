@@ -3,8 +3,8 @@ package com.mygdx.game.parser;
 public class SandFunction2d extends Function2d.ConstantFunction2d {
 
     public final double sand_friction;
-    private Function2d main;
-    private Function2d sand;
+    public final Function2d main;
+    public final Function2d sand;
 
     /**
      * Defines a function that equals {@code sand_friction} where {@code sand} lies above {@code main} and
