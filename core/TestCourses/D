@@ -5,4 +5,5 @@ vmax = 6.0;
 tol = 0.5;
 start = (1, 2);
 goal = (10.0, 12.0);
-height = sin(5x)*cos(5y)/5 +.1
+height = sin(5x)*cos(5y)/5 +.1;
+sand = sin(x) + cos(y);

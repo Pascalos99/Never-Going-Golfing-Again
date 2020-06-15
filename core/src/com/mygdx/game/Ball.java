@@ -1,8 +1,9 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
-import com.mygdx.game.courses.MapDrawer;
+import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.obstacles.AxisAllignedBoundingBox;
 import com.mygdx.game.obstacles.CollisionData;
@@ -480,7 +481,8 @@ public class Ball extends TopDownPhysicsObject {
         return aabb;
     }
 
-    public void visit(MapDrawer mapDrawer) {
+    @Override
+    public void visit(MiniMapDrawer mapDrawer) {
         mapDrawer.draw(this);
     }
 

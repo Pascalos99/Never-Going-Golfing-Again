@@ -26,9 +26,10 @@ public final class Variables {
 
 	// DEFAULT CONSTRUCTOR OF PUTTINGCOURSE SETTINGS
 	public static final double 	DEFAULT_FRICTION = 0.131;
-	public static final double	DEFAULT_HOLE_TOLERANCE = 0.02;
-	public static final double 	DEFAULT_MAXIMUM_VELOCITY = 20;
+	public static final double	DEFAULT_HOLE_TOLERANCE = 0.3;
+	public static final double 	DEFAULT_MAXIMUM_VELOCITY = 6;
 	public static final double	DEFAULT_GRAVITY = 9.812;
+	public static final double 	DEFAULT_SAND_FRICTION = 0.178;
 	public static final double	DEFAULT_MASS = 50;
 
 	public static final String	FLAG_TEXTURE = ".\\textures\\Flag.png";
@@ -86,7 +87,7 @@ public final class Variables {
 	//CRAZY PUTTING
 	public static PerspectiveCamera CAMERA;
 	public static GameInfo GAME_ASPECTS;
-	public static final float WORLD_SCALING = (float)(1d/(2d*Math.PI/ 50d));
+	public static final float WORLD_SCALING = (float)(1d/(2d*Math.PI/ 50d)); // ~7,9577471545947668
 	public static final float BALL_RADIUS = 0.05f / WORLD_SCALING;
 	public static PuttingCourse WORLD;
 	public static final float FLAGPOLE_HEIGHT = 7;

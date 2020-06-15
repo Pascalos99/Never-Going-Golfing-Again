@@ -10,8 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.game.courses.CourseBuilder;
+import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.courses.IO_course_module;
+import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
 import java.io.File;
@@ -36,6 +39,9 @@ public class SettingsScreen implements Screen {
     private TextField goalY;
 
     private TextField height;
+    private TextField sandFunction;
+    private TextField sandFriciton;
+    static CourseBuilder cb;
 
     IO_course_module io;
 
@@ -64,6 +70,7 @@ public class SettingsScreen implements Screen {
         table.add(tablel).expandY().expandX();
         TextButton play=new TextButton("PLAY", MENU_SKIN);
         TextButton save = new TextButton("Save course to file", MENU_SKIN);
+        TextButton customizeObstacles = new TextButton("Customize Obstacles", MENU_SKIN);
         TextButton load = new TextButton("Load course from file", MENU_SKIN);
         TextButton backButton= new TextButton("BACK",MENU_SKIN);
         backButton.align(Align.bottomLeft);
@@ -74,10 +81,19 @@ public class SettingsScreen implements Screen {
                 parent.changeScreen(Menu.GAME_SELECT);
             }
         });
-        table.add(play);
+
         TextField savePath= new TextField("", MENU_SKIN);
         TextField loadPath =new TextField("", MENU_SKIN);
 
+        customizeObstacles.addListener(new ChangeListener() {
+
+               @Override
+               public void changed(ChangeEvent event, Actor actor) {
+                   MAX_SHOT_VELOCITY = getMaxV();
+                   cb=new CourseBuilder(getGameInfo());
+                   parent.changeScreen(Menu.CUSTOMIZE_OBSTACLES);
+               }
+       });
         save.addListener(new ChangeListener() {
 
             @Override
@@ -90,8 +106,8 @@ public class SettingsScreen implements Screen {
                         f.createNewFile();
                     }
                     setCoords();
-                    io.outputFile(f, getGravity(),getMassofBall(),getFrictionc(),getMaxV(),getTolerance(),
-                            new Vector2d(start_x, start_y),new Vector2d(goal_x, goal_y), height.getText());
+                    io.outputFile(f, getGravity(),getMassofBall(),getFrictionc(), getSandFriction(),getMaxV(),getTolerance(),
+                            new Vector2d(start_x, start_y),new Vector2d(goal_x, goal_y), height.getText(), sandFunction.getText());
 
                 }catch(Exception e){
                     e.printStackTrace();
@@ -104,11 +120,14 @@ public class SettingsScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 File f = new File(loadPath.getText());
-                if(f.exists()) {
+                if (!f.exists() && IO_course_module.isDefaultCourseName(loadPath.getText()))
+                    f = new File(IO_course_module.default_courses_path + loadPath.getText());
+                if (f.exists()) {
                     io = new IO_course_module(f.getPath());
                     gravity.setText("" + io.getGravity());
                     ballMass.setText("" + io.getMassofBall());
                     coefff.setText(("" + io.getFrictionc()));
+                    sandFriciton.setText("" + io.getSandFrictionc());
                     vMax.setText(""+io.getMaxV());
                     tolerance.setText(""+io.getTolerance());
                     startX.setText(""+io.getStartX());
@@ -116,15 +135,18 @@ public class SettingsScreen implements Screen {
                     goalX.setText(""+io.getGoalX());
                     goalY.setText(""+io.getGoalY());
                     height.setText(""+io.getHeightFunction());
+                    sandFunction.setText("" + io.getSandFunction());
                 }
-
             }
         });
+
         play.addListener(new ChangeListener() {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 MAX_SHOT_VELOCITY = getMaxV();
+                GameInfo g = getGameInfo();
+                cb=new CourseBuilder(g);
                 parent.changeScreen(Menu.PLAY);
             }
         });
@@ -154,27 +176,38 @@ public class SettingsScreen implements Screen {
         height = new TextField("-0.01x+0.003x^2+0.04y", MENU_SKIN);
         Label h =new Label("Height function: ", MENU_SKIN);
 
+        sandFunction= new TextField("sin(x)+cos(y)", MENU_SKIN);
+        Label sf= new Label("Sand function: ", MENU_SKIN);
 
+
+        sandFriciton = new TextField(""+ DEFAULT_SAND_FRICTION, MENU_SKIN);
+        Label sandCoeff =new Label("Coefficient of friction for sand: ", MENU_SKIN);
         int margine =10;
        /* tablel.row().pad(margine, 0, 0, 0);
         tabler.row().pad(margine, 0, 0, 0);
 */
+        table.setDebug(true);
         tablel.padRight(margine);
-        tablel.padLeft((margine));
+        tablel.padLeft(margine);
         tabler.padRight(margine);
         tabler.padLeft(margine);
         addToTable(tabler, g,gravity,margine,0,margine,0);
         addToTable(tabler, bm,ballMass,0,0,margine,0);
         addToTable(tabler,cf,coefff,0,0,margine,0);
         addToTable(tabler,vm,vMax,0,0,margine,0);
-        addToTable(tabler,t,tolerance,margine,0,margine,0);
+        addToTable(tabler,t,tolerance,0,0,margine,0);
+        addToTable(tabler,sandCoeff,sandFriciton,margine,0,margine,0);
         addToTable(tablel,sX,startX,margine,0,margine,0);
         addToTable(tablel,sY,startY,0,0,margine,0);
         addToTable(tablel,gX,goalX,0,0,margine,0);
         addToTable(tablel,gY,goalY,0,0,margine,0);
         addToTable(tablel,h,height,0,0,margine,0);
+        addToTable(tablel,sf,sandFunction,0,0,margine,0);
 
 
+        table.row().pad(0, 0, 10, 0);
+        table.add(play);
+        table.add(customizeObstacles);
         table.row().pad(0, 0, 10, 0);
         table.add(save);
         table.add(savePath);
@@ -264,6 +297,7 @@ public class SettingsScreen implements Screen {
         return Double.parseDouble(tolerance.getText());
     }
 
+
     private double start_x, start_y, goal_x, goal_y;
     private boolean calculated_coords = false;
 
@@ -300,6 +334,18 @@ public class SettingsScreen implements Screen {
         return height.getText();
     }
 
+    public String getSandFunction(){
+        shiftCalculation();
+        return sandFunction.getText();
+    }
+
+    public double getSandFriction(){
+        return Double.parseDouble(sandFriciton.getText());
+    }
+
+
+
+
     private boolean calculated_world_shift = false;
 
     private void shiftCalculation() {
@@ -318,6 +364,13 @@ public class SettingsScreen implements Screen {
         calculated_world_shift = true;
     }
 
+
+    public GameInfo getGameInfo(){
+        return new GameInfo(parent.players.getPlayers(),getGravity(),getMassofBall(),
+                getFrictionc(),getMaxV(),getTolerance(),getStartX(),
+                getStartY(),getGoalX(),getGoalY(),getHeightFunction(),
+                getSandFriction(),getSandFunction());
+    }
     public static class ColorSelection {
         public String name;
         public Color color;

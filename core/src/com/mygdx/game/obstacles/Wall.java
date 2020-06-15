@@ -2,10 +2,14 @@ package com.mygdx.game.obstacles;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.mygdx.game.Ball;
-import com.mygdx.game.courses.MapDrawer;
+import com.mygdx.game.courses.MiniMapDrawer;
+import com.mygdx.game.courses.PuttingCourse;
+import com.mygdx.game.physics.PhysicsEngine;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
 import static com.mygdx.game.utils.Variables.*;
+
+import java.awt.*;
 
 public class Wall extends Obstacle {
     final Vector2d[] points;
@@ -62,12 +66,18 @@ public class Wall extends Obstacle {
     }
 
     @Override
+    public void setWorld(PuttingCourse world, PhysicsEngine engine) {
+        throw new AssertionError("Obstacle holds no reference to World.");
+    }
+
+    @Override
     public AxisAllignedBoundingBox getBoundingBox() {
         //TODO Dennis'
         return null;
     }
 
-    public void visit(MapDrawer mapDrawer) {
+    @Override
+    public void visit(MiniMapDrawer mapDrawer) {
         mapDrawer.draw(this);
     }
 }
