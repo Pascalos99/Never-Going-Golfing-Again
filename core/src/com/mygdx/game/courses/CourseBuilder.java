@@ -4,6 +4,7 @@ import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.parser.SandFunction2d;
+import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
 import java.util.ArrayList;
@@ -120,6 +121,12 @@ public class CourseBuilder {
             for (Obstacle o : obstacles) o.setAnchorPoint(o.getAnchorPoint().add(shift));
             shift = Vector2d.ZERO;
         }
+    }
+
+    public PuttingCourse getModified() throws MissingFormatArgumentException {
+        addShift(Variables.WORLD_SHIFT);
+        applyHeightScaling(1 / Variables.WORLD_SCALING);
+        return get();
     }
 
     public PuttingCourse get() throws MissingFormatArgumentException {
