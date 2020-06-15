@@ -2,11 +2,13 @@ package com.mygdx.game.obstacles;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.mygdx.game.Ball;
-import com.mygdx.game.courses.MapDrawer;
+import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.physics.PhysicsEngine;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
+
+import java.awt.*;
 
 public class Wall extends Obstacle {
     Vector2d[] points;
@@ -70,7 +72,7 @@ public class Wall extends Obstacle {
         return null;
     }
 
-    public void visit(MapDrawer mapDrawer) {
-        mapDrawer.draw(this);
+    public void visit(MiniMapDrawer mapDrawer, com.badlogic.gdx.graphics.Pixmap pm) {
+        mapDrawer.draw(this, pm);
     }
 }

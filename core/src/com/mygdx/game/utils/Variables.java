@@ -86,7 +86,7 @@ public final class Variables {
 	//CRAZY PUTTING
 	public static PerspectiveCamera CAMERA;
 	public static GameInfo GAME_ASPECTS;
-	public static final float WORLD_SCALING = (float)(1d/(2d*Math.PI/ 50d));
+	public static final float WORLD_SCALING = (float)(1d/(2d*Math.PI/ 50d)); // ~7,9577471545947668
 	public static final float BALL_RADIUS = 0.05f / WORLD_SCALING;
 	public static PuttingCourse WORLD;
 	public static final float FLAGPOLE_HEIGHT = 7;
