@@ -75,19 +75,17 @@ public abstract class MiniMapDrawer {
         @Override
         public void drawHeight(Function2d h, Pixmap pm) {
             System.out.println(h);
-            double heightBarrier=15;
+            double heightBarrier=5;
             for (int i=0; i < width; i++) {
                 double x = i / scale_X + getAnchor().get_x();
                 for (int j=0; j < height; j++) {
                     double y = j / scale_Y + getAnchor().get_y();
-                    Color color= null;
-                    if (h.evaluate(x, y) <= 0) color = Color.BLUE;
-                    else if (h.evaluate(x, y) <= heightBarrier){
+                    Color color;
+                    if (h.evaluate(x, y) <= 0)
+                        color = new Color(20/255f, 20/255f, (float)((200d + h.evaluate(x, y) * 25d)/255d),1f);
+                    else
                         color = new Color(20/255f, (float)((200-150* (h.evaluate(x, y)/heightBarrier))/255d), 20/255f,1f);
-                    } else {
-                        color = new Color(25/255f,40/255f,25/255f,1f);
 
-                    }
                     pm.setColor(color);
                     pm.drawPixel(i, j);
                 }
@@ -100,8 +98,10 @@ public abstract class MiniMapDrawer {
                 double x = i / scale_X + getAnchor().get_x();
                 for (int j=0; j < height; j++) {
                     double y = j / scale_Y + getAnchor().get_x();
-                   // if (s.isSandAt(x, y))
-                   //     pm.drawPixel(i, j, new Color(180,180,0).getRGB());
+                    if (s.isSandAt(x, y)) {
+                        pm.setColor(new Color(180/255f, 180/255f, 0f, 1f));
+                        pm.drawPixel(i, j);
+                    }
                 }
             }
         }
