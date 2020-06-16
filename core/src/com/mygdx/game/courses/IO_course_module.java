@@ -32,9 +32,16 @@ public class IO_course_module {
     private String[] preprocess() throws IOException {
         String result = "";
         while (reader.ready())
-            result += reader.readLine().strip() + "\n";
+            result += strip(reader.readLine()) + "\n";
         result = result.replaceAll("//.*\n?", ";");
         return result.split(" *[;\n] *");
+    }
+
+    private String strip(String str) {
+        int i=0, j = str.length() - 1;
+        while (str.charAt(i) == ' ') i++;
+        while (str.charAt(j) == ' ') j--;
+        return str.substring(i, j+1);
     }
 
     private void readValues(String[] pre) throws NumberFormatException, IllegalArgumentException, IllegalAccessException {
