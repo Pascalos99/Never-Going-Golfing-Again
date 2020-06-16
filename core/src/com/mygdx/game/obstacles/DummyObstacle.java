@@ -20,7 +20,7 @@ import com.mygdx.game.utils.Vector3d;
 public class DummyObstacle extends Obstacle {
     private Vector3d pos;
 
-    private static double size = 1;
+    private static double size = 1d;
 
     private static double TO_GRAPHICS = Variables.WORLD_SCALING/Variables.GRAPHICS_SCALING;
 
@@ -31,7 +31,8 @@ public class DummyObstacle extends Obstacle {
 
     @Override
     public Vector3d getPosition() {
-        return new Vector3d(toWorldScale(pos.get_x()), toWorldScale(pos.get_y()), toWorldScale(pos.get_z()));
+        return new Vector3d(toWorldScale(pos.get_x() + getAnchorPoint().get_x()) + size*TO_GRAPHICS/2d,
+                toWorldScale(pos.get_y()), toWorldScale(pos.get_z() + getAnchorPoint().get_y())  + size*TO_GRAPHICS/2d);
     }
 
     public Vector3d getPhysicsPosition(){
@@ -46,7 +47,7 @@ public class DummyObstacle extends Obstacle {
     public DummyObstacle(double x, double y) {
         try {
             if (model == null) model = createModel();
-            pos = new Vector3d(x, 1, y);
+            pos = new Vector3d(x, 0.4, y);
             Vector3d real_position = getPosition();
             model_instance = new ModelInstance(model, (float)(real_position.get_x()), (float)(real_position.get_y()), (float)(real_position.get_z()));
         } catch (NullPointerException e) {
@@ -73,6 +74,7 @@ public class DummyObstacle extends Obstacle {
 
     @Override
     public ModelInstance getModel() {
+        model_instance.transform.setTranslation((float) getPosition().get_x(), (float) getPosition().get_y(), (float) getPosition().get_z());
         return model_instance;
     }
 

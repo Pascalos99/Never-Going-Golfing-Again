@@ -6,13 +6,14 @@ import com.mygdx.game.utils.Vector2d;
 
 public abstract class Obstacle extends TopDownPhysicsObject {
 
+    Vector2d anchor = Vector2d.ZERO;
+
     public void setAnchorPoint(Vector2d position) {
-        // TODO for Dennis
+        anchor = position;
     }
 
     public Vector2d getAnchorPoint() {
-        // TODO for Dennis
-        return Vector2d.ZERO;
+        return anchor;
     }
 
     public CollisionData isColliding(Ball ball) {
