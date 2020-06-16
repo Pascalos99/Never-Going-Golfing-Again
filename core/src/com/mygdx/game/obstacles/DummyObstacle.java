@@ -23,8 +23,8 @@ public class DummyObstacle extends Obstacle {
     private static double TO_GRAPHICS = Variables.WORLD_SCALING/Variables.GRAPHICS_SCALING;
 
     @Override
-    protected boolean isShapeColliding(Ball ball) {
-        return false;
+    protected CollisionData isShapeColliding(Ball ball) {
+        return null;
     }
 
     @Override
