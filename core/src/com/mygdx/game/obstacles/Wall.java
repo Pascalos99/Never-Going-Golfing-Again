@@ -49,9 +49,14 @@ public class Wall extends Obstacle {
     }
 
     @Override
-    public Vector3d getPosition() {
+    public Vector3d getGraphicsPosition() {
         Vector2d vec = start.add(end).div(new Vector2d(2, 2));
         return new Vector3d(toWorldScale(vec.get_x()), WALL_BASE, toWorldScale(vec.get_y()));
+    }
+
+    @Override
+    public Vector3d getPhysicsPosition(){
+        return null;
     }
 
     @Override

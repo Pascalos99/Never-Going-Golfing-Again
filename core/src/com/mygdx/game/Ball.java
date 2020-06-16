@@ -1,15 +1,12 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.courses.MiniMapDrawer;
-import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.obstacles.AxisAllignedBoundingBox;
 import com.mygdx.game.obstacles.CollisionData;
 import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.parser.Function2d;
-import com.mygdx.game.physics.PhysicsEngine;
 import com.mygdx.game.physics.PuttingCoursePhysics;
 import com.mygdx.game.physics.TopDownPhysicsObject;
 import com.mygdx.game.utils.Vector2d;
@@ -244,7 +241,7 @@ public class Ball extends TopDownPhysicsObject {
     }
 
     @Override
-    public Vector3d getPosition() {
+    public Vector3d getGraphicsPosition() {
         Vector3d vec = new Vector3d(
                 toWorldScale(x),
                 toWorldScale(world.height_function.evaluate(x, y) + BALL_RADIUS),
@@ -256,13 +253,19 @@ public class Ball extends TopDownPhysicsObject {
 
         return vec;
     }
+
+    @Override
+    public Vector3d getPhysicsPosition(){
+        return new Vector3d(x, height, y);
+    }
+
     public Vector2d topDownPosition() {
         return new Vector2d(x, y);
     }
 
     @Override
     public ModelInstance getModel() {
-        Vector3d real_pos = getPosition();
+        Vector3d real_pos = getGraphicsPosition();
         model.transform.setTranslation((float) real_pos.get_x(), (float) real_pos.get_y(), (float) real_pos.get_z());
         return model;
     }

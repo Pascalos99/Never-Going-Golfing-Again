@@ -54,6 +54,8 @@ public class AI_Gaussian extends AI_controller {
                     chosen_velocity = speed_i;
                     chosen_angle = direct_angle + angle_partition[k];
                 }
+
+
             }
         }
         setShotVelocity(chosen_velocity);
