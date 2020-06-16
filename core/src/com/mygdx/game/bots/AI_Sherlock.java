@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AI_Sherlock extends AI_controller {
-    public String getName() { return "Sherlock bot"; }
+    public String getName() { return "Estimated Suite-step Search"; }
 
     public String getDescription() { return "Heuristic bot that uses A* and MCTS based tree search to find the optimal set of shots"; }
 

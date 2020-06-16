@@ -28,7 +28,7 @@ public class AI_Fedora extends AI_controller {
 
     @Override
     public String getName() {
-        return "Fedora Bot";
+        return "Heuristic Sample Search";
     }
 
     @Override
