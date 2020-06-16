@@ -61,8 +61,8 @@ public class PuttingCourse {
 	public Function2d getSandZeroFunction() {
 		if (sandZero == null) {
 			SandFunction2d sand = extractSandFunction(friction_function);
-			if (sand == null) sandZero = friction_function.sub(Function2d.getConstant(DEFAULT_FRICTION));
-			else sandZero = sand.sand.sub(sand.main);
+			if (sand == null) sandZero = friction_function.sub(Function2d.getConstant(DEFAULT_FRICTION)).shift(WORLD_SHIFT);
+			else sandZero = sand.sand.sub(sand.main).shift(WORLD_SHIFT);
 		}
 		return sandZero;
 	}
