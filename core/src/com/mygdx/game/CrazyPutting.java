@@ -75,8 +75,8 @@ public class CrazyPutting  implements ApplicationListener {
         CAMERA.position.set(-5f, 5f, -5f);
         CAMERA.lookAt(0f, 0f, 0f);
 
-        CAMERA.near = 0.1f;
-        CAMERA.far = 300.0f;
+        CAMERA.near = 2.5f;
+        CAMERA.far = 200.0f;
     }
 
     @Override
@@ -135,7 +135,6 @@ public class CrazyPutting  implements ApplicationListener {
             gameScreen.endGame=true;
         }
 
-        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -182,12 +181,12 @@ public class CrazyPutting  implements ApplicationListener {
 
         if (currentPlayer.requestedZoomIn()) {
 
-            if (VIEW_ZOOM > 1f) {
+            if (VIEW_ZOOM > 5f) {
                 VIEW_ZOOM -= cameraZoomSpeed;
             }
 
             else {
-                VIEW_ZOOM = 1f;
+                VIEW_ZOOM = 5f;
             }
 
         }
@@ -227,7 +226,7 @@ public class CrazyPutting  implements ApplicationListener {
             }
         }
 
-        for (int i = 0; i < 25; i++)
+        for (int i = 0; i < TerrainBuilder.bigDepth * TerrainBuilder.bigWidth; i++)
             modelBatch.render(terrainInstance[i], environment);
 
         modelBatch.render(flagInstances[0], environment);
