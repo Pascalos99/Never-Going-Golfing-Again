@@ -290,21 +290,26 @@ public class TerrainBuilder {
                         nor4 = new Vector3(0, (float) (func.gradient(vec4).get_y()), 1).crs(new Vector3(1, (float) (func.gradient(vec4).get_x()), 0));
                         nor4.nor();
 
+                        //TODO:tidy up
                         float difference = (float) (WORLD.getSandZeroFunction().evaluate(posx1, posy1));
-                        if (difference > 1) difference = 1.0f;
-                        else if (difference < 0) difference = 0.0f;
+                        if (difference > 0.5f) difference = 0.5f;
+                        else if (difference < -0.5f) difference = -0.5f;
+                        difference+=0.5f;
                         v1 = new MeshPartBuilder.VertexInfo().setPos(pos1).setNor(nor1).setCol(null).setUV(difference, 1.0f);
                         difference = (float) (WORLD.getSandZeroFunction().evaluate(posx2, posy2));
-                        if (difference > 1) difference = 1.0f;
-                        else if (difference < 0) difference = 0.0f;
+                        if (difference > 0.5f) difference = 0.5f;
+                        else if (difference < -0.5f) difference = -0.5f;
+                        difference+=0.5f;
                         v2 = new MeshPartBuilder.VertexInfo().setPos(pos2).setNor(nor2).setCol(null).setUV(difference, 1.0f);
                         difference = (float) (WORLD.getSandZeroFunction().evaluate(posx3, posy3));
-                        if (difference > 1) difference = 1.0f;
-                        else if (difference < 0) difference = 0.0f;
+                        if (difference > 0.5f) difference = 0.5f;
+                        else if (difference < -0.5f) difference = -0.5f;
+                        difference+=0.5f;
                         v3 = new MeshPartBuilder.VertexInfo().setPos(pos3).setNor(nor3).setCol(null).setUV(difference, 1.0f);
                         difference = (float) (WORLD.getSandZeroFunction().evaluate(posx4, posy4));
-                        if (difference > 1) difference = 1.0f;
-                        else if (difference < 0) difference = 0.0f;
+                        if (difference > 0.5f) difference = 0.5f;
+                        else if (difference < -0.5f) difference = -0.5f;
+                        difference+=0.5f;
                         v4 = new MeshPartBuilder.VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(difference, 1.0f);
 
                         builder.rect(v1, v2, v3, v4);

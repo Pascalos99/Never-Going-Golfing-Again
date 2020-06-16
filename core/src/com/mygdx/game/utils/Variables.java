@@ -29,7 +29,7 @@ public final class Variables {
 	public static final double	DEFAULT_HOLE_TOLERANCE = 0.3;
 	public static final double 	DEFAULT_MAXIMUM_VELOCITY = 6;
 	public static final double	DEFAULT_GRAVITY = 9.812;
-	public static final double 	DEFAULT_SAND_FRICTION = 0.178;
+	public static final double 	DEFAULT_SAND_FRICTION = 0.578;
 	public static final double	DEFAULT_MASS = 50;
 
 	public static final String	FLAG_TEXTURE = ".\\textures\\Flag.png";
