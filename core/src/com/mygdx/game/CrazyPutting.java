@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.courses.PuttingCourse;
+import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.physics.PuttingCoursePhysics;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.utils.Vector2d;
@@ -235,6 +236,10 @@ public class CrazyPutting  implements ApplicationListener {
 
         modelBatch.render(waterInstance, environment);
         modelBatch.render(wallInstance, environment);
+
+        for (Obstacle obstacle : course.getObstacles()) {
+            if (obstacle.getModel() != null) modelBatch.render(obstacle.getModel());
+        }
 
         if(CAST_SHADOWS) {
             shadowBatch.render(flagInstances[0], environment);

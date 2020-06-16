@@ -7,13 +7,14 @@ import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.physics.PhysicsEngine;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
+import static com.mygdx.game.utils.Variables.*;
 
 import java.awt.*;
 
 public class Wall extends Obstacle {
-    Vector2d[] points;
-    Vector2d start, end;
-    double thickness, angle;
+    final Vector2d[] points;
+    final Vector2d start, end;
+    final double thickness, angle;
 
     Wall(Vector2d a, Vector2d b, double thickness){
         Vector2d center = a.add(b).div(new Vector2d(2, 2));
@@ -43,22 +44,24 @@ public class Wall extends Obstacle {
     }
 
     @Override
-    protected boolean isShapeColliding(Ball ball) {
-        return false;
+    protected CollisionData isShapeColliding(Ball ball) {
+        return null;
     }
 
     @Override
     public Vector3d getPosition() {
-        throw new AssertionError("Wall has no unique position.");
+        Vector2d vec = start.add(end).div(new Vector2d(2, 2));
+        return new Vector3d(toWorldScale(vec.get_x()), WALL_BASE, toWorldScale(vec.get_y()));
     }
 
     @Override
     public double getOrientation() {
-        throw new AssertionError("Wall has no unique orientation.");
+        return end.sub(start).angle();
     }
 
     @Override
     public ModelInstance getModel() {
+        //TODO Samuele's
         return null;
     }
 
@@ -69,10 +72,12 @@ public class Wall extends Obstacle {
 
     @Override
     public AxisAllignedBoundingBox getBoundingBox() {
+        //TODO Dennis'
         return null;
     }
 
-    public void visit(MiniMapDrawer mapDrawer, com.badlogic.gdx.graphics.Pixmap pm) {
-        mapDrawer.draw(this, pm);
+    @Override
+    public void visit(MiniMapDrawer mapDrawer) {
+        mapDrawer.draw(this);
     }
 }

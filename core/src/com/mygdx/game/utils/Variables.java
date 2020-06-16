@@ -150,4 +150,6 @@ public final class Variables {
 	public static boolean CAST_SHADOWS = false;
 
 	public static final double DELTA = 0.01d;
+
+	public static final double WALL_BASE = -10d;
 }

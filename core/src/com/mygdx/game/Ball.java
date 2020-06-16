@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.obstacles.AxisAllignedBoundingBox;
+import com.mygdx.game.obstacles.CollisionData;
+import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.physics.PhysicsEngine;
 import com.mygdx.game.physics.PuttingCoursePhysics;
@@ -13,11 +15,12 @@ import com.mygdx.game.physics.TopDownPhysicsObject;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.mygdx.game.utils.Variables.*;
 
-public class Ball implements TopDownPhysicsObject {
+public class Ball extends TopDownPhysicsObject {
     public Vector2d velocity;
     public double x, y, old_x, old_y, init_x, init_y;
     public double mass = 0.05;
@@ -29,18 +32,17 @@ public class Ball implements TopDownPhysicsObject {
 
     private double height_velocity;
     private int flight_state;
-    private double height;
+    public double height;
 
     private static int LAUNCH = 0;
     private static int ROLL = 2;
-
-    private PuttingCourse world;
-    private PuttingCoursePhysics engine;
 
     public double travel_distance;
     public double rolling_distance;
     public int ticks;
     public Vector3 frozen_direction;
+
+    private AxisAllignedBoundingBox aabb;
 
     Ball(double x_pos, double y_pos, ModelInstance model, Player owner) {
         this.mass = GAME_ASPECTS.getMassofBall() * 0.001;
@@ -91,7 +93,7 @@ public class Ball implements TopDownPhysicsObject {
                 x += velocity.get_x();
                 y += velocity.get_y();
                 boolean fence_check = ballVsFenceCollision();
-                height = h.evaluate(x, y);
+                height = h.evaluate(x, y) + BALL_RADIUS;
 
                 double x_diff = x - initial_x;
                 double y_diff = y - initial_y;
@@ -143,7 +145,7 @@ public class Ball implements TopDownPhysicsObject {
                 height_velocity = height_velocity + delta * (-mass * flightGravity());
                 height += height_velocity;
 
-                if(height <= h.evaluate(x, y)){
+                if(height - BALL_RADIUS <= h.evaluate(x, y)){
                     height = h.evaluate(x, y);
                     flight_state = ROLL;
                     height_velocity = 0;
@@ -169,6 +171,12 @@ public class Ball implements TopDownPhysicsObject {
                         is_moving = false;
                         velocity = new Vector2d(0, 0);
                         break;
+                    }
+
+                    List<CollisionData> collisions = isColliding();
+
+                    if(!collisions.isEmpty()){
+                        System.out.println("Hey! I found a collision here.");
                     }
 
             }
@@ -235,14 +243,6 @@ public class Ball implements TopDownPhysicsObject {
         velocity = velocity.add(v);
     }
 
-    public float toWorldScale(double n){
-        return (float)(n * WORLD_SCALING);
-    }
-
-    public double fromWorldScale(float n){
-        return  n / WORLD_SCALING;
-    }
-
     @Override
     public Vector3d getPosition() {
         Vector3d vec = new Vector3d(
@@ -285,6 +285,34 @@ public class Ball implements TopDownPhysicsObject {
     @Override
     public double getOrientation() {
         return 0;
+    }
+
+    public List<CollisionData> isColliding(){
+        List<CollisionData> collisions = new ArrayList<CollisionData>();
+
+        for(TopDownPhysicsObject body : engine.getBodies()){
+
+            if(body instanceof Obstacle){
+                Obstacle obstacle = (Obstacle) body;
+
+                CollisionData data = obstacle.isColliding(this);
+
+                if(data.contact){
+                    this.x += data.clipping_correction.get_x();
+                    this.y += data.clipping_correction.get_z();
+                    this.height = data.clipping_correction.get_y();
+
+                    this.velocity.add(new Vector2d(data.bounce.get_x(), data.bounce.get_z()));
+                    this.height_velocity += data.bounce.get_y();
+
+                    collisions.add(data);
+                }
+
+            }
+
+        }
+
+        return collisions;
     }
 
     public boolean isTouchingFlag() {
@@ -332,7 +360,7 @@ public class Ball implements TopDownPhysicsObject {
     private Vector2d f(Vector2d pos, Vector2d vel){
         Function2d h = world.height_function;
         double gravity = world.gravity;
-        double friction = world.get_friction_coefficient();
+        double friction = world.friction_function.evaluate(x, y);
 
         if(isOnWater()){
             friction = 1d;
@@ -346,8 +374,6 @@ public class Ball implements TopDownPhysicsObject {
             half_x -= mass * gravity * friction * vel.get_x() / vel.get_length();
             half_y -= mass * gravity * friction * vel.get_y() / vel.get_length();
         }
-
-
 
         Vector2d acceleration = new Vector2d(half_x, half_y);
         return acceleration;
@@ -442,19 +468,22 @@ public class Ball implements TopDownPhysicsObject {
         return xy;
     }
 
-    @Override
-    public void setWorld(PuttingCourse world, PhysicsEngine engine){
-        this.world = world;
-        this.engine = (PuttingCoursePhysics) engine;
-    }
-
     public AxisAllignedBoundingBox getBoundingBox() {
-        // TODO implementation
-        return null;
+
+        if(aabb == null)
+            aabb = new AxisAllignedBoundingBox(
+                    new Vector3d(x - BALL_RADIUS, height - BALL_RADIUS, y - BALL_RADIUS),
+                    BALL_RADIUS*2,
+                    BALL_RADIUS*2,
+                    BALL_RADIUS*2
+                    );
+
+        return aabb;
     }
 
-    public void visit(MiniMapDrawer mapDrawer, com.badlogic.gdx.graphics.Pixmap pm) {
-        mapDrawer.draw(this, pm);
+    @Override
+    public void visit(MiniMapDrawer mapDrawer) {
+        mapDrawer.draw(this);
     }
 
 }

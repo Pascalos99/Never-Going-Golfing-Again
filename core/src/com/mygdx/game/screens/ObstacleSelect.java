@@ -45,7 +45,9 @@ public class ObstacleSelect implements Screen {
         overall.setDebug(true);
 
         CourseBuilder cb = SettingsScreen.cb;
-        m = MiniMapDrawer.defaultDrawer(20,20,30,new Vector2d(0,0));
+        cb.addDummy(1, 2);
+
+        m = MiniMapDrawer.defaultDrawer(20, 20,30, Vector2d.ZERO.sub(WORLD_SHIFT));
         m.draw(cb);
         txt= m.getTexture();
 

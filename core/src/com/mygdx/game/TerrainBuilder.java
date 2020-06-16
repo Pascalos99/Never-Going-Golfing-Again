@@ -19,9 +19,11 @@ import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.parser.FunctionParser;
+import com.mygdx.game.parser.SandFunction2d;
 import com.mygdx.game.utils.Vector2d;
 
 import java.util.ArrayList;
+import java.util.function.Function;
 
 import static com.mygdx.game.utils.Variables.*;
 
@@ -184,6 +186,12 @@ public class TerrainBuilder {
         ModelBuilder modelBuilder = new ModelBuilder();
         MeshPartBuilder builder;
         Function2d func = new AtomFunction2d("sin(x)+cos(y)");
+
+        Function<Vector2d, Boolean> sand = v -> WORLD.isSandAt(v.get_x(), v.get_y());
+        // TODO maybe you can use this,
+        //  usage:
+        //  if (sand.apply(new Vector2d(x, y))) then it is sand at the physics position (x,y) in [0, 20] x [0, 20]
+
         double y_scalar = WORLD_SCALING;
 
         try {

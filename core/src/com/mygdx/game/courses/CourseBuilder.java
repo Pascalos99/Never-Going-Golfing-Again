@@ -1,5 +1,6 @@
 package com.mygdx.game.courses;
 
+import com.mygdx.game.obstacles.DummyObstacle;
 import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.parser.Function2d;
@@ -81,6 +82,10 @@ public class CourseBuilder {
         this.shift = this.shift.add(shift);
     }
 
+    public void addDummy(double x, double y) {
+        addObstacle(new DummyObstacle(x, y));
+    }
+
     public void addObstacle(Obstacle obstacle) {
         obstacles.add(obstacle);
     }
@@ -141,6 +146,7 @@ public class CourseBuilder {
     }
 
     // TODO add functionality of adding obstacles to the course
+    // TODO move random course generation to this class
     // (add functionality of generating start and goal positions based on course)
     // (add functionality of generating path between start and goal)
 
