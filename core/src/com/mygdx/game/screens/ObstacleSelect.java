@@ -25,7 +25,17 @@ public class ObstacleSelect implements Screen {
     private Menu parent;
     Texture txt;
     MiniMapDrawer m;
+    Image map;
+    Label coords;
 
+    private final static int SMALL_TREE =0;
+    private final static int MED_TREE=1;
+    private final static int  LARGE_TREE=2;
+    private final static int WALL_SELECT=3;
+    private final static int WALL_START=4;
+    private final static int WALL_END=5;
+
+    private int selected=-1;
     public ObstacleSelect(Menu menu){
         parent=menu;
         stage = new Stage(new ScreenViewport());
@@ -39,9 +49,10 @@ public class ObstacleSelect implements Screen {
         m.draw(cb);
         txt= m.getTexture();
 
-        Image map = new Image(txt);
+        map = new Image(txt);
         overall.add(map);
 
+        coords= new Label("", MENU_SKIN);
         Table buttons = new Table();
         buttons.align(Align.bottomLeft);
 
@@ -72,21 +83,21 @@ public class ObstacleSelect implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
+                selected=0;
             }
         });
 
         medTree.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
+                selected=1;
             }
         });
 
         largeTree.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
+                selected=2;
             }
         });
 
@@ -94,13 +105,13 @@ public class ObstacleSelect implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
+                selected=3;
             }
         });
 
         overall.add(obstacleT);
 
-        buttons.add(play);
+        buttons.add(play,coords);
         stage.addActor(overall);
         stage.addActor(buttons);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
@@ -116,6 +127,26 @@ public class ObstacleSelect implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+
+            switch (selected){
+                case SMALL_TREE:
+
+                    break;
+                case MED_TREE:
+                    break;
+                case LARGE_TREE:
+                    break;
+                case WALL_SELECT:
+                    break;
+                case WALL_START:
+                    break;
+                case WALL_END:
+                    break;
+            }
+        }
+
+        coords.setText(Gdx.input.getX()+"  "+Gdx.input.getY());
         txt.draw(m.getPixmap(),0,0);
         stage.act(delta);
         stage.draw();
