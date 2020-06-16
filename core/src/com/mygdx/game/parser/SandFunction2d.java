@@ -1,7 +1,10 @@
 package com.mygdx.game.parser;
 
-public class SandFunction2d extends Function2d.ConstantFunction2d {
+import com.mygdx.game.utils.Vector2d;
 
+public class SandFunction2d implements Function2d {
+
+    public final double default_friction;
     public final double sand_friction;
     public final Function2d main;
     public final Function2d sand;
@@ -15,16 +18,21 @@ public class SandFunction2d extends Function2d.ConstantFunction2d {
      * @param sand
      */
     public SandFunction2d(double normal_friction, double sand_friction, Function2d main, Function2d sand) {
-        super(normal_friction);
+        default_friction = normal_friction;
         this.sand_friction = sand_friction;
         this.main = main;
         this.sand = sand;
     }
 
     @Override
+    public Vector2d gradient(double x, double y) {
+        return Vector2d.ZERO;
+    }
+
+    @Override
     public double evaluate(double x, double y) {
         if (isSandAt(x, y)) return sand_friction;
-        else return super.evaluate(x, y);
+        else return default_friction;
     }
 
     public boolean isSandAt(double x, double y) {

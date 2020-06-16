@@ -26,9 +26,6 @@ public class AtomFunction2d implements Function2d {
 		if (func instanceof AtomFunction2d) {
 			SumAtom at = new SumAtom(this.function, ((AtomFunction2d) func).function);
 			return new AtomFunction2d(at);
-		} else if (func instanceof ConstantFunction2d) {
-			SumAtom at = new SumAtom(this.function, new ConstantAtom(((ConstantFunction2d) func).value));
-			return new AtomFunction2d(at);
 		}
 		return raw_add(func);
 	}

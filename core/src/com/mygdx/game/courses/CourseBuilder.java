@@ -53,7 +53,7 @@ public class CourseBuilder {
         else height_function = height_function.add(func);
         if (friction_function instanceof SandFunction2d) {
             SandFunction2d s = (SandFunction2d)friction_function;
-            friction_function = new SandFunction2d(s.value, s.sand_friction, height_function, s.sand);
+            friction_function = new SandFunction2d(s.default_friction, s.sand_friction, height_function, s.sand);
         }
     }
 
