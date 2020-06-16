@@ -38,10 +38,10 @@ public class IO_course_module {
     }
 
     private String strip(String str) {
-        int i=0, j = str.length() - 1;
-        while (str.charAt(i) == ' ') i++;
-        while (str.charAt(j) == ' ') j--;
-        return str.substring(i, j+1);
+        int i=0, j = str.length();
+        while (str.substring(i, i+1).matches("\\s")) i++;
+        while (str.substring(j-1, j).matches("\\s")) j--;
+        return str.substring(i, j);
     }
 
     private void readValues(String[] pre) throws NumberFormatException, IllegalArgumentException, IllegalAccessException {
