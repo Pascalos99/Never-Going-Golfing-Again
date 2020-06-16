@@ -7,3 +7,4 @@ start = (1.0, 2.0);
 goal = (10.0, 12.0);
 height = sin(5x)*cos(5y)/5 +.1;
 sand = sin(x)+cos(y);
+mu_sand =0.6;
