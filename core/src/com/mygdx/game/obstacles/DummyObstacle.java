@@ -90,6 +90,6 @@ public class DummyObstacle extends Obstacle {
 
     @Override
     public void visit(MiniMapDrawer mapDrawer) {
-        mapDrawer.draw(this, size);
+        mapDrawer.draw(this);
     }
 }
