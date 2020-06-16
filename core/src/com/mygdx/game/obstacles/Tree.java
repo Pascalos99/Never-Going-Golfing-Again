@@ -27,6 +27,8 @@ public class Tree extends Obstacle {
 
     @Override
     protected CollisionData isShapeColliding(Ball ball) {
+        Vector3d physics_pos = getPhysicsPosition();
+        Vector2d position = new Vector2d(physics_pos.get_x(), physics_pos.get_z());
         CollisionData data = new CollisionData();
 
         if(ball.height - BALL_RADIUS <= height) {
@@ -55,9 +57,15 @@ public class Tree extends Obstacle {
     }
 
     @Override
-    public Vector3d getPosition() {
-        Vector3d vec = new Vector3d(position.get_x(), WORLD.height_function.evaluate(position), position.get_y());
+    public Vector3d getGraphicsPosition() {
+        Vector3d vec = getPhysicsPosition();
         return  new Vector3d(toWorldScale(vec.get_x()), toWorldScale(vec.get_y()), toWorldScale(vec.get_z()));
+    }
+
+    @Override
+    public Vector3d getPhysicsPosition(){
+        Vector2d real_position = position.add(anchor);
+        return new Vector3d(real_position.get_x(), WORLD.height_function.evaluate(real_position), real_position.get_y());
     }
 
     @Override
@@ -74,16 +82,17 @@ public class Tree extends Obstacle {
 //        builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.GREEN)));
 //        builder.sphere((float)this.radius*2f, (float)this.height, (float)this.radius*2f, 20,20);
         Model tree = modelBuilder.end();
-        ModelInstance treeInstance = new ModelInstance(tree, (float)this.getPosition().get_x(), (float)this.getPosition().get_y(), (float)this.getPosition().get_z());
+        ModelInstance treeInstance = new ModelInstance(tree, (float)this.getGraphicsPosition().get_x(), (float)this.getGraphicsPosition().get_y(), (float)this.getGraphicsPosition().get_z());
         return treeInstance;
     }
 
     @Override
     public AxisAllignedBoundingBox getBoundingBox() {
+        Vector3d physics_pos = getPhysicsPosition();
 
         if(aabb == null)
             aabb = new AxisAllignedBoundingBox(
-                    new Vector3d(position.get_x() - radius, height, position.get_y() - radius),
+                    new Vector3d(physics_pos.get_x() - radius, height, physics_pos.get_z() - radius),
                     radius*2, radius*2, height + 10
             );
 

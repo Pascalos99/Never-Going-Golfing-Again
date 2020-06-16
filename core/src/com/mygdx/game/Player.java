@@ -73,7 +73,7 @@ public abstract class Player {
         _y *= VIEW_ZOOM;
         _z *= VIEW_ZOOM;
 
-        Vector3d add = ball.getPosition();
+        Vector3d add = ball.getGraphicsPosition();
         Vector3 pre = new Vector3((float)_x, (float)_y, (float)_z);
 
         return pre.add(new Vector3((float) add.get_x(), (float) add.get_y(), (float) add.get_z()));

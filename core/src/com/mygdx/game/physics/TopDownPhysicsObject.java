@@ -12,7 +12,8 @@ public abstract class TopDownPhysicsObject implements Drawable {
     protected PuttingCourse world;
     protected PhysicsEngine engine;
 
-    public abstract Vector3d getPosition();
+    public abstract Vector3d getGraphicsPosition();
+    public abstract Vector3d getPhysicsPosition();
     public abstract double getOrientation();
     public  abstract ModelInstance getModel();
     public PuttingCourse getWorld(){

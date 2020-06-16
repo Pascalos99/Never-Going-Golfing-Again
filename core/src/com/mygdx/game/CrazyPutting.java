@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.courses.GameInfo;
-import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.physics.PuttingCoursePhysics;
@@ -145,7 +144,7 @@ public class CrazyPutting  implements ApplicationListener {
 
         previous_time = world_physics.frameStep(previous_time);
 
-        Vector3d real_pos = currentPlayer.getBall().getPosition();
+        Vector3d real_pos = currentPlayer.getBall().getGraphicsPosition();
         float ballX = (float) real_pos.get_x();
         float ballY = (float) real_pos.get_y();
         float ballZ = (float) real_pos.get_z();
