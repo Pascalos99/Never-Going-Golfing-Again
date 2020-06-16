@@ -43,19 +43,13 @@ public class ObstacleSelect implements Screen {
         Gdx.input.setInputProcessor(stage);
         Table overall = new Table();
         overall.setFillParent(true);
-        overall.setDebug(true);
-        Tree t1 = new Tree(new Vector2d(3.0,4.0),10.0,1.0);
-        Tree t2 = new Tree(new Vector2d(5.0,6.0),10.0,1.0);
-        Tree t3 = new Tree(new Vector2d(1.0,2.0),10.0,1.0);
-        Tree t4 = new Tree(new Vector2d(2.0,3.0),10.0,1.0);
-
+        //overall.setDebug(true);
 
         CourseBuilder cb = SettingsScreen.cb;
-        cb.addObstacle(t1);
-        cb.addObstacle(t2);
-        cb.addObstacle(t3);
-        cb.addObstacle(t4);
-//        cb.addDummy(1, 2);
+        cb.addTree(new Vector2d(3.0,4.0),10.0,1.0);
+        cb.addTree(new Vector2d(5.0,6.0),10.0,1.0);
+        cb.addTree(new Vector2d(1.0,2.0),10.0,1.0);
+        cb.addTree(new Vector2d(2.0,3.0),10.0,1.0);
 
         m = MiniMapDrawer.defaultDrawer(20, 20,30, Vector2d.ZERO.sub(WORLD_SHIFT));
         m.draw(cb);
