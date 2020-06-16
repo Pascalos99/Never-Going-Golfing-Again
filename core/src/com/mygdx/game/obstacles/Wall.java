@@ -16,7 +16,7 @@ public class Wall extends Obstacle {
     final Vector2d start, end;
     final double thickness, angle;
 
-    Wall(Vector2d a, Vector2d b, double thickness){
+    public Wall(Vector2d a, Vector2d b, double thickness){
         Vector2d center = a.add(b).div(new Vector2d(2, 2));
         double length = a.distance(b);
 
@@ -78,6 +78,6 @@ public class Wall extends Obstacle {
 
     @Override
     public void visit(MiniMapDrawer mapDrawer) {
-        mapDrawer.draw(this);
+        mapDrawer.draw(start, end, thickness);
     }
 }

@@ -6,14 +6,13 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.mygdx.game.Ball;
-import com.mygdx.game.obstacles.DummyObstacle;
+import com.mygdx.game.obstacles.Tree;
 import com.mygdx.game.obstacles.Wall;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.parser.SandFunction2d;
 import com.mygdx.game.physics.TopDownPhysicsObject;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
-import com.mygdx.game.utils.Vector3d;
 
 public abstract class MiniMapDrawer {
 
@@ -87,11 +86,11 @@ public abstract class MiniMapDrawer {
 
     public abstract void draw(TopDownPhysicsObject unspecified_object);
 
-    public abstract void draw(Wall wall);
+    public abstract void draw(Vector2d from, Vector2d to, double thickness);
 
     public abstract void draw(Ball ball);
 
-    public abstract void draw(DummyObstacle dummy, double size);
+    public abstract void draw(Tree tree);
 
     public abstract void drawStartingPos(Vector2d start);
 
@@ -150,8 +149,13 @@ public abstract class MiniMapDrawer {
         }
 
         @Override
-        public void draw(Wall wall) {
+        public void draw(Vector2d from, Vector2d to, double thickness) {
 
+        }
+
+        @Override
+        public void draw(Tree tree) {
+            
         }
 
         @Override
@@ -167,18 +171,6 @@ public abstract class MiniMapDrawer {
                     pm.setColor(c);
                     pm.fillCircle(ball_x, ball_y, (size_x > size_y)?size_x:size_y);
                 }
-        }
-
-        @Override
-        public void draw(DummyObstacle dummy, double size) {
-            Vector3d p = dummy.getPhysicsPosition();
-            Color c = new Color(1f, 0.3f, 0.3f, 1f);
-            pm.setColor(c);
-            pm.fillRectangle(
-                    (int)Math.round((p.get_x() - getAnchor().get_x())*scale_X),
-                    (int)Math.round((p.get_z() - getAnchor().get_y())*scale_Y),
-                    (int)Math.round(size * scale_X),
-                    (int)Math.round(size * scale_X));
         }
 
         @Override

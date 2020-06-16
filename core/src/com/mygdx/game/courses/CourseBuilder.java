@@ -1,7 +1,8 @@
 package com.mygdx.game.courses;
 
-import com.mygdx.game.obstacles.DummyObstacle;
 import com.mygdx.game.obstacles.Obstacle;
+import com.mygdx.game.obstacles.Tree;
+import com.mygdx.game.obstacles.Wall;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.parser.SandFunction2d;
@@ -82,10 +83,6 @@ public class CourseBuilder {
         this.shift = this.shift.add(shift);
     }
 
-    public void addDummy(double x, double y) {
-        addObstacle(new DummyObstacle(x, y));
-    }
-
     public void addObstacle(Obstacle obstacle) {
         obstacles.add(obstacle);
     }
@@ -94,6 +91,13 @@ public class CourseBuilder {
     }
     public void clearObstacles() {
         obstacles.clear();
+    }
+
+    public void addTree(Vector2d position, double height, double radius) {
+        addObstacle(new Tree(position, height, radius));
+    }
+    public void addWall(Vector2d from, Vector2d to, double thickness) {
+        addObstacle(new Wall(from, to, thickness));
     }
 
     public void setHoleTolerance(double value) {
