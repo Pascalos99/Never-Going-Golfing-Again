@@ -12,9 +12,12 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.courses.CourseBuilder;
+import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.parser.Function2d;
@@ -196,6 +199,7 @@ public class TerrainBuilder {
         ModelInstance[] terrainInstance = new ModelInstance[bigWidth * bigDepth];
         ModelBuilder modelBuilder = new ModelBuilder();
         MeshPartBuilder builder;
+
         Function2d func = new AtomFunction2d("sin(x)+cos(y)");
 
         Function<Vector2d, Boolean> sand = v -> WORLD.isSandAt(v.get_x(), v.get_y());
@@ -204,7 +208,7 @@ public class TerrainBuilder {
         //  if (sand.apply(new Vector2d(x, y))) then it is sand at the physics position (x,y) in [0, 20] x [0, 20]
 
         Color grass_color = new Color(0.2f, 1f, 0.2f, 1f);
-        Color sand_color = new Color(0.7f, 0.7f, 0f, 1f);
+        Color sand_color = new Color(0.9f, 1f, 0.4f, 1f);
 
         double y_scalar = WORLD_SCALING;
 
@@ -214,25 +218,24 @@ public class TerrainBuilder {
             System.out.println(e);
         }
 
-
+        Texture terrainTexture = new Texture(Gdx.files.internal("tx.png"));
 
         for (int a = 0; a < bigWidth; a++) {
             for (int b = 0; b < bigDepth; b++) {
                 float gw = (float) BOUNDED_WORLD_SIZE / (gridWidth * (float)bigWidth);
                 float gd = (float) BOUNDED_WORLD_SIZE / (gridDepth * (float)bigDepth);
                 modelBuilder.begin();
-                Color color;
-                if (sand_grid && sand.apply(new Vector2d((gridWidth/2d + (a * gridWidth)) * gw, (gridDepth/2d + (b * gridDepth)) * gd)))
-                    color = sand_color;
-                else color = grass_color;
-                builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(color)));
+                builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates, new Material(TextureAttribute.createDiffuse(terrainTexture)));
 
                 //                builder = modelBuilder.part("grid", GL20.GL_LINES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(new Color(0.2f, 1f, 0.2f, 1f))));
                 float x, y = 0;
 
                 for (int i = 0; i < gridWidth; i++) {
-
                     for (int k = 0; k < gridDepth; k++) {
+
+                        /*if (sand_grid && sand.apply(new Vector2d((i + (a * gridWidth)) * gw, (k + (b * gridDepth)) * gd)))
+                            color = sand_color;
+                        else color = grass_color;*/
 
                         pos1 = new Vector3(i * resolution, (float) (func.evaluate((i + (a * gridWidth)) * gw, (k + (b * gridDepth)) * gd) * y_scalar), k * resolution);
                         pos2 = new Vector3(i * resolution, (float) (func.evaluate((i + (a * gridWidth)) * gw, (k + 1 + (b * gridDepth)) * gd) * y_scalar), (k + 1) * resolution);
@@ -278,10 +281,14 @@ public class TerrainBuilder {
                         nor4 = new Vector3(0, (float) (func.gradient(vec4).get_y()), 1).crs(new Vector3(1, (float) (func.gradient(vec4).get_x()), 0));
                         nor4.nor();
 
-                        v1 = new MeshPartBuilder.VertexInfo().setPos(pos1).setNor(nor1).setCol(null).setUV(0.5f, 0.0f);
-                        v2 = new MeshPartBuilder.VertexInfo().setPos(pos2).setNor(nor2).setCol(null).setUV(0.0f, 0.0f);
-                        v3 = new MeshPartBuilder.VertexInfo().setPos(pos3).setNor(nor3).setCol(null).setUV(0.0f, 0.5f);
-                        v4 = new MeshPartBuilder.VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(0.5f, 0.5f);
+                        float diff=(float)(func.evaluate((i + (a * gridWidth)) * gw, (k + (b * gridDepth)) * gd)-WORLD.friction_function.evaluate((i + (a * gridWidth)) * gw, (k + (b * gridDepth)) * gd));
+                        System.out.println(WORLD.friction_function);
+                        if(sand.apply(new Vector2d((i + (a * gridWidth)) * gw, (k + (b * gridDepth)) * gd))) diff=1.0f;
+                        else diff=0.0f;
+                        v1 = new MeshPartBuilder.VertexInfo().setPos(pos1).setNor(nor1).setCol(null).setUV(diff, 1.0f);
+                        v2 = new MeshPartBuilder.VertexInfo().setPos(pos2).setNor(nor2).setCol(null).setUV(diff, 1.0f);
+                        v3 = new MeshPartBuilder.VertexInfo().setPos(pos3).setNor(nor3).setCol(null).setUV(diff, 1.0f);
+                        v4 = new MeshPartBuilder.VertexInfo().setPos(pos4).setNor(nor4).setCol(null).setUV(diff, 1.0f);
 
                         builder.rect(v1, v2, v3, v4);
 //                        builder.line(pos1,pos1.cpy().add(nor1.cpy().scl(0.4f)));
