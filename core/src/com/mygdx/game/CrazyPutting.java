@@ -237,15 +237,15 @@ public class CrazyPutting  implements ApplicationListener {
         modelBatch.render(waterInstance, environment);
         modelBatch.render(wallInstance, environment);
 
+        for (Obstacle obstacle : course.getObstacles()) {
+            if (obstacle.getModel() != null) modelBatch.render(obstacle.getModel());
+        }
+
         if(CAST_SHADOWS) {
             shadowBatch.render(flagInstances[0], environment);
             shadowBatch.render(flagInstances[1], environment);
             shadowBatch.end();
             shadowLight.end();
-        }
-
-        for (Obstacle obstacle : course.getObstacles()) {
-            if (obstacle.getModel() != null) modelBatch.render(obstacle.getModel());
         }
 
         modelBatch.end();

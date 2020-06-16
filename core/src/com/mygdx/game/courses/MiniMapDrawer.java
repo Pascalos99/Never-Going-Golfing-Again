@@ -171,7 +171,7 @@ public abstract class MiniMapDrawer {
 
         @Override
         public void draw(DummyObstacle dummy, double size) {
-            Vector3d p = dummy.getPosition();
+            Vector3d p = dummy.getPhysicsPosition();
             Color c = new Color(1f, 0.3f, 0.3f, 1f);
             pm.setColor(c);
             pm.fillRectangle(

@@ -14,9 +14,11 @@ import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.physics.PhysicsEngine;
 import com.mygdx.game.utils.Variables;
+import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
 
 public class DummyObstacle extends Obstacle {
+    private Vector3d pos;
 
     private static double size = 1;
 
@@ -29,6 +31,10 @@ public class DummyObstacle extends Obstacle {
 
     @Override
     public Vector3d getPosition() {
+        return new Vector3d(toWorldScale(pos.get_x()), toWorldScale(pos.get_y()), toWorldScale(pos.get_z()));
+    }
+
+    public Vector3d getPhysicsPosition(){
         return pos;
     }
 
@@ -37,13 +43,12 @@ public class DummyObstacle extends Obstacle {
         return 0;
     }
 
-    private Vector3d pos;
-
     public DummyObstacle(double x, double y) {
         try {
             if (model == null) model = createModel();
             pos = new Vector3d(x, 1, y);
-            model_instance = new ModelInstance(model, (float)(pos.get_x()*Variables.WORLD_SCALING), (float)(pos.get_y()*Variables.WORLD_SCALING), (float)(pos.get_z()*Variables.WORLD_SCALING));
+            Vector3d real_position = getPosition();
+            model_instance = new ModelInstance(model, (float)(real_position.get_x()), (float)(real_position.get_y()), (float)(real_position.get_z()));
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
