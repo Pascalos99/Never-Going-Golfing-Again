@@ -1,9 +1,8 @@
 package com.mygdx.game.courses;
 
 import com.mygdx.game.obstacles.Obstacle;
-import com.mygdx.game.parser.SandFunction2d;
+import com.mygdx.game.parser.*;
 import com.mygdx.game.utils.Vector2d;
-import com.mygdx.game.parser.Function2d;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,9 +54,33 @@ public class PuttingCourse {
 	}
 	
 	public double get_friction_coefficient() {
-		if (friction_function instanceof Function2d.ConstantFunction2d)
-			return ((Function2d.ConstantFunction2d)friction_function).value;
 		return friction_function.evaluate(0, 0);
+	}
+
+	private Function2d sandZero = null;
+	public Function2d getSandZeroFunction() {
+		if (sandZero == null) {
+			SandFunction2d sand = extractSandFunction(friction_function);
+			if (sand == null) sandZero = friction_function.sub(Function2d.getConstant(DEFAULT_FRICTION));
+			else sandZero = sand.sand.sub(sand.main);
+		}
+		return sandZero;
+	}
+
+	private static SandFunction2d extractSandFunction(Function2d func) {
+		if (func instanceof SandFunction2d) return (SandFunction2d)func;
+		else if (func instanceof AtomFunction2d) return null;
+		else if (func instanceof ArrayFunction2d) return null;
+		else if (func instanceof FunctionalFunction2d) return null;
+		else if (func instanceof Function2d.ModifiedFunction)
+			return extractSandFunction(((Function2d.ModifiedFunction) func).original());
+		else if (func instanceof Function2d.AdditionFunction2d) {
+			SandFunction2d a = extractSandFunction(((Function2d.AdditionFunction2d) func).a);
+			if (a != null) return a;
+			SandFunction2d b = extractSandFunction(((Function2d.AdditionFunction2d) func).b);
+			if (b != null) return b;
+		}
+		return null;
 	}
 
 	/** @return an unmodifiable list of all obstacles in this course. */

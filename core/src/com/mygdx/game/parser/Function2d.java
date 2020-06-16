@@ -16,8 +16,8 @@ public interface Function2d {
 
 	double evaluate(double x, double y);
 	
-	static ConstantFunction2d getConstant(double value) {
-		return new ConstantFunction2d(value);
+	static AtomFunction2d getConstant(double value) {
+		return new AtomFunction2d(""+value);
 	}
 
 	default double directionalDerivative(double x, double y, Vector2d direction) {
@@ -25,23 +25,15 @@ public interface Function2d {
 	}
 
 	default Function2d raw_add(Function2d func) {
-		return new Function2d(){
+		return new AdditionFunction2d(this, func);
+	}
 
-			@Override
-			public Vector2d gradient(double x, double y) {
-				return this.gradient(x, y).add(func.gradient(x, y));
-			}
+	default Function2d raw_subtract(Function2d func) {
+		return new AdditionFunction2d(this, new ScaledFunction2d(func, -1));
+	}
 
-			@Override
-			public double evaluate(double x, double y) {
-				return this.evaluate(x, y) + func.evaluate(x, y);
-			}
-
-			public String toString() {
-				return "Function2d of "+this+" + "+func;
-			}
-
-		};
+	default Function2d sub(Function2d func) {
+		return raw_subtract(func);
 	}
 
 	default Function2d add(Function2d func) {
@@ -56,33 +48,11 @@ public interface Function2d {
 		return new ScaledFunction2d(this, scaling);
 	}
 
-	class ConstantFunction2d implements Function2d {
-
-		public ConstantFunction2d(double constant) {
-			value = constant;
-		}
-		public final double value;
-		public double evaluate(double x, double y) {
-			return value;
-		}
-		public Vector2d gradient(double x, double y) {
-			return new Vector2d(0, 0);
-		}
-
-		@Override
-		public Function2d add(Function2d func) {
-			if (func instanceof ConstantFunction2d)
-				return Function2d.getConstant(value + ((ConstantFunction2d)func).value);
-			else if (func instanceof AtomFunction2d)
-				return func.add(this);
-			return raw_add(func);
-		}
-		public String toString() {
-			return "Constant function with value "+value;
-		}
+	interface ModifiedFunction extends Function2d {
+		public Function2d original();
 	}
 
-	class ShiftedFunction2d implements Function2d {
+	class ShiftedFunction2d implements ModifiedFunction {
 
 		public final Function2d original;
 		public final Vector2d shift;
@@ -103,9 +73,14 @@ public interface Function2d {
 		public String toString() {
 			return "Function2d of "+original+", shifted by "+shift;
 		}
+
+		@Override
+		public Function2d original() {
+			return original;
+		}
 	}
 
-	class ScaledFunction2d implements Function2d {
+	class ScaledFunction2d implements ModifiedFunction {
 		public final Function2d original;
 		public final double factor;
 		public ScaledFunction2d(Function2d original, double factor) {
@@ -124,6 +99,32 @@ public interface Function2d {
 
 		public String toString() {
 			return "Function2d of "+original+", multiplied by "+factor;
+		}
+
+		@Override
+		public Function2d original() {
+			return original;
+		}
+	}
+
+	class AdditionFunction2d implements Function2d {
+		public final Function2d a, b;
+		public AdditionFunction2d(Function2d a, Function2d b) {
+			this.a = a;
+			this.b = b;
+		}
+		@Override
+		public Vector2d gradient(double x, double y) {
+			return a.gradient(x, y).add(b.gradient(x, y));
+		}
+
+		@Override
+		public double evaluate(double x, double y) {
+			return a.evaluate(x, y) + b.evaluate(x, y);
+		}
+
+		public String toString() {
+			return "Function2d of "+a+" + "+b;
 		}
 	}
 }
