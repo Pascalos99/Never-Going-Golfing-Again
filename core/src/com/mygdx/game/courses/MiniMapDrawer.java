@@ -7,12 +7,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.mygdx.game.Ball;
 import com.mygdx.game.obstacles.Tree;
-import com.mygdx.game.obstacles.Wall;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.parser.SandFunction2d;
 import com.mygdx.game.physics.TopDownPhysicsObject;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
+
+import java.awt.*;
 
 public abstract class MiniMapDrawer {
 
@@ -74,6 +75,32 @@ public abstract class MiniMapDrawer {
         if (course.goal != null) drawGoalPos(course.goal);
     }
 
+    protected int toMiniMapX(double physics_x) {
+        return (int)Math.round((physics_x - getAnchor().get_x())*scale_X);
+    }
+    protected int toMiniMapY(double physics_y) {
+        return (int)Math.round((physics_y - getAnchor().get_y())*scale_Y);
+    }
+    protected int toMiniMapW(double physics_w) {
+        return (int)Math.round(physics_w * scale_X);
+    }
+    protected int toMiniMapH(double physics_h) {
+        return (int)Math.round(physics_h * scale_X);
+    }
+
+    protected double toPhysicsX(int minimap_x) {
+        return ((double)minimap_x) / scale_X + getAnchor().get_x();
+    }
+    protected double toPhysicsY(int minimap_y) {
+        return ((double)minimap_y) / scale_Y + getAnchor().get_y();
+    }
+    protected double toPhysicsW(int minimap_w) {
+        return ((double)minimap_w) / scale_X;
+    }
+    protected double toPhysicsH(int minimap_h) {
+        return ((double)minimap_h) / scale_Y;
+    }
+
     public Texture getTexture() {
         return new Texture(pm);
     }
@@ -100,9 +127,7 @@ public abstract class MiniMapDrawer {
         TextureData td = texture.getTextureData();
         td.prepare();
         Pixmap tm = td.consumePixmap();
-        int x_pos = (int)Math.round((x - getAnchor().get_x()) * scale_X);
-        int y_pos = (int)Math.round((y - getAnchor().get_y()) * scale_Y);
-        pm.drawPixmap(tm, x_pos, y_pos);
+        pm.drawPixmap(tm, toMiniMapX(x), toMiniMapY(y));
     }
 
     static class DefaultMiniMap extends MiniMapDrawer {
@@ -114,9 +139,9 @@ public abstract class MiniMapDrawer {
         @Override
         public void drawHeight(Function2d h, double heightBarrier) {
             for (int i=0; i < width; i++) {
-                double x = i / scale_X + getAnchor().get_x();
+                double x = toPhysicsX(i);
                 for (int j=0; j < height; j++) {
-                    double y = j / scale_Y + getAnchor().get_y();
+                    double y = toPhysicsY(j);
                     Color color;
                     if (h.evaluate(x, y) <= 0)
                         color = new Color(20/255f, 20/255f, (float)((200d + h.evaluate(x, y) * 25d)/255d),1f);
@@ -132,9 +157,9 @@ public abstract class MiniMapDrawer {
         @Override
         public void drawSand(SandFunction2d s) {
             for (int i=0; i < width; i++) {
-                double x = i / scale_X + getAnchor().get_x();
+                double x = toPhysicsX(i);
                 for (int j=0; j < height; j++) {
-                    double y = j / scale_Y + getAnchor().get_y();
+                    double y = toPhysicsY(j);
                     if (s.isSandAt(x, y) && s.main.evaluate(x, y) > 0) {
                         pm.setColor(new Color(180/255f, 180/255f, 0f, 1f));
                         pm.drawPixel(i, j);
@@ -151,19 +176,38 @@ public abstract class MiniMapDrawer {
         @Override
         public void draw(Vector2d from, Vector2d to, double thickness) {
 
+            Vector2d short_line = to.sub(from).normalize().rotate(Math.PI/2).scale(thickness);
+
+            Vector2d v1 = from.add(short_line);
+            Vector2d v2 = from.sub(short_line);
+            Vector2d v3 = v2.add(to.sub(from));
+            Vector2d v4 = v1.add(to.sub(from));
+
+            Polygon poly = new Polygon(new int[]{
+                    toMiniMapX(v1.get_x()), toMiniMapX(v2.get_x()),
+                    toMiniMapX(v3.get_x()), toMiniMapX(v4.get_x())},
+                new int[]{
+                    toMiniMapY(v1.get_y()), toMiniMapY(v2.get_y()),
+                    toMiniMapY(v3.get_y()), toMiniMapY(v4.get_y())
+            }, 4);
+
+            pm.setColor(new Color(0.2f, 0.2f, 0.2f, 1f));
+            for (int i=0; i < width; i++)
+                for (int j=0; j < height; j++)
+                    if (poly.contains(i, j)) pm.drawPixel(i, j);
         }
 
         @Override
         public void draw(Tree tree) {
-            
+
         }
 
         @Override
         public void draw(Ball ball) {
-            int ball_x = (int)Math.round((ball.topDownPosition().get_x() - getAnchor().get_x())*scale_X);
-            int ball_y = (int)Math.round((ball.topDownPosition().get_y() - getAnchor().get_y())*scale_Y);
-            int size_x = (int)Math.round(Variables.BALL_RADIUS * Variables.WORLD_SCALING * scale_X);
-            int size_y = (int)Math.round(Variables.BALL_RADIUS * Variables.WORLD_SCALING * scale_Y);
+            int ball_x = toMiniMapX(ball.topDownPosition().get_x());
+            int ball_y = toMiniMapY(ball.topDownPosition().get_y());
+            int size_x = toMiniMapW(Variables.BALL_RADIUS * Variables.WORLD_SCALING);
+            int size_y = toMiniMapH(Variables.BALL_RADIUS * Variables.WORLD_SCALING);
             String ball_color = ball.owner.getBallColor();
             for (int i=0; i < Variables.BALL_COLORS.length; i++)
                 if (Variables.BALL_COLORS[i].name.equals(ball_color)) {
@@ -175,7 +219,6 @@ public abstract class MiniMapDrawer {
 
         @Override
         public void drawStartingPos(Vector2d start) {
-            System.out.println("hey");
             Texture ball_point;
             try {
                 ball_point = new Texture(Gdx.files.internal("misc/Start.png"));
