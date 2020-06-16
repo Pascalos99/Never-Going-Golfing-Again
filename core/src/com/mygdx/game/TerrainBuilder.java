@@ -290,6 +290,7 @@ public class TerrainBuilder {
                         nor4 = new Vector3(0, (float) (func.gradient(vec4).get_y()), 1).crs(new Vector3(1, (float) (func.gradient(vec4).get_x()), 0));
                         nor4.nor();
 
+                        //TODO:tidy up
                         float difference = (float) (WORLD.getSandZeroFunction().evaluate(posx1, posy1));
                         if (difference > 0.5f) difference = 0.5f;
                         else if (difference < -0.5f) difference = -0.5f;
