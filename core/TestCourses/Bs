@@ -6,4 +6,4 @@ tol = 0.5;
 start = (0.01, 0.01);
 goal = (0.0, 10.0);
 height = -0.01x+0.003x^2+0.04y;
-sand = 0;
+sand = sin(x)+cos(y);
