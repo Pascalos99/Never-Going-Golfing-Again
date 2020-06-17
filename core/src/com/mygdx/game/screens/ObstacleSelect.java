@@ -96,6 +96,7 @@ public class ObstacleSelect implements Screen {
         TextButton largeTree= new TextButton("Large Tree", MENU_SKIN);
         TextButton thickWall= new TextButton("Thick Wall", MENU_SKIN);
         TextButton thinWall= new TextButton("Thin Wall", MENU_SKIN);
+        TextButton resetObstacles = new TextButton(" Clear Obstacles", MENU_SKIN);
         Table obstacleT= new Table();
         obstacleT.add(selectionImage).prefSize(100).center();
         obstacleT.row().pad(10, 10, 0, 10);
@@ -105,11 +106,13 @@ public class ObstacleSelect implements Screen {
         obstacleT.add(medTree);
         obstacleT.row().pad(10,10,0,10);
         obstacleT.add(largeTree);
-        obstacleT.row().pad(10,10,0,10);;
-        obstacleT.add(thickWall);;
-        obstacleT.row().pad(10,10,0,10);;
-        obstacleT.add(thinWall);;
-        obstacleT.row().pad(10,10,0,10);;
+        obstacleT.row().pad(10,10,0,10);
+        obstacleT.add(thickWall);
+        obstacleT.row().pad(10,10,0,10);
+        obstacleT.add(thinWall);
+        obstacleT.row().pad(10,10,0,10);
+        obstacleT.add(resetObstacles);
+        obstacleT.row().pad(10,10,0,10);
 
         smallTree.addListener(new ChangeListener() {
 
@@ -152,6 +155,15 @@ public class ObstacleSelect implements Screen {
                 selectionImage.setDrawable(wallThickSelectDraw);
                 selectedThickness=0.4;
                 selected=3;
+            }
+        });
+
+        resetObstacles.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                courseBuilder.clearObstacles();
+                mapUpdate();
             }
         });
 
@@ -206,9 +218,7 @@ public class ObstacleSelect implements Screen {
                 default: update_minimap = false;
             }
             if (update_minimap) {
-                minimapDraw.draw(courseBuilder);
-                minimapTexture = minimapDraw.getTexture();
-                map.setDrawable(new TextureRegionDrawable(minimapTexture));
+               mapUpdate();
             }
         }
 
@@ -218,6 +228,11 @@ public class ObstacleSelect implements Screen {
         stage.draw();
     }
 
+    private void mapUpdate(){
+        minimapDraw.draw(courseBuilder);
+        minimapTexture = minimapDraw.getTexture();
+        map.setDrawable(new TextureRegionDrawable(minimapTexture));
+    }
 
 
     @Override
