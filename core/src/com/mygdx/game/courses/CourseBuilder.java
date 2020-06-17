@@ -113,7 +113,11 @@ public class CourseBuilder {
     }
 
     public void addWall(Vector2d from, Vector2d to, double thickness) {
-        addObstacle(new Wall(from, to, thickness));
+        Obstacle wall = new Wall(from, to,thickness);
+        System.out.println(wall);
+        addObstacle(wall);
+       // addObstacle(new Wall(from, to, thickness));
+
     }
 
     public void setHoleTolerance(double value) {
