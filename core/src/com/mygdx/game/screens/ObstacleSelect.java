@@ -21,6 +21,7 @@ import com.mygdx.game.utils.Vector2d;
 
 
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 
 import static com.mygdx.game.utils.Variables.*;
 
@@ -171,6 +172,23 @@ public class ObstacleSelect implements Screen {
         });
 
         overall.add(obstacleT);
+        overall.row();
+
+
+        TextButton save = new TextButton("Save course to: ", MENU_SKIN);
+        TextField savePath = new TextField("",MENU_SKIN);
+        save.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+                
+
+            }
+        });
+        Table saveSett = new Table();
+        saveSett.add(save,savePath);
+        overall.add(saveSett);
 
         buttons.add(play,coords);
         stage.addActor(overall);
