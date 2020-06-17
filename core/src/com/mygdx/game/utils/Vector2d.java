@@ -63,7 +63,11 @@ public class Vector2d {
 	}
 
 	public Vector2d scale(double scale) {
-		return new Vector2d(scale * x, scale * y);
+		return scaleXY(scale, scale);
+	}
+
+	public Vector2d scaleXY(double scaleX, double scaleY) {
+		return new Vector2d(scaleX * x, scaleY * y);
 	}
 
 	public double distance(Vector2d o) {

@@ -15,7 +15,6 @@ import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.Comparator;
 
 public abstract class MiniMapDrawer {
@@ -86,6 +85,10 @@ public abstract class MiniMapDrawer {
         if (course.goal != null) drawGoalPos(course.goal);
     }
 
+    public Vector2d getRealPos(Vector2d pos_in_image) {
+        return new Vector2d(toPhysicsX(pos_in_image.get_x()), toPhysicsY(pos_in_image.get_y()));
+    }
+
     protected int toMiniMapX(double physics_x) {
         return (int)Math.round((physics_x - getAnchor().get_x())*scale_X);
     }
@@ -99,17 +102,11 @@ public abstract class MiniMapDrawer {
         return (int)Math.round(physics_h * scale_X);
     }
 
-    protected double toPhysicsX(int minimap_x) {
-        return ((double)minimap_x) / scale_X + getAnchor().get_x();
+    protected double toPhysicsX(double minimap_x) {
+        return minimap_x / scale_X + getAnchor().get_x();
     }
-    protected double toPhysicsY(int minimap_y) {
-        return ((double)minimap_y) / scale_Y + getAnchor().get_y();
-    }
-    protected double toPhysicsW(int minimap_w) {
-        return ((double)minimap_w) / scale_X;
-    }
-    protected double toPhysicsH(int minimap_h) {
-        return ((double)minimap_h) / scale_Y;
+    protected double toPhysicsY(double minimap_y) {
+        return minimap_y / scale_Y + getAnchor().get_y();
     }
 
     public Texture getTexture() {
@@ -141,7 +138,7 @@ public abstract class MiniMapDrawer {
         TextureData td = texture.getTextureData();
         td.prepare();
         Pixmap tm = td.consumePixmap();
-        pm.drawPixmap(tm, toMiniMapX(x) - td.getWidth() / 2, toMiniMapY(y));
+        pm.drawPixmap(tm, toMiniMapX(x) - td.getWidth() / 2, toMiniMapY(y)-td.getHeight());
     }
     public void drawImageAtWorldPos(String internal_path, double x, double y) {
         Texture texture;

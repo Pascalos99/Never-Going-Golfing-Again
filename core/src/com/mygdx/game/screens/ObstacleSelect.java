@@ -4,37 +4,50 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.courses.CourseBuilder;
-import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.courses.MiniMapDrawer;
-import com.mygdx.game.courses.PuttingCourse;
-import com.mygdx.game.obstacles.Tree;
 import com.mygdx.game.utils.Vector2d;
 
+
+import java.awt.geom.Rectangle2D;
 
 import static com.mygdx.game.utils.Variables.*;
 
 public class ObstacleSelect implements Screen {
     private Stage stage;
     private Menu parent;
-    Texture txt;
-    MiniMapDrawer m;
+    Texture minimapTexture;
+    MiniMapDrawer minimapDraw;
     Image map;
     Label coords;
 
     private final static int SMALL_TREE =0;
     private final static int MED_TREE=1;
-    private final static int  LARGE_TREE=2;
+    private final static int LARGE_TREE=2;
     private final static int WALL_SELECT=3;
     private final static int WALL_START=4;
     private final static int WALL_END=5;
+
+    private Texture selectBoxTxt = new Texture(Gdx.files.internal("misc/SelectionBox.png"));
+    private Drawable sTreeSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/SmallTreeSelect.png"))));
+    private Drawable mTreeSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/MediumTreeSelect.png"))));
+    private Drawable lTreeSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/LargeTreeSelect.png"))));
+    private Drawable wallSelectDraw  = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/WallSelect.png"))));
+
+    private Image selectionImage;
+
+    private CourseBuilder courseBuilder;
 
     private int selected=-1;
     public ObstacleSelect(Menu menu){
@@ -45,20 +58,22 @@ public class ObstacleSelect implements Screen {
         overall.setFillParent(true);
         //overall.setDebug(true);
 
-        CourseBuilder cb = SettingsScreen.cb;
-        cb.addSmallTree(new Vector2d(3.0,4.0));
-        cb.addMediumTree(new Vector2d(5.0,6.0));
-        cb.addLargeTree(new Vector2d(1.0,2.0));
-        cb.addTree(new Vector2d(2.0,3.0),10.0,1.0);
+        courseBuilder = SettingsScreen.cb;
+        courseBuilder.addSmallTree(new Vector2d(3.0,4.0));
+        courseBuilder.addMediumTree(new Vector2d(5.0,6.0));
+        courseBuilder.addLargeTree(new Vector2d(1.0,2.0));
+        courseBuilder.addTree(new Vector2d(2.0,3.0),10.0,1.0);
 
-        cb.addWall(new Vector2d(1.0, 2.0), new Vector2d(3.0, 3.0), 0.2);
+        courseBuilder.addWall(new Vector2d(1.0, 2.0), new Vector2d(3.0, 3.0), 0.2);
 
-        m = MiniMapDrawer.defaultDrawer(20, 20,30, Vector2d.ZERO.sub(WORLD_SHIFT));
-        m.draw(cb);
-        txt= m.getTexture();
+        minimapDraw = MiniMapDrawer.defaultDrawer(20, 20,30, Vector2d.ZERO.sub(WORLD_SHIFT));
+        minimapDraw.draw(courseBuilder);
+        minimapTexture = minimapDraw.getTexture();
 
-        map = new Image(txt);
+        map = new Image(minimapTexture);
         overall.add(map);
+
+        selectionImage = new Image(selectBoxTxt);
 
         coords= new Label("", MENU_SKIN);
         Table buttons = new Table();
@@ -77,6 +92,8 @@ public class ObstacleSelect implements Screen {
         TextButton largeTree= new TextButton("Large Tree", MENU_SKIN);
         TextButton wall= new TextButton("Wall", MENU_SKIN);
         Table obstacleT= new Table();
+        obstacleT.add(selectionImage).prefSize(100).center();
+        obstacleT.row().pad(10, 10, 0, 10);
         obstacleT.pad(10,10,0,10);
         obstacleT.add(smallTree);
         obstacleT.row().pad(10,10,0,10);
@@ -91,6 +108,7 @@ public class ObstacleSelect implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                selectionImage.setDrawable(sTreeSelectDraw);
                 selected=0;
             }
         });
@@ -98,6 +116,7 @@ public class ObstacleSelect implements Screen {
         medTree.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                selectionImage.setDrawable(mTreeSelectDraw);
                 selected=1;
             }
         });
@@ -105,6 +124,7 @@ public class ObstacleSelect implements Screen {
         largeTree.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                selectionImage.setDrawable(lTreeSelectDraw);
                 selected=2;
             }
         });
@@ -113,6 +133,7 @@ public class ObstacleSelect implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                selectionImage.setDrawable(wallSelectDraw);
                 selected=3;
             }
         });
@@ -137,13 +158,24 @@ public class ObstacleSelect implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
 
+            Vector2d mousePos = new Vector2d(Gdx.input.getX(), Gdx.input.getY());
+            Rectangle2D map_rectangle = new Rectangle2D.Double(map.getX(), map.getY(), map.getWidth(), map.getHeight());
+            boolean is_on_map = map_rectangle.contains(mousePos.get_x(), mousePos.get_y());
+            Vector2d pos_in_actor = mousePos.sub(new Vector2d(map.getX(), map.getY()));
+            Vector2d pos_on_map = pos_in_actor.scaleXY(
+                    map.getWidth() / minimapTexture.getWidth(), map.getHeight() / minimapTexture.getHeight());
+            Vector2d pos_in_world = minimapDraw.getRealPos(pos_on_map);
+
+            boolean update_minimap = is_on_map;
             switch (selected){
                 case SMALL_TREE:
-
+                    if (is_on_map) courseBuilder.addSmallTree(pos_in_world);
                     break;
                 case MED_TREE:
+                    if (is_on_map) courseBuilder.addMediumTree(pos_in_world);
                     break;
                 case LARGE_TREE:
+                    if (is_on_map) courseBuilder.addLargeTree(pos_in_world);
                     break;
                 case WALL_SELECT:
                     break;
@@ -151,11 +183,17 @@ public class ObstacleSelect implements Screen {
                     break;
                 case WALL_END:
                     break;
+                default: update_minimap = false;
+            }
+            if (update_minimap) {
+                minimapDraw.draw(courseBuilder);
+                minimapTexture = minimapDraw.getTexture();
+                map.setDrawable(new TextureRegionDrawable(minimapTexture));
             }
         }
 
         coords.setText(Gdx.input.getX()+"  "+Gdx.input.getY());
-        txt.draw(m.getPixmap(),0,0);
+        minimapTexture.draw(minimapDraw.getPixmap(),0,0);
         stage.act(delta);
         stage.draw();
     }
@@ -186,4 +224,14 @@ public class ObstacleSelect implements Screen {
     public void dispose() {
 
     }
+
+    private Texture sumTextures(Texture a, Texture b) {
+        TextureData tdA = a.getTextureData();
+        TextureData tdB = b.getTextureData();
+        tdA.prepare(); tdB.prepare();
+        Pixmap pm = tdA.consumePixmap();
+        pm.drawPixmap(tdB.consumePixmap(), 0, 0);
+        return new Texture(pm);
+    }
+
 }
