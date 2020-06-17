@@ -6,6 +6,9 @@ import com.mygdx.game.obstacles.Wall;
 import com.mygdx.game.utils.Vector2d;
 
 import java.io.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.mygdx.game.utils.Variables.*;
@@ -13,13 +16,16 @@ import static com.mygdx.game.utils.Variables.*;
 public class IO_course_module {
 
     private BufferedReader reader;
+    private String path;
 
     public IO_course_module(String path) {
+        this.path = path;
+        obstacles = new ArrayList<>();
         try {
             reader = new BufferedReader(new FileReader(path));
-            String[] pre = preprocess();
-            readValues(pre);
-        } catch (IOException | IllegalArgumentException | IllegalAccessException e) {
+            List<String> clumped_pre = clumpCompounds(preprocess());
+            readValues(clumped_pre);
+        } catch (IOException | IllegalArgumentException e) {
             e.printStackTrace();
         }
     }
@@ -36,10 +42,34 @@ public class IO_course_module {
 
     private String[] preprocess() throws IOException {
         String result = "";
-        while (reader.ready())
-            result += strip(reader.readLine()) + "\n";
-        result = result.replaceAll("//.*\n?", ";");
-        return result.split(" *[;\n] *");
+        while (reader.ready()) {
+            result += strip(reader.readLine()) + "\n"; // removing spaces at the begin and end of each line
+        }
+        result = result.replaceAll("//.*\n?", ";"); // removing all comments
+        return result.split(" *[;\n] *"); // splitting per ';' and linebreak
+    }
+
+    private List<String> clumpCompounds(String[] pre) {
+        List<String> result = new ArrayList<>(pre.length);
+        boolean in_compound = false;
+        String compound = "";
+        for (int i=0; i < pre.length; i++) {
+            String part = pre[i];
+            boolean is_closing = part.contains("}");
+            if (part.contains("{") && !is_closing) {
+                if (in_compound) throw new IllegalArgumentException("File ("+path+") format invalid, compound {...} should not contain further compounds");
+                in_compound = true;
+                compound = pre[i];
+            }
+            else if (in_compound && !is_closing)
+                compound += "; "+pre[i];
+            else if (in_compound && is_closing) {
+                compound += "; "+pre[i];
+                in_compound = false;
+                result.add(compound);
+            } else result.add(pre[i]);
+        }
+        return result;
     }
 
     private String strip(String str) {
@@ -49,10 +79,10 @@ public class IO_course_module {
         return str.substring(i, j);
     }
 
-    private void readValues(String[] pre) throws NumberFormatException, IllegalArgumentException, IllegalAccessException {
-        for (int i=0; i < pre.length; i++) {
-            if (pre[i].equals("")) continue;
-            String[] setting = pre[i].split(" *= *");
+    private void readValues(List<String> clumped_pre) throws IllegalArgumentException {
+        for (int i=0; i < clumped_pre.size(); i++) {
+            if (clumped_pre.get(i).equals("")) continue;
+            String[] setting = clumped_pre.get(i).split(" *= *", 2);
             if (setting.length <= 1) continue;
             String name = setting[0]; String value = setting[1];
             if (name.equals("g")) g = Double.parseDouble(value);
@@ -65,7 +95,36 @@ public class IO_course_module {
             if (name.equals("goal")) goal = parseVector2d(value);
             if (name.equals("height")) height = value;
             if (name.equals("sand")) sand = value;
+            if (name.equals("tree")) obstacles.add(parseTree(value.replaceAll("(\\{[;\\s]*)|([;\\s]*})", "")));
+            if (name.equals("wall")) obstacles.add(parseWall(value.replaceAll("(\\{[;\\s]*)|([;\\s]*})", "")));
         }
+    }
+
+    private Obstacle parseTree(String compound) {
+        String[] settings = compound.split("\\s*;\\s*");
+        double h = Tree.HEIGHT_MEDIUM;
+        double r = Tree.HEIGHT_MEDIUM / Tree.H_R_RATIO;
+        Vector2d pos = Vector2d.ZERO;
+        for (int i=0; i < settings.length; i++) {
+            String[] setting = settings[i].split("\\s*=\\s*");
+            if (setting[0].equals("pos")) pos = parseVector2d(setting[1]);
+            if (setting[0].equals("h")) h = Double.parseDouble(setting[1]);
+            if (setting[0].equals("r")) r = Double.parseDouble(setting[1]);
+        }
+        return new Tree(pos, h, r);
+    }
+    private Obstacle parseWall(String compound) {
+        String[] settings = compound.split("\\s*;\\s*");
+        Vector2d from = Vector2d.ZERO;
+        Vector2d to = Vector2d.ZERO;
+        double d = 0;
+        for (int i=0; i < settings.length; i++) {
+            String[] setting = settings[i].split("\\s*=\\s*");
+            if (setting[0].equals("from")) from = parseVector2d(setting[1]);
+            if (setting[0].equals("to")) to = parseVector2d(setting[1]);
+            if (setting[0].equals("d")) d = Double.parseDouble(setting[1]);
+        }
+        return new Wall(from, to, d);
     }
 
     private Vector2d parseVector2d(String input) {
@@ -86,9 +145,11 @@ public class IO_course_module {
     private String height = "sin(x) + cos(y)";
     private String sand = "sin(x-1) + cos(y-1)";
 
+    private List<Obstacle> obstacles;
+
     public String toString() {
-        return String.format("g = %s\nm = %s\nmu = %s\nmu_sand = %s\nvmax = %s\ntol = %s\nstart = %s\ngoal = %s\nheight = %s\nsand = %s",
-                g, m, mu, mu_sand, vmax, tol, start, goal, height, sand);
+        return String.format("g = %s\nm = %s\nmu = %s\nmu_sand = %s\nvmax = %s\ntol = %s\nstart = %s\ngoal = %s\nheight = %s\nsand = %s\nobstacles = %s",
+                g, m, mu, mu_sand, vmax, tol, start, goal, height, sand, obstacles);
     }
 
     public double getGravity(){

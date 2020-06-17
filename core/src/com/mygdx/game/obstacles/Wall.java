@@ -74,6 +74,10 @@ public class Wall extends Obstacle {
         return new Vector3d(real_position.get_x(), y, real_position.get_y());
     }
 
+    public String toString() {
+        return "Wall from "+start+" to "+end+", with a thickness of "+thickness;
+    }
+
     @Override
     public double getOrientation() {
         return end.sub(start).angle();

@@ -121,6 +121,10 @@ public class Tree extends Obstacle {
         return radius;
     }
 
+    public String toString() {
+        return "Tree at "+position+" with height of "+height+" and radius of "+radius;
+    }
+
     @Override
     public void visit(MiniMapDrawer mapDrawer) {
         if (texture_used == TEXTURE_SMALL) mapDrawer.drawSmall(this);
