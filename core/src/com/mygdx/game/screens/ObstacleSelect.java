@@ -47,6 +47,7 @@ public class ObstacleSelect implements Screen {
     private Drawable mTreeSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/MediumTreeSelect.png"))));
     private Drawable lTreeSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/LargeTreeSelect.png"))));
     private Drawable wallSelectDraw  = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/WallSelect.png"))));
+    private Drawable wallThickSelectDraw  = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/WallSelectThick.png"))));
 
     private Image selectionImage;
 
