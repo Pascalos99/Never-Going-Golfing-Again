@@ -41,6 +41,9 @@ public class ObstacleSelect implements Screen {
     private Vector2d dummy_start;
     private Vector2d dummy_end;
     private double selectedThickness;
+    private final double thinThickness=0.1;
+    private final double thickThickness=0.2;
+
 
     private Texture selectBoxTxt = new Texture(Gdx.files.internal("misc/SelectionBox.png"));
     private Drawable sTreeSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/SmallTreeSelect.png"))));
@@ -144,7 +147,7 @@ public class ObstacleSelect implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 selectionImage.setDrawable(wallSelectDraw);
-                selectedThickness=0.2;
+                selectedThickness=thinThickness;
                 selected=3;
             }
         });
@@ -153,7 +156,7 @@ public class ObstacleSelect implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 selectionImage.setDrawable(wallThickSelectDraw);
-                selectedThickness=0.4;
+                selectedThickness=thickThickness;
                 selected=3;
             }
         });
