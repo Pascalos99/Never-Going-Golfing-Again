@@ -136,6 +136,7 @@ public class SettingsScreen implements Screen {
                     goalY.setText(""+io.getGoalY());
                     height.setText(""+io.getHeightFunction());
                     sandFunction.setText("" + io.getSandFunction());
+
                 }
             }
         });
