@@ -90,7 +90,7 @@ public class GameScreen implements Screen {
             course = cb.getModified();
             course.updateGameAspects(gameAspects);
         }else{
-            course = generator.fractalGeneratedCourse(size, 1,0.8,0.7,size/200,3,9.81);
+            course = /*generator.fractalGeneratedCourse(size, 1,0.8,0.7,size/200,3,9.81);*/ null;
         }
         game =new CrazyPutting(course, gameAspects, this);
         game.create();

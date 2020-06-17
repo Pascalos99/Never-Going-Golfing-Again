@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.courses.CourseBuilder;
+import com.mygdx.game.courses.IO_course_module;
 import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.utils.Vector2d;
 
@@ -67,15 +68,7 @@ public class ObstacleSelect implements Screen {
         Table overall = new Table();
         overall.setFillParent(true);
         overall.setDebug(true);
-
         courseBuilder = SettingsScreen.cb;
-        courseBuilder.addSmallTree(new Vector2d(3.0, 4.0));
-        courseBuilder.addMediumTree(new Vector2d(5.0, 6.0));
-        courseBuilder.addLargeTree(new Vector2d(1.0, 2.0));
-        courseBuilder.addTree(new Vector2d(2.0, 3.0), 10.0, 1.0);
-
-        courseBuilder.addWall(new Vector2d(1.0, 2.0), new Vector2d(3.0, 3.0), 0.2);
-
         minimapDraw = MiniMapDrawer.defaultDrawer(20, 20, 30, Vector2d.ZERO.sub(WORLD_SHIFT));
         minimapDraw.draw(courseBuilder);
         minimapTexture = minimapDraw.getTexture();
@@ -181,7 +174,18 @@ public class ObstacleSelect implements Screen {
         save.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                System.out.println("button pressed!");
+                try{
+                    File f = new File(savePath.getText());
+                    if (!f.createNewFile()) {
+                        f.delete();
+                        f.createNewFile();
+                    }
+                    IO_course_module.outputFile(f, GAME_ASPECTS, courseBuilder.getObstacles());
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
             }
         });
         Table saveSett = new Table();
@@ -214,8 +218,6 @@ public class ObstacleSelect implements Screen {
         boolean is_on_map = map_rectangle.contains(pos_in_actor.get_x(), pos_in_actor.get_y());
 
         if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
-
-            System.out.println(pos_in_actor+" and mouse at "+mousePos);
 
             boolean update_minimap = is_on_map;
             switch (selected){

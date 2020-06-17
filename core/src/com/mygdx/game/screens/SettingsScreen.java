@@ -48,6 +48,8 @@ public class SettingsScreen implements Screen {
     public SettingsScreen(Menu menu){
         parent=menu;
 
+        cb = new CourseBuilder();
+
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         //tables
@@ -90,7 +92,8 @@ public class SettingsScreen implements Screen {
                @Override
                public void changed(ChangeEvent event, Actor actor) {
                    MAX_SHOT_VELOCITY = getMaxV();
-                   cb=new CourseBuilder(getGameInfo());
+                   GAME_ASPECTS = getGameInfo();
+                   cb.loadInfo(getGameInfo());
                    parent.changeScreen(Menu.CUSTOMIZE_OBSTACLES);
                }
        });
@@ -136,7 +139,7 @@ public class SettingsScreen implements Screen {
                     goalY.setText(""+io.getGoalY());
                     height.setText(""+io.getHeightFunction());
                     sandFunction.setText("" + io.getSandFunction());
-
+                    cb.addObstacles(io.getObstacles());
                 }
             }
         });
@@ -147,7 +150,7 @@ public class SettingsScreen implements Screen {
             public void changed(ChangeEvent event, Actor actor) {
                 MAX_SHOT_VELOCITY = getMaxV();
                 GameInfo g = getGameInfo();
-                cb=new CourseBuilder(g);
+                cb.loadInfo(g);
                 parent.changeScreen(Menu.PLAY);
             }
         });

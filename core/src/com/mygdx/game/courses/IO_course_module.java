@@ -74,8 +74,8 @@ public class IO_course_module {
 
     private String strip(String str) {
         int i=0, j = str.length();
-        while (str.substring(i, i+1).matches("\\s")) i++;
-        while (str.substring(j-1, j).matches("\\s")) j--;
+        while (i < str.length() && str.substring(i, i+1).matches("\\s")) i++;
+        while (j > 0 && str.substring(j-1, j).matches("\\s")) j--;
         return str.substring(i, j);
     }
 
@@ -129,7 +129,7 @@ public class IO_course_module {
 
     private Vector2d parseVector2d(String input) {
         // something like "( 123 , 2 )" or "(1,2)" or "( 1, 002)", etc. (below)
-        if (!input.matches("\\(\\s*\\d+(\\.\\d+)?\\s*,\\s*\\d+(\\.\\d+)?\\s*\\)")) throw new IllegalArgumentException("Argument is not a vector");
+        if (!input.matches("\\(\\s*-?\\s*\\d+(\\.\\d+)?\\s*,\\s*-?\\s*\\d+(\\.\\d+)?\\s*\\)")) throw new IllegalArgumentException("Argument is not a vector");
         String[] numbers = input.replaceAll("[\\(\\)\\s+]", "").split(",");
         return new Vector2d(Double.parseDouble(numbers[0]), Double.parseDouble(numbers[1]));
     }
@@ -195,20 +195,27 @@ public class IO_course_module {
 
     public String getSandFunction() { return sand;}
 
+    public List<Obstacle> getObstacles() { return obstacles; }
+
     public static String vector_to_string(Vector2d v) {
-        return "("+v.get_x()+", "+v.get_y()+")";
+        return String.format("(% .4f, % .4f)", v.get_x(), v.get_y());
     }
 
     private static String obstacle_to_string(Obstacle o) {
         if (o instanceof Wall) {
             Wall w = (Wall)o;
-            return String.format("wall = { from = %s; to = %s; d = %f }", vector_to_string(w.getStart()), vector_to_string(w.getEnd()), w.getThickness());
+            return String.format("wall = { from = %s; to = %s; d = % .2f }", vector_to_string(w.getStart()), vector_to_string(w.getEnd()), w.getThickness());
         } else if (o instanceof Tree) {
             Tree t = (Tree)o;
             Vector2d pos = new Vector2d(t.getPhysicsPosition().get_x(), t.getPhysicsPosition().get_z());
-            return String.format("tree = { pos = %s; h = %f; r = %f }", vector_to_string(pos), t.getHeight(), t.getRadius());
+            return String.format("tree = { pos = %s; h = % .2f; r = % .2f }", vector_to_string(pos), t.getHeight(), t.getRadius());
         }
         return "";
+    }
+
+    public static void main(String[] args) {
+        IO_course_module io = new IO_course_module("core/testCourses/M");
+        System.out.println(io.getObstacles());
     }
 
     public static void outputFile(File file, GameInfo aspects, List<Obstacle> obstacles) {

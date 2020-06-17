@@ -181,11 +181,11 @@ public class TerrainBuilder {
     // I am basically increasing the number of squares and decreasing the amount of triangles per square
     // this is not a perfect solution, because it gets really slow for larger numbers than this
 
-    public static int gridWidth = 5; // was 50
-    public static int gridDepth = 5; // was 50
+    public static int gridWidth = 50; // was 50
+    public static int gridDepth = 50; // was 50
 
-    public static int bigWidth = 50; // was 5
-    public static int bigDepth = 50; // was 5
+    public static int bigWidth = 5; // was 5
+    public static int bigDepth = 5; // was 5
 
     public static float grid_spacing = 100f / (bigDepth + bigWidth);
 

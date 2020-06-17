@@ -1,5 +1,6 @@
 package com.mygdx.game.courses;
 
+@Deprecated
 public enum MaterialType {
 	
 	/** Ball can roll on surface, although its behaviour on that surface can differ from point to point and from material to material. */

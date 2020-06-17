@@ -10,6 +10,7 @@ import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.MissingFormatArgumentException;
 
@@ -32,20 +33,18 @@ public class CourseBuilder {
         shift = Vector2d.ZERO;
         obstacles = new ArrayList<>();
     }
-    public CourseBuilder(Function2d height, Function2d friction, Vector2d flag, Vector2d start, double hole_tolerance, double maximum_velocity, double gravity) {
-        this();
-        addHeight(height);
-        addFriction(friction);
-        setStartAndGoalPos(start, flag);
-        setHoleTolerance(hole_tolerance);
-        setMaximumVelocity(maximum_velocity);
-        setGravity(gravity);
-    }
 
     public CourseBuilder(GameInfo aspects) {
-        this(new AtomFunction2d(aspects.getHeightFunction()),
-                Function2d.getConstant(aspects.getFriction()), aspects.getGoal(), aspects.getStart(),
-                aspects.getTolerance(), aspects.getMaxV(), aspects.getGravity());
+        this();
+        loadInfo(aspects);
+    }
+
+    public void loadInfo(GameInfo aspects) {
+        addHeight(new AtomFunction2d(aspects.getHeightFunction()));
+        setStartAndGoalPos(aspects.getStart(), aspects.getGoal());
+        setHoleTolerance(aspects.getTolerance());
+        setMaximumVelocity(aspects.getMaxV());
+        setGravity(aspects.getGravity());
         setSandFunction(new AtomFunction2d(aspects.getSandFunction()), aspects.friction, aspects.sandFriciton);
     }
 
@@ -83,6 +82,9 @@ public class CourseBuilder {
         this.shift = this.shift.add(shift);
     }
 
+    public void addObstacles(Collection<Obstacle> o) {
+        obstacles.addAll(o);
+    }
     public void addObstacle(Obstacle obstacle) {
         obstacles.add(obstacle);
     }
@@ -113,11 +115,7 @@ public class CourseBuilder {
     }
 
     public void addWall(Vector2d from, Vector2d to, double thickness) {
-        Obstacle wall = new Wall(from, to,thickness);
-        System.out.println(wall);
-        addObstacle(wall);
-       // addObstacle(new Wall(from, to, thickness));
-
+        addObstacle(new Wall(from, to,thickness));
     }
 
     public void setHoleTolerance(double value) {
@@ -167,6 +165,11 @@ public class CourseBuilder {
                 goal, start, hole_tolerance, maximum_velocity, gravity);
         for (Obstacle o : obstacles) course.obstacles.add(o);
         return course;
+    }
+
+    /** modifying this list also modifies the original course builder, but not the resulting course(s). */
+    public List<Obstacle> getObstacles() {
+        return obstacles;
     }
 
     // TODO add functionality of adding obstacles to the course

@@ -1,5 +1,6 @@
 package com.mygdx.game.courses;
 
+@Deprecated
 public class Range {
 
 	public final double min, max;

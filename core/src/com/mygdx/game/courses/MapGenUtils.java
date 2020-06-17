@@ -23,6 +23,7 @@ import javax.swing.JFrame;
 import static com.mygdx.game.courses.Material.*;
 import static com.mygdx.game.utils.Variables.*;
 
+@Deprecated
 public class MapGenUtils {
 	
 	static class FractalGenerationSettings {

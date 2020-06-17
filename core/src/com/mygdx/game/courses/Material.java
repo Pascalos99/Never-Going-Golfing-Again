@@ -4,6 +4,7 @@ import java.awt.*;
 
 import static com.mygdx.game.courses.MaterialType.*;
 
+@Deprecated
 public enum Material {			// index
 	GRASS			(SURFACE,		0,		new Color(0x47bf67)),
 	HILL			(SURFACE,		1,		new Color(0x2e8c47)),
