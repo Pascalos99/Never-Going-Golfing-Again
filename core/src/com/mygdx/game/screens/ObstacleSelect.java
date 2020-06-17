@@ -35,9 +35,11 @@ public class ObstacleSelect implements Screen {
     private final static int SMALL_TREE =0;
     private final static int MED_TREE=1;
     private final static int LARGE_TREE=2;
-    private final static int WALL_SELECT=3;
-    private final static int WALL_START=4;
-    private final static int WALL_END=5;
+    private final static int WALL_START=3;
+    private final static int WALL_END=4;
+
+    private Vector2d dummy_start;
+    private Vector2d dummy_end;
 
     private Texture selectBoxTxt = new Texture(Gdx.files.internal("misc/SelectionBox.png"));
     private Drawable sTreeSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/SmallTreeSelect.png"))));
@@ -158,7 +160,6 @@ public class ObstacleSelect implements Screen {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
-
             Vector2d mousePos = new Vector2d(Gdx.input.getX(), Gdx.input.getY());
             Rectangle2D map_rectangle = new Rectangle2D.Double(map.getX(), map.getY(), map.getWidth(), map.getHeight());
             boolean is_on_map = map_rectangle.contains(mousePos.get_x(), mousePos.get_y());
@@ -178,11 +179,14 @@ public class ObstacleSelect implements Screen {
                 case LARGE_TREE:
                     if (is_on_map) courseBuilder.addLargeTree(pos_in_world);
                     break;
-                case WALL_SELECT:
-                    break;
                 case WALL_START:
+                    dummy_start=pos_in_world;
+                    selected=WALL_END;
                     break;
                 case WALL_END:
+                    dummy_end=pos_in_world;
+                    courseBuilder.addWall(dummy_start, dummy_end, 0.2);
+                    selected=WALL_START;
                     break;
                 default: update_minimap = false;
             }
