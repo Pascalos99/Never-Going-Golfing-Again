@@ -173,14 +173,15 @@ public class ObstacleSelect implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Vector2d mousePos = new Vector2d(Gdx.input.getX(), Gdx.input.getY());
+        Rectangle2D map_rectangle = new Rectangle2D.Double(map.getX(), map.getY(), map.getWidth(), map.getHeight());
+        boolean is_on_map = map_rectangle.contains(mousePos.get_x(), mousePos.get_y());
+        Vector2d pos_in_actor = mousePos.sub(new Vector2d(map.getX(), map.getY()));
+        Vector2d pos_on_map = pos_in_actor.scaleXY(
+                map.getWidth() / minimapTexture.getWidth(), map.getHeight() / minimapTexture.getHeight());
+        Vector2d pos_in_world = minimapDraw.getRealPos(pos_on_map);
         if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
-            Vector2d mousePos = new Vector2d(Gdx.input.getX(), Gdx.input.getY());
-            Rectangle2D map_rectangle = new Rectangle2D.Double(map.getX(), map.getY(), map.getWidth(), map.getHeight());
-            boolean is_on_map = map_rectangle.contains(mousePos.get_x(), mousePos.get_y());
-            Vector2d pos_in_actor = mousePos.sub(new Vector2d(map.getX(), map.getY()));
-            Vector2d pos_on_map = pos_in_actor.scaleXY(
-                    map.getWidth() / minimapTexture.getWidth(), map.getHeight() / minimapTexture.getHeight());
-            Vector2d pos_in_world = minimapDraw.getRealPos(pos_on_map);
+
 
             boolean update_minimap = is_on_map;
             switch (selected){
@@ -211,7 +212,7 @@ public class ObstacleSelect implements Screen {
             }
         }
 
-        coords.setText(Gdx.input.getX()+"  "+Gdx.input.getY());
+        coords.setText("   ("+String.format("% .2f",pos_in_world.get_x())+ " , "+String.format("% .2f",pos_in_world.get_y())+")");
         minimapTexture.draw(minimapDraw.getPixmap(),0,0);
         stage.act(delta);
         stage.draw();
