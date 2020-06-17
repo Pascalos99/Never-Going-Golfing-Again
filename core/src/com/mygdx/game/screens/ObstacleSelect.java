@@ -149,7 +149,7 @@ public class ObstacleSelect implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                selectionImage.setDrawable(wallSelectDraw);
+                selectionImage.setDrawable(wallThickSelectDraw);
                 selectedThickness=0.4;
                 selected=3;
             }
