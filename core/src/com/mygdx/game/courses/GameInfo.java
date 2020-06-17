@@ -81,7 +81,7 @@ public class GameInfo {
         return goalY;
     }
 
-    public String getFrictionFunction(){ return sandFunction; }
+    public String getSandFunction(){ return sandFunction; }
     public double getSandFriction(){ return sandFriciton; }
 
 

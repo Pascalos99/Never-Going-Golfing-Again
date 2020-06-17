@@ -54,6 +54,16 @@ public class Wall extends Obstacle {
         return new Vector3d(toWorldScale(vec.get_x()), WALL_BASE, toWorldScale(vec.get_y()));
     }
 
+    public Vector2d getStart() {
+        return start;
+    }
+    public Vector2d getEnd() {
+        return end;
+    }
+    public double getThickness() {
+        return thickness;
+    }
+
     @Override
     public Vector3d getPhysicsPosition(){
 

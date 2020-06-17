@@ -197,7 +197,6 @@ public class ObstacleSelect implements Screen {
         Vector2d pos_in_world = minimapDraw.getRealPos(pos_on_map);
         if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
 
-
             boolean update_minimap = is_on_map;
             switch (selected){
                 case SMALL_TREE:

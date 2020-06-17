@@ -1,8 +1,13 @@
 package com.mygdx.game.courses;
 
+import com.mygdx.game.obstacles.Obstacle;
+import com.mygdx.game.obstacles.Tree;
+import com.mygdx.game.obstacles.Wall;
 import com.mygdx.game.utils.Vector2d;
 
 import java.io.*;
+import java.util.List;
+
 import static com.mygdx.game.utils.Variables.*;
 
 public class IO_course_module {
@@ -131,6 +136,38 @@ public class IO_course_module {
 
     public static String vector_to_string(Vector2d v) {
         return "("+v.get_x()+", "+v.get_y()+")";
+    }
+
+    private static String obstacle_to_string(Obstacle o) {
+        if (o instanceof Wall) {
+            Wall w = (Wall)o;
+            return String.format("wall = { from = %s; to = %s; d = %f }", vector_to_string(w.getStart()), vector_to_string(w.getEnd()), w.getThickness());
+        } else if (o instanceof Tree) {
+            Tree t = (Tree)o;
+            Vector2d pos = new Vector2d(t.getPhysicsPosition().get_x(), t.getPhysicsPosition().get_z());
+            return String.format("tree = { pos = %s; h = %f; r = %f }", vector_to_string(pos), t.getHeight(), t.getRadius());
+        }
+        return "";
+    }
+
+    public static void outputFile(File file, GameInfo aspects, List<Obstacle> obstacles) {
+        String start_str = vector_to_string(aspects.getStart());
+        String goal_str = vector_to_string(aspects.getGoal());
+        PrintWriter writer;
+        try {
+            writer = new PrintWriter(new FileWriter(file));
+            writer.format("g = %s; m = %s; mu = %s; mu_sand = %s; vmax = %s; tol = %s;\nstart = %s; goal = %s;\nheight = %s; sand = %s\n",
+                    aspects.gravity, aspects.ballMass, aspects.friction, aspects.sandFriciton, aspects.maxVelocity,
+                    aspects.tol, start_str, goal_str, aspects.getHeightFunction(), aspects.getSandFunction());
+            if (obstacles.size() > 0) {
+                writer.println();
+                for (Obstacle o : obstacles) writer.println(obstacle_to_string(o));
+            }
+            writer.close();
+        } catch (IOException e) {
+            System.err.println("Given file is invalid");
+            e.printStackTrace();
+        }
     }
 
     public static void outputFile(File file, double g, double m, double mu, double mu_sand, double vmax, double tol, Vector2d start, Vector2d goal, String height, String sand) {
