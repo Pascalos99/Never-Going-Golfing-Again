@@ -15,6 +15,19 @@ import com.mygdx.game.utils.Vector3d;
 import static com.mygdx.game.utils.Variables.*;
 
 public class Tree extends Obstacle {
+
+    public static final int TEXTURE_NOT_SPECIFIED = 0;
+    public static final int TEXTURE_SMALL = 1;
+    public static final double HEIGHT_SMALL = 8;
+    public static final int TEXTURE_MEDIUM = 2;
+    public static final double HEIGHT_MEDIUM = 15;
+    public static final int TEXTURE_LARGE = 3;
+    public static final double HEIGHT_LARGE = 22;
+    /** tree height / tree radius = H_R_RATIO (for all default trees) - "the tree is 18* taller than it is wide" */
+    public static final double H_R_RATIO = 18d;
+
+    public int texture_used = TEXTURE_NOT_SPECIFIED;
+
     private Vector2d position = null;
     private double height = 0d, radius = 0d;
     private AxisAllignedBoundingBox aabb = null;
@@ -65,7 +78,9 @@ public class Tree extends Obstacle {
     @Override
     public Vector3d getPhysicsPosition(){
         Vector2d real_position = position.add(anchor);
-        return new Vector3d(real_position.get_x(), WORLD.height_function.evaluate(real_position), real_position.get_y());
+        double y = 0;
+        if (WORLD != null) y = WORLD.height_function.evaluate(real_position);
+        return new Vector3d(real_position.get_x(), y, real_position.get_y());
     }
 
     @Override
@@ -99,8 +114,18 @@ public class Tree extends Obstacle {
         return aabb;
     }
 
+    public double getHeight() {
+        return height;
+    }
+    public double getRadius() {
+        return radius;
+    }
+
     @Override
     public void visit(MiniMapDrawer mapDrawer) {
-        mapDrawer.draw(this);
+        if (texture_used == TEXTURE_SMALL) mapDrawer.drawSmall(this);
+        else if (texture_used == TEXTURE_MEDIUM) mapDrawer.drawMedium(this);
+        else if (texture_used == TEXTURE_LARGE) mapDrawer.drawLarge(this);
+        else mapDrawer.draw(this);
     }
 }

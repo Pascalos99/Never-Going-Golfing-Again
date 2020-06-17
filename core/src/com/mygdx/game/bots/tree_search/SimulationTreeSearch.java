@@ -68,10 +68,10 @@ public class SimulationTreeSearch {
         from.updateHeuristic();
         for (Node child : from.children) {
             if (child.isSimulated() && child.getHeuristic() >= from.getHeuristic() + minimum_improvement) {
-                endorsed_nodes.add(child);
+                if (!endorsed_nodes.contains(child)) endorsed_nodes.add(child);
                 addAllChildren(child);
             } else if (!child.isSimulated()) {
-                suggested_nodes.add(child);
+                if (!suggested_nodes.contains(child)) suggested_nodes.add(child);
             }
         }
     }

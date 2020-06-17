@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.mygdx.game.Ball;
+import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.obstacles.Tree;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.parser.SandFunction2d;
@@ -14,6 +15,8 @@ import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
 import java.awt.*;
+import java.io.IOException;
+import java.util.Comparator;
 
 public abstract class MiniMapDrawer {
 
@@ -60,9 +63,16 @@ public abstract class MiniMapDrawer {
         return pm;
     }
 
+    private Comparator<Obstacle> obstacleSort = (o1, o2) -> {
+        if (o1.getPhysicsPosition().get_z() < o2.getPhysicsPosition().get_z()) return -1;
+        if (o1.getPhysicsPosition().get_z() == o2.getPhysicsPosition().get_z()) return 0;
+        return 1;
+    };
+
     public void draw(PuttingCourse course) {
         drawHeight(course.height_function, 5);
         if (course.friction_function instanceof SandFunction2d) drawSand((SandFunction2d) course.friction_function);
+        course.obstacles.sort(obstacleSort);
         for (Drawable draw : course.obstacles) draw.visit(this);
         drawStartingPos(course.start_position);
         drawGoalPos(course.flag_position);
@@ -70,6 +80,7 @@ public abstract class MiniMapDrawer {
     public void draw(CourseBuilder course) {
         if (course.height_function != null) drawHeight(course.height_function, 5 * Variables.WORLD_SCALING);
         if (course.friction_function instanceof SandFunction2d) drawSand((SandFunction2d) course.friction_function);
+        course.obstacles.sort(obstacleSort);
         for (Drawable draw : course.obstacles) draw.visit(this);
         if (course.start != null) drawStartingPos(course.start);
         if (course.goal != null) drawGoalPos(course.goal);
@@ -118,6 +129,9 @@ public abstract class MiniMapDrawer {
     public abstract void draw(Ball ball);
 
     public abstract void draw(Tree tree);
+    public abstract void drawSmall(Tree tree);
+    public abstract void drawMedium(Tree tree);
+    public abstract void drawLarge(Tree tree);
 
     public abstract void drawStartingPos(Vector2d start);
 
@@ -127,7 +141,17 @@ public abstract class MiniMapDrawer {
         TextureData td = texture.getTextureData();
         td.prepare();
         Pixmap tm = td.consumePixmap();
-        pm.drawPixmap(tm, toMiniMapX(x), toMiniMapY(y));
+        pm.drawPixmap(tm, toMiniMapX(x) - td.getWidth() / 2, toMiniMapY(y));
+    }
+    public void drawImageAtWorldPos(String internal_path, double x, double y) {
+        Texture texture;
+        try {
+            texture = new Texture(Gdx.files.internal(internal_path));
+            drawAtWorldPos(texture, x, y);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("could not load image "+internal_path+": \""+e.getMessage()+"\"");
+        }
     }
 
     static class DefaultMiniMap extends MiniMapDrawer {
@@ -199,7 +223,32 @@ public abstract class MiniMapDrawer {
 
         @Override
         public void draw(Tree tree) {
+            double tree_val = tree.getHeight()*tree.getRadius();
+            double distance_from_small = Math.abs(tree_val - Tree.HEIGHT_SMALL*Tree.HEIGHT_SMALL/Tree.H_R_RATIO);
+            double distance_from_medium = Math.abs(tree_val - Tree.HEIGHT_MEDIUM*Tree.HEIGHT_MEDIUM/Tree.H_R_RATIO);
+            double distance_from_large = Math.abs(tree_val - Tree.HEIGHT_LARGE*Tree.HEIGHT_LARGE/Tree.H_R_RATIO);
+            double minimum_distance = Math.min(distance_from_small, Math.min(distance_from_medium, distance_from_large));
+            if (minimum_distance == distance_from_small) drawSmall(tree);
+            else if (minimum_distance == distance_from_large) drawLarge(tree);
+            else drawMedium(tree);
+        }
 
+        @Override
+        public void drawSmall(Tree tree) {
+            drawImageAtWorldPos("misc/SmallTree.png",
+                    tree.getPhysicsPosition().get_x(), tree.getPhysicsPosition().get_z());
+        }
+
+        @Override
+        public void drawMedium(Tree tree) {
+            drawImageAtWorldPos("misc/MediumTree.png",
+                    tree.getPhysicsPosition().get_x(), tree.getPhysicsPosition().get_z());
+        }
+
+        @Override
+        public void drawLarge(Tree tree) {
+            drawImageAtWorldPos("misc/LargeTree.png",
+                    tree.getPhysicsPosition().get_x(), tree.getPhysicsPosition().get_z());
         }
 
         @Override
@@ -219,26 +268,12 @@ public abstract class MiniMapDrawer {
 
         @Override
         public void drawStartingPos(Vector2d start) {
-            Texture ball_point;
-            try {
-                ball_point = new Texture(Gdx.files.internal("misc/Start.png"));
-                drawAtWorldPos(ball_point, start.get_x(), start.get_y());
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("it gave error with message: \""+e.getMessage()+"\"");
-            }
+            drawImageAtWorldPos("misc/Start.png", start.get_x(), start.get_y());
         }
 
         @Override
         public void drawGoalPos(Vector2d flag) {
-            Texture flag_point;
-            try {
-                flag_point = new Texture(Gdx.files.internal("misc/Flag.png"));
-                drawAtWorldPos(flag_point, flag.get_x(), flag.get_y());
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.out.println("it gave error with message: \""+e.getMessage()+"\"");
-            }
+            drawImageAtWorldPos("misc/Flag.png", flag.get_x(), flag.get_y());
         }
 
     }

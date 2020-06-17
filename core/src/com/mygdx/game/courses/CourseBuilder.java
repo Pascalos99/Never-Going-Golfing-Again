@@ -96,6 +96,22 @@ public class CourseBuilder {
     public void addTree(Vector2d position, double height, double radius) {
         addObstacle(new Tree(position, height, radius));
     }
+    public void addSmallTree(Vector2d position) {
+        Tree t = new Tree(position, Tree.HEIGHT_SMALL, Tree.HEIGHT_SMALL / Tree.H_R_RATIO);
+        t.texture_used = Tree.TEXTURE_SMALL;
+        addObstacle(t);
+    }
+    public void addMediumTree(Vector2d position) {
+        Tree t = new Tree(position, Tree.HEIGHT_MEDIUM, Tree.HEIGHT_MEDIUM / Tree.H_R_RATIO);
+        t.texture_used = Tree.TEXTURE_MEDIUM;
+        addObstacle(t);
+    }
+    public void addLargeTree(Vector2d position) {
+        Tree t = new Tree(position, Tree.HEIGHT_LARGE, Tree.HEIGHT_LARGE / Tree.H_R_RATIO);
+        t.texture_used = Tree.TEXTURE_LARGE;
+        addObstacle(t);
+    }
+
     public void addWall(Vector2d from, Vector2d to, double thickness) {
         addObstacle(new Wall(from, to, thickness));
     }

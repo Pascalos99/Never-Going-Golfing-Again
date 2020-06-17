@@ -56,7 +56,12 @@ public class Wall extends Obstacle {
 
     @Override
     public Vector3d getPhysicsPosition(){
-        return null;
+
+        Vector2d real_position = end.sub(start).add(anchor);
+        double y = 0;
+        if (WORLD != null) y = WORLD.height_function.evaluate(real_position);
+
+        return new Vector3d(real_position.get_x(), y, real_position.get_y());
     }
 
     @Override
