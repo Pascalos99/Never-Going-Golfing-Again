@@ -40,6 +40,7 @@ public class ObstacleSelect implements Screen {
 
     private Vector2d dummy_start;
     private Vector2d dummy_end;
+    private double selectedThickness;
 
     private Texture selectBoxTxt = new Texture(Gdx.files.internal("misc/SelectionBox.png"));
     private Drawable sTreeSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/SmallTreeSelect.png"))));
@@ -92,7 +93,8 @@ public class ObstacleSelect implements Screen {
         TextButton smallTree= new TextButton("Small Tree", MENU_SKIN);
         TextButton medTree= new TextButton("Medium Tree", MENU_SKIN);
         TextButton largeTree= new TextButton("Large Tree", MENU_SKIN);
-        TextButton wall= new TextButton("Wall", MENU_SKIN);
+        TextButton thickWall= new TextButton("Thick Wall", MENU_SKIN);
+        TextButton thinWall= new TextButton("Thin Wall", MENU_SKIN);
         Table obstacleT= new Table();
         obstacleT.add(selectionImage).prefSize(100).center();
         obstacleT.row().pad(10, 10, 0, 10);
@@ -103,7 +105,9 @@ public class ObstacleSelect implements Screen {
         obstacleT.row().pad(10,10,0,10);
         obstacleT.add(largeTree);
         obstacleT.row().pad(10,10,0,10);;
-        obstacleT.add(wall);;
+        obstacleT.add(thickWall);;
+        obstacleT.row().pad(10,10,0,10);;
+        obstacleT.add(thinWall);;
         obstacleT.row().pad(10,10,0,10);;
 
         smallTree.addListener(new ChangeListener() {
@@ -131,11 +135,21 @@ public class ObstacleSelect implements Screen {
             }
         });
 
-        wall.addListener(new ChangeListener() {
+        thinWall.addListener(new ChangeListener() {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 selectionImage.setDrawable(wallSelectDraw);
+                selectedThickness=0.2;
+                selected=3;
+            }
+        });
+        thickWall.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                selectionImage.setDrawable(wallSelectDraw);
+                selectedThickness=0.4;
                 selected=3;
             }
         });
@@ -184,7 +198,7 @@ public class ObstacleSelect implements Screen {
                     break;
                 case WALL_END:
                     dummy_end=pos_in_world;
-                    courseBuilder.addWall(dummy_start, dummy_end, 0.2);
+                    courseBuilder.addWall(dummy_start, dummy_end, selectedThickness);
                     selected=WALL_START;
                     break;
                 default: update_minimap = false;
