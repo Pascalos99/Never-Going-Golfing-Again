@@ -160,4 +160,24 @@ public class FractalSettings implements Screen {
             return Long.parseLong(val);
         }
     }
+
+    public double getRoughness(){
+        return Double.parseDouble(roughness.getText());
+    }
+
+    public String getResSetting(){
+        return resolution.getSelected();
+    }
+
+    public String getSmoothingSetting(){
+        return smoothingFactor.getSelected();
+    }
+
+    public double getMin(){
+        return Double.parseDouble(minimum.getText());
+    }
+
+    public double getMax(){
+        return Double.parseDouble(maximum.getText());
+    }
 }
