@@ -225,7 +225,7 @@ public class CourseBuilder {
         }
         height_function = new FractalGenerator(seed).biLinearFractal(resolution, smoothness, roughness,
                 Variables.BOUNDED_WORLD_SIZE + 1, min_value, max_value, Variables.OUT_OF_BOUNDS_HEIGHT);
-        ((BiLinearArrayFunction2d)height_function).setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
+        ((ArrayFunction2d)height_function).setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
         updateSandFunction();
     }
 
