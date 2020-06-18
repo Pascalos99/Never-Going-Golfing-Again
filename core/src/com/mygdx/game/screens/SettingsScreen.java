@@ -368,9 +368,6 @@ public class SettingsScreen implements Screen {
         return Double.parseDouble(sandFriciton.getText());
     }
 
-
-
-
     private boolean calculated_world_shift = false;
 
     private void shiftCalculation() {

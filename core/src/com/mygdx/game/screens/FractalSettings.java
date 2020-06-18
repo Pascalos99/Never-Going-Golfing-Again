@@ -145,7 +145,8 @@ public class FractalSettings implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        waterCoverage.setText(String.format("%.2f%%",coverageCalc()*100));
+        double cov = coverageCalc();
+        if (cov != Double.NEGATIVE_INFINITY) waterCoverage.setText(String.format("%.2f%%",cov*100));
         stage.act(delta);
         stage.draw();
     }
@@ -175,10 +176,14 @@ public class FractalSettings implements Screen {
 
     }
     public double coverageCalc(){
-        double min =Double.parseDouble(minimum.getText());
-        double max = Double.parseDouble(maximum.getText());
-        if (min >= 0) return 0;
-        else return Math.abs(min) / (max - min);
+        try {
+            double min = Double.parseDouble(minimum.getText());
+            double max = Double.parseDouble(maximum.getText());
+            if (min >= 0) return 0;
+            else return Math.abs(min) / (max - min);
+        } catch (NumberFormatException e) {
+            return Double.NEGATIVE_INFINITY;
+        }
     }
 
     public long getSeed(){
@@ -201,7 +206,6 @@ public class FractalSettings implements Screen {
 
     public String getSmoothingSetting(){
       return smoothingFactor.getSelected();
-
     }
 
     public double getMin(){
