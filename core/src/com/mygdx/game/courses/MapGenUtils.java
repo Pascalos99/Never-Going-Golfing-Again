@@ -1,27 +1,6 @@
 package com.mygdx.game.courses;
 
-import com.mygdx.game.utils.Vector2d;
-import com.mygdx.game.parser.ArrayFunction2d;
 import com.mygdx.game.parser.Function2d;
-import com.mygdx.game.parser.FunctionalFunction2d;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Toolkit;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-
-import static com.mygdx.game.courses.Material.*;
-import static com.mygdx.game.utils.Variables.*;
 
 @Deprecated
 public class MapGenUtils {

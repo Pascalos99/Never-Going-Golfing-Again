@@ -16,20 +16,22 @@ public class PuttingCourseGenerator {
 	
 	Random random;
 	FractalGenerator frac;
-	Range height_range;
-	Range friction_range;
+	double height_range_min, height_range_max;
+	double friction_range_min, friction_range_max;
 	boolean path_preference;
 
-	public PuttingCourseGenerator(long seed, Range height, Range friction, boolean always_lay_paths) {
+	public PuttingCourseGenerator(long seed, double height_min, double height_max, double friction_min, double friction_max, boolean always_lay_paths) {
 		random = new Random(seed);
 		frac = new FractalGenerator(random);
-		height_range = height;
-		friction_range = friction;
+		height_range_min = height_min;
+		height_range_max = height_max;
+		friction_range_min = friction_min;
+		friction_range_max = friction_max;
 		path_preference = always_lay_paths;
 	}
 	
 	public PuttingCourseGenerator(long seed) {
-		this(seed, new Range(MINIMUM_HEIGHT, MAXIMUM_HEIGHT), new Range(MINIMUM_FRICTION, MAXIMUM_FRICTION), true);
+		this(seed, MINIMUM_HEIGHT, MAXIMUM_HEIGHT, MINIMUM_FRICTION, MAXIMUM_FRICTION, true);
 	}
 
 	/**
@@ -49,8 +51,8 @@ public class PuttingCourseGenerator {
 	public PuttingCourse fractalGeneratedCourse(int desired_size, int smoothing_factor, double roughness_height, double roughness_friction, double hole_tolerance, double maximum_velocity, double gravity) {
 		double[][] heightmap = frac.smoothenedFractalMap(desired_size, smoothing_factor, roughness_height);
 		double[][] frictionmap = frac.smoothenedFractalMap(desired_size, smoothing_factor, roughness_friction);
-		frac.applyRangeToMatrix(heightmap, height_range.min, height_range.max);
-		frac.applyRangeToMatrix(frictionmap, friction_range.min, height_range.max);
+		frac.applyRangeToMatrix(heightmap, height_range_min, height_range_max);
+		frac.applyRangeToMatrix(frictionmap, friction_range_min, height_range_max);
 		Vector2d[] pos = determineFlagAndStartPositions(heightmap, frictionmap);
 		Function2d height = new BiLinearArrayFunction2d(heightmap, OUT_OF_BOUNDS_HEIGHT);
 		Function2d friction = new BiLinearArrayFunction2d(frictionmap, OUT_OF_BOUNDS_FRICTION);
