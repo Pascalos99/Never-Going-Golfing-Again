@@ -51,10 +51,10 @@ public class CourseBuilder {
 
     public void addHeight(String raw_func) {
         if (raw_func.matches("\\s*fractal\\[?.*]?\\s*")) {
-            double roughness = 0.6;
+            double roughness = 0.5;
             BiLinearArrayFunction2d func = new FractalGenerator(System.currentTimeMillis()).biLinearFractal(
-                6000, 5, roughness, Variables.BOUNDED_WORLD_SIZE + 1,
-                    -5, 15, Variables.OUT_OF_BOUNDS_HEIGHT);
+                4000, 1, roughness, Variables.BOUNDED_WORLD_SIZE + 1,
+                    -10, 15, Variables.OUT_OF_BOUNDS_HEIGHT);
             func.setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
             addHeight(func);
         }
@@ -211,8 +211,21 @@ public class CourseBuilder {
         return obstacles;
     }
 
-    // TODO add functionality of adding obstacles to the course
-    // TODO move random course generation to this class
+    public void setFractalHeight(long seed, double roughness, String resolution_setting, String smoothness_setting, double min_value, double max_value) {
+        int resolution = 4000;
+        switch(resolution_setting) {
+            case("low"): resolution = 2000; break;
+            case("high"): resolution = 6000; break;
+        } int smoothness = 1;
+        switch(smoothness_setting) {
+            case("low"): smoothness = 2; break;
+            case("medium"): smoothness = 4; break;
+            case("high"): smoothness = 8; break;
+        }
+        height_function = new FractalGenerator(seed).biLinearFractal(resolution, smoothness, roughness,
+                Variables.BOUNDED_WORLD_SIZE + 1, min_value, max_value, Variables.OUT_OF_BOUNDS_HEIGHT);
+    }
+
     // (add functionality of generating start and goal positions based on course)
     // (add functionality of generating path between start and goal)
 
