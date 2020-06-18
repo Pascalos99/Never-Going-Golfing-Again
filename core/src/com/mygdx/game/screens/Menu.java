@@ -36,6 +36,7 @@ public class Menu extends Game {
 	private GameScreen gameScreen;
 	private ObstacleSelect obstacleScreen;
 	private GameInfo gameInfo;
+	private FractalSettings fractalSettings;
 
 	public static final int MAIN_MENU=0;
 	public static final int DEFAULT_GAME=1;
@@ -45,6 +46,8 @@ public class Menu extends Game {
 	public static final int GAME_SELECT=5;
 	public static final int PLAY =6;
 	public static final int CUSTOMIZE_OBSTACLES=7;
+	public static final int FRACTAL_SELECT=8;
+
 
 
 
@@ -95,6 +98,10 @@ public class Menu extends Game {
 				System.out.println("Customize obstacles");
 				obstacleScreen= new ObstacleSelect(this);
 				this.setScreen(obstacleScreen);
+				break;
+			case FRACTAL_SELECT:
+				fractalSettings= new FractalSettings(this);
+				this.setScreen(fractalSettings);
 				break;
 		}
 	}

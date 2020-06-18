@@ -40,6 +40,8 @@ public class ObstacleSelect implements Screen {
     private final static int LARGE_TREE = 2;
     private final static int WALL_START = 3;
     private final static int WALL_END = 4;
+    private final static int CHANGE_START = 5;
+    private final static int CHANGE_GOAL = 6;
     
     private double selectedThickness;
     private final double thinThickness = 0.1;
