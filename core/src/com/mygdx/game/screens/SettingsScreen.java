@@ -224,7 +224,6 @@ public class SettingsScreen implements Screen {
         table.add(play);
         table.add(customizeObstacles);
         table.row().pad(0, 0, 10, 0);
-        table.add();
         table.add(fractals);
         table.row().pad(0, 0, 10, 0);
         table.add(save);

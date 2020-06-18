@@ -3,10 +3,7 @@ package com.mygdx.game.courses;
 import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.obstacles.Tree;
 import com.mygdx.game.obstacles.Wall;
-import com.mygdx.game.parser.AtomFunction2d;
-import com.mygdx.game.parser.BiLinearArrayFunction2d;
-import com.mygdx.game.parser.Function2d;
-import com.mygdx.game.parser.SandFunction2d;
+import com.mygdx.game.parser.*;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
@@ -218,16 +215,17 @@ public class CourseBuilder {
     public void setFractalHeight(long seed, double roughness, String resolution_setting, String smoothness_setting, double min_value, double max_value) {
         int resolution = 4000;
         switch(resolution_setting) {
-            case("low"): resolution = 2000; break;
-            case("high"): resolution = 6000; break;
+            case("Low"): resolution = 2000; break;
+            case("High"): resolution = 6000; break;
         } int smoothness = 1;
         switch(smoothness_setting) {
-            case("low"): smoothness = 2; break;
-            case("medium"): smoothness = 4; break;
-            case("high"): smoothness = 8; break;
+            case("Low"): smoothness = 2; break;
+            case("Medium"): smoothness = 4; break;
+            case("High"): smoothness = 8; break;
         }
         height_function = new FractalGenerator(seed).biLinearFractal(resolution, smoothness, roughness,
                 Variables.BOUNDED_WORLD_SIZE + 1, min_value, max_value, Variables.OUT_OF_BOUNDS_HEIGHT);
+        ((BiLinearArrayFunction2d)height_function).setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
         updateSandFunction();
     }
 

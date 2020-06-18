@@ -54,12 +54,7 @@ public class FractalSettings implements Screen {
         play.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                //TODO:ASK PASCAL HOW HE WANTS THE RES AND SF TO TRANSLATE/if this is correct
-                BiLinearArrayFunction2d func = new FractalGenerator(getSeed()).biLinearFractal(
-                        4000, 1, getRoughness(), Variables.BOUNDED_WORLD_SIZE + 1,
-                        getMin(), getMax(), Variables.OUT_OF_BOUNDS_HEIGHT);
-                func.setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
-                cb.addHeight(func);
+                cb.setFractalHeight(getSeed(),getRoughness(),getResSetting(),getSmoothingSetting(),getMin(),getMax());
                 parent.changeScreen(Menu.PLAY);
             }
         });
@@ -68,12 +63,7 @@ public class FractalSettings implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                //TODO:ASK PASCAL HOW HE WANTS THE RES AND SF TO TRANSLATE/if this is correct
-                BiLinearArrayFunction2d func = new FractalGenerator(getSeed()).biLinearFractal(
-                        4000, 1, getRoughness(), Variables.BOUNDED_WORLD_SIZE + 1,
-                        getMin(), getMax(), Variables.OUT_OF_BOUNDS_HEIGHT);
-                func.setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
-                cb.addHeight(func);
+                cb.setFractalHeight(getSeed(),getRoughness(),getResSetting(),getSmoothingSetting(),getMin(),getMax());
                 parent.changeScreen(Menu.CUSTOMIZE_OBSTACLES);
             }
         });
@@ -182,10 +172,12 @@ public class FractalSettings implements Screen {
 
     public String getResSetting(){
         return resolution.getSelected();
+
     }
 
     public String getSmoothingSetting(){
-        return smoothingFactor.getSelected();
+      return smoothingFactor.getSelected();
+
     }
 
     public double getMin(){
@@ -195,6 +187,8 @@ public class FractalSettings implements Screen {
     public double getMax(){
         return Double.parseDouble(maximum.getText());
     }
+
+
 
 
 }
