@@ -221,16 +221,13 @@ public class SettingsScreen implements Screen {
 
 
         table.row().pad(0, 0, 10, 0);
-        table.add(play);
-        table.add(customizeObstacles);
+        table.add(play,customizeObstacles);
         table.row().pad(0, 0, 10, 0);
         table.add(fractals);
         table.row().pad(0, 0, 10, 0);
-        table.add(save);
-        table.add(savePath);
+        table.add(save,savePath);
         table.row().pad(0, 0, 10, 0);
-        table.add(load);
-        table.add(loadPath);
+        table.add(load,loadPath);
 
 
         stage.addActor(backButton);

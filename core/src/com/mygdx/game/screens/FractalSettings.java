@@ -68,18 +68,30 @@ public class FractalSettings implements Screen {
             }
         });
 
+        //TODO: Fill out descriptions in all variables with "Desc"
+        Label sDesc = new Label("Seed Description: ", MENU_SKIN);
         Label s = new Label("Seed :",MENU_SKIN);
         seed=new TextField("",MENU_SKIN);
-        Label roug = new Label("Roughness :\nRoughness of the terrain",MENU_SKIN);
+
+        Label rougDesc = new Label("Roughness Description: ", MENU_SKIN);
+        Label roug = new Label("Roughness :",MENU_SKIN);
         roughness=new TextField("0.5",MENU_SKIN);
+
+        Label resDesc = new Label("Resolution Description: ", MENU_SKIN);
         Label res = new Label("Resolution :",MENU_SKIN);
         resolution=new SelectBox<String>(MENU_SKIN);
         resolution.setItems("Low","Normal","High");
+
+        Label smoothingDesc = new Label("Smoothing Factor Description: ", MENU_SKIN);
         Label smoothingf = new Label("Smoothing Factor :",MENU_SKIN);
         smoothingFactor=new SelectBox<String>(MENU_SKIN);
         smoothingFactor.setItems("None","Low","Medium","High");
+
+        Label minDesc = new Label("Minimum Description: ", MENU_SKIN);
         Label min= new Label("Minimum: ",MENU_SKIN);
         minimum=new TextField("-10",MENU_SKIN);
+
+        Label maxDesc = new Label("Maximum Description: ", MENU_SKIN);
         Label max = new Label("Maximum :",MENU_SKIN);
         maximum=new TextField("15",MENU_SKIN);
 
@@ -87,17 +99,17 @@ public class FractalSettings implements Screen {
         Table fields= new Table();
         fields.setBackground(TABLE_BKG);
         fields.row().pad(10,10,10,10);
-        fields.add(s,seed);
+        fields.add(s,seed,sDesc);
         fields.row().pad(10,10,10,10);
-        fields.add(roug,roughness);
+        fields.add(roug,roughness,rougDesc);
         fields.row().pad(10,10,10,10);
-        fields.add(res,resolution);
+        fields.add(res,resolution,resDesc);
         fields.row().pad(10,10,10,10);
-        fields.add(smoothingf,smoothingFactor);
+        fields.add(smoothingf,smoothingFactor,smoothingDesc);
         fields.row().pad(10,10,10,10);
-        fields.add(min,minimum);
+        fields.add(min,minimum,minDesc);
         fields.row().pad(10,10,10,10);
-        fields.add(max,maximum);
+        fields.add(max,maximum,maxDesc);
         fields.row().pad(10,10,10,10);
         fields.add(new Label("Water Coverage :",MENU_SKIN), waterCoverage);
 
