@@ -10,7 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.courses.CourseBuilder;
+import com.mygdx.game.courses.FractalGenerator;
 import com.mygdx.game.courses.GameInfo;
+import com.mygdx.game.parser.BiLinearArrayFunction2d;
+import com.mygdx.game.utils.Variables;
+import com.mygdx.game.utils.Vector2d;
 
 import static com.mygdx.game.utils.Variables.*;
 
@@ -40,7 +44,6 @@ public class FractalSettings implements Screen {
         stage.addActor(table);
         TextButton backButton= new TextButton("BACK",MENU_SKIN);
         backButton.addListener(new ChangeListener(){
-
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 parent.changeScreen(Menu.CUSTOM_GAME);
@@ -51,6 +54,12 @@ public class FractalSettings implements Screen {
         play.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                //TODO:ASK PASCAL HOW HE WANTS THE RES AND SF TO TRANSLATE/if this is correct
+                BiLinearArrayFunction2d func = new FractalGenerator(getSeed()).biLinearFractal(
+                        4000, 1, getRoughness(), Variables.BOUNDED_WORLD_SIZE + 1,
+                        getMin(), getMax(), Variables.OUT_OF_BOUNDS_HEIGHT);
+                func.setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
+                cb.addHeight(func);
                 parent.changeScreen(Menu.PLAY);
             }
         });
@@ -59,6 +68,12 @@ public class FractalSettings implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                //TODO:ASK PASCAL HOW HE WANTS THE RES AND SF TO TRANSLATE/if this is correct
+                BiLinearArrayFunction2d func = new FractalGenerator(getSeed()).biLinearFractal(
+                        4000, 1, getRoughness(), Variables.BOUNDED_WORLD_SIZE + 1,
+                        getMin(), getMax(), Variables.OUT_OF_BOUNDS_HEIGHT);
+                func.setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
+                cb.addHeight(func);
                 parent.changeScreen(Menu.CUSTOMIZE_OBSTACLES);
             }
         });
@@ -66,7 +81,7 @@ public class FractalSettings implements Screen {
         Label s = new Label("Seed :",MENU_SKIN);
         seed=new TextField("",MENU_SKIN);
         Label roug = new Label("Roughness :\nRoughness of the terrain",MENU_SKIN);
-        roughness=new TextField("",MENU_SKIN);
+        roughness=new TextField("0.5",MENU_SKIN);
         Label res = new Label("Resolution :",MENU_SKIN);
         resolution=new SelectBox<String>(MENU_SKIN);
         resolution.setItems("Low","Normal","High");
@@ -180,4 +195,6 @@ public class FractalSettings implements Screen {
     public double getMax(){
         return Double.parseDouble(maximum.getText());
     }
+
+
 }
