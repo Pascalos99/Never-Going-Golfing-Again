@@ -94,7 +94,7 @@ public class FractalSettings implements Screen {
         fields.row().pad(10,10,10,10);
         fields.add(max,maximum);
         fields.row().pad(10,10,10,10);
-        fields.add(waterCoverage);
+        fields.add(new Label("Water Coverage :",MENU_SKIN), waterCoverage);
 
         table.add(fields);
         Table navigation=new Table();
@@ -116,7 +116,7 @@ public class FractalSettings implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        waterCoverage.setText("");
+        waterCoverage.setText(" ");
         stage.act(delta);
         stage.draw();
     }
