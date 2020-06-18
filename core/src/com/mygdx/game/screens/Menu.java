@@ -37,6 +37,7 @@ public class Menu extends Game {
 	private ObstacleSelect obstacleScreen;
 	private GameInfo gameInfo;
 	private FractalSettings fractalSettings;
+	private WarningScreen warningScreen;
 
 	public static final int MAIN_MENU=0;
 	public static final int DEFAULT_GAME=1;
@@ -47,6 +48,7 @@ public class Menu extends Game {
 	public static final int PLAY =6;
 	public static final int CUSTOMIZE_OBSTACLES=7;
 	public static final int FRACTAL_SELECT=8;
+	public static final int WARNING_SCREEN=9;
 
 
 
@@ -102,6 +104,10 @@ public class Menu extends Game {
 			case FRACTAL_SELECT:
 				fractalSettings= new FractalSettings(this);
 				this.setScreen(fractalSettings);
+				break;
+			case WARNING_SCREEN:
+				warningScreen=new WarningScreen(this);
+				this.setScreen(warningScreen);
 				break;
 		}
 	}
