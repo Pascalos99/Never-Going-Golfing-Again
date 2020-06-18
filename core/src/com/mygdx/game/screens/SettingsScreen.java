@@ -68,12 +68,11 @@ public class SettingsScreen implements Screen {
         BLANK_BKG.setColor(0,0,0,100);
         tabler.setBackground(BLANK_BKG);
         table.setFillParent(true);
-        table.add(tabler).expandY().expandX();
-        table.add(tablel).expandY().expandX();
+
         TextButton play=new TextButton("PLAY", MENU_SKIN);
         TextButton save = new TextButton("Save course to file", MENU_SKIN);
         TextButton customizeObstacles = new TextButton("Customize Obstacles", MENU_SKIN);
-        TextButton fractals = new TextButton("Use Fractal", MENU_SKIN);
+        TextButton fractals = new TextButton("Generate Fractal Course", MENU_SKIN);
         TextButton load = new TextButton("Load course from file", MENU_SKIN);
         TextButton backButton= new TextButton("BACK",MENU_SKIN);
         backButton.align(Align.bottomLeft);
@@ -201,7 +200,10 @@ public class SettingsScreen implements Screen {
        /* tablel.row().pad(margine, 0, 0, 0);
         tabler.row().pad(margine, 0, 0, 0);
 */
-        table.setDebug(true);
+        Table sett =new Table();
+        sett.row().pad(90,10,0,10);
+        sett.add(tablel,tabler);
+        table.add(sett);
         tablel.padRight(margine);
         tablel.padLeft(margine);
         tabler.padRight(margine);
@@ -220,14 +222,23 @@ public class SettingsScreen implements Screen {
         addToTable(tablel,sf,sandFunction,0,0,margine,0);
 
 
+        Table fileConfig = new Table();
+        Table buttons = new Table();
+        buttons.row().pad(20,0,10,10);
+        buttons.add(play).minWidth(customizeObstacles.getPrefWidth());
+        buttons.add(customizeObstacles);
         table.row().pad(0, 0, 10, 0);
-        table.add(play,customizeObstacles);
+        table.add(buttons);
         table.row().pad(0, 0, 10, 0);
         table.add(fractals);
-        table.row().pad(0, 0, 10, 0);
-        table.add(save,savePath);
-        table.row().pad(0, 0, 10, 0);
-        table.add(load,loadPath);
+        table.row().pad(0,0,10,0);
+        fileConfig.row().pad(0, 5, 10, 5);
+        fileConfig.add(save).minWidth(load.getPrefWidth()).maxHeight(savePath.getPrefHeight());
+        fileConfig.add(savePath);
+        fileConfig.row().pad(0, 5, 10, 5);
+        fileConfig.add(load).maxHeight(loadPath.getPrefHeight());
+        fileConfig.add(loadPath);
+        table.add(fileConfig);
 
 
         stage.addActor(backButton);
