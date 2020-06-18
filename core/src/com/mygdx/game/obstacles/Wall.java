@@ -1,6 +1,16 @@
 package com.mygdx.game.obstacles;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
+import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.Ball;
 import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.courses.PuttingCourse;
@@ -14,11 +24,15 @@ import java.awt.*;
 public class Wall extends Obstacle {
     final Vector2d[] points;
     final Vector2d start, end;
-    final double thickness, angle;
+    final double thickness, angle, length, height, rootHeight;
+
 
     public Wall(Vector2d a, Vector2d b, double thickness){
         Vector2d center = a.add(b).div(new Vector2d(2, 2));
-        double length = a.distance(b);
+        length = a.distance(b);
+        height = 3.0;
+        rootHeight = 1.0;
+
 
         Vector2d left_point = (new Vector2d(-length/2d, 0));
         Vector2d right_point = (new Vector2d(length/2d, 0));
@@ -50,8 +64,9 @@ public class Wall extends Obstacle {
 
     @Override
     public Vector3d getGraphicsPosition() {
-        Vector2d vec = start.add(end).div(new Vector2d(2, 2));
-        return new Vector3d(toWorldScale(vec.get_x()), WALL_BASE, toWorldScale(vec.get_y()));
+        Vector2d vec = start.add(end.sub(start).scale(.5)).add(WORLD_SHIFT);
+        double y=WORLD.height_function.evaluate(vec);
+        return new Vector3d(toWorldScale(vec.get_x()), toWorldScale(y)-rootHeight, toWorldScale(vec.get_y()));
     }
 
     public Vector2d getStart() {
@@ -85,8 +100,20 @@ public class Wall extends Obstacle {
 
     @Override
     public ModelInstance getModel() {
-        //TODO Samuele's
-        return null;
+        ModelBuilder modelBuilder = new ModelBuilder();
+        modelBuilder.begin();
+        MeshPartBuilder builder = modelBuilder.part("tree", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(Color.BROWN)));
+        new BoxShapeBuilder().build(builder,toWorldScale(this.thickness), (float)(height+rootHeight), toWorldScale(this.length));
+//        builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.GREEN)));
+//        builder.sphere((float)this.radius*2f, (float)this.height, (float)this.radius*2f, 20,20);
+        Model wall = modelBuilder.end();
+        System.out.println((float)this.getGraphicsPosition().get_y());
+        System.out.println(height+rootHeight);
+        double y=this.getGraphicsPosition().get_y();
+        ModelInstance wallInstance = new ModelInstance(wall, (float)this.getGraphicsPosition().get_x(), (float)(y+((height+rootHeight)/2f)), (float)this.getGraphicsPosition().get_z());
+        Vector2d dir=end.sub(start);
+        wallInstance.transform.rotateRad(Vector3.Y, (float)((Math.PI/2)-dir.angle()));
+        return wallInstance;
     }
 
     @Override
