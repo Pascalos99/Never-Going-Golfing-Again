@@ -68,30 +68,26 @@ public class FractalSettings implements Screen {
             }
         });
 
-        //TODO: Fill out descriptions in all variables with "Desc"
-        Label sDesc = new Label("Seed Description: ", MENU_SKIN);
+
         Label s = new Label("Seed :",MENU_SKIN);
         seed=new TextField("",MENU_SKIN);
 
-        Label rougDesc = new Label("Roughness Description: ", MENU_SKIN);
         Label roug = new Label("Roughness :",MENU_SKIN);
         roughness=new TextField("0.5",MENU_SKIN);
 
-        Label resDesc = new Label("Resolution Description: ", MENU_SKIN);
         Label res = new Label("Resolution :",MENU_SKIN);
         resolution=new SelectBox<String>(MENU_SKIN);
-        resolution.setItems("Low","Normal","High");
+        resolution.setItems("Low","Medium","High");
+        resolution.setSelected("Medium");
 
-        Label smoothingDesc = new Label("Smoothing Factor Description: ", MENU_SKIN);
         Label smoothingf = new Label("Smoothing Factor :",MENU_SKIN);
         smoothingFactor=new SelectBox<String>(MENU_SKIN);
         smoothingFactor.setItems("None","Low","Medium","High");
 
-        Label minDesc = new Label("Minimum Description: ", MENU_SKIN);
+
         Label min= new Label("Minimum: ",MENU_SKIN);
         minimum=new TextField("-10",MENU_SKIN);
 
-        Label maxDesc = new Label("Maximum Description: ", MENU_SKIN);
         Label max = new Label("Maximum :",MENU_SKIN);
         maximum=new TextField("15",MENU_SKIN);
 
@@ -99,21 +95,37 @@ public class FractalSettings implements Screen {
         Table fields= new Table();
         fields.setBackground(TABLE_BKG);
         fields.row().pad(10,10,10,10);
-        fields.add(s,seed,sDesc);
+        fields.add(s,seed);
         fields.row().pad(10,10,10,10);
-        fields.add(roug,roughness,rougDesc);
+        fields.add(roug,roughness);
         fields.row().pad(10,10,10,10);
-        fields.add(res,resolution,resDesc);
+        fields.add(res,resolution);
         fields.row().pad(10,10,10,10);
-        fields.add(smoothingf,smoothingFactor,smoothingDesc);
+        fields.add(smoothingf,smoothingFactor);
         fields.row().pad(10,10,10,10);
-        fields.add(min,minimum,minDesc);
+        fields.add(min,minimum);
         fields.row().pad(10,10,10,10);
-        fields.add(max,maximum,maxDesc);
+        fields.add(max,maximum);
         fields.row().pad(10,10,10,10);
         fields.add(new Label("Water Coverage :",MENU_SKIN), waterCoverage);
 
+        Table info= new Table();
+        Table inner=new Table();
+        info.setBackground(BLANK_BKG);
+        Label title= new Label("Fractal Settings", MENU_SKIN);
+
+        //TODO: fill the empty string
+        Label body= new Label("",MENU_SKIN);
+
+
+        title.setAlignment(Align.center);
+        inner.add(title);
+        inner.add(body);
+        info.add(inner).minSize(fields.getPrefWidth()/2,fields.getPrefHeight());
+
+        table.row().pad(0,10,0,10);
         table.add(fields);
+        table.add(info);
         Table navigation=new Table();
         navigation.row().pad(0,10,10,10);
         navigation.add(backButton,play,customizeObstacles);

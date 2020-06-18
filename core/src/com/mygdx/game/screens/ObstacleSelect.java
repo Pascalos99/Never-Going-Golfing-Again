@@ -67,7 +67,6 @@ public class ObstacleSelect implements Screen {
         Gdx.input.setInputProcessor(stage);
         Table overall = new Table();
         overall.setFillParent(true);
-        overall.setDebug(true);
         courseBuilder = SettingsScreen.cb;
         minimapDraw = MiniMapDrawer.defaultDrawer(20, 20, 30, Vector2d.ZERO.sub(WORLD_SHIFT));
         minimapDraw.draw(courseBuilder);
