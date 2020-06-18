@@ -82,15 +82,17 @@ public class CourseBuilder {
         else friction_function = friction_function.add(func);
     }
 
-    public Function2d getHeight() {
-        return height_function;
+    public boolean isStartInWater() {
+        return height_function.evaluate(start) < 0;
     }
-
-    public Vector2d getStart() {
-        return start;
+    public boolean isFlagInWater() {
+        return height_function.evaluate(goal) < 0;
     }
-    public Vector2d getGoal() {
-        return goal;
+    public String getStartFlagWaterString() {
+        if (!isFlagInWater() && !isStartInWater()) return "";
+        return String.format("Warning:\nYour %s in water.\nYou should move the %s to\n make the game playable",
+                isFlagInWater()&&(!isStartInWater())?"flag position is":(isFlagInWater()?"flag and start position are":"start position is"),
+                isFlagInWater()&&(!isStartInWater())?"flag position":(isFlagInWater()?"flag and start position":"start position"));
     }
 
     public void setStartPos(Vector2d v) {
