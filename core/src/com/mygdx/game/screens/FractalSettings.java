@@ -74,9 +74,9 @@ public class FractalSettings implements Screen {
         smoothingFactor=new SelectBox<String>(MENU_SKIN);
         smoothingFactor.setItems("None","Low","Medium","High");
         Label min= new Label("Minimum: ",MENU_SKIN);
-        minimum=new TextField("",MENU_SKIN);
+        minimum=new TextField("-10",MENU_SKIN);
         Label max = new Label("Maximum :",MENU_SKIN);
-        maximum=new TextField("",MENU_SKIN);
+        maximum=new TextField("15",MENU_SKIN);
 
         waterCoverage=new Label("",MENU_SKIN);
         Table fields= new Table();
@@ -116,7 +116,7 @@ public class FractalSettings implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        waterCoverage.setText(" ");
+        waterCoverage.setText(String.format("%.2f%%",coverageCalc()*100));
         stage.act(delta);
         stage.draw();
     }
@@ -144,5 +144,20 @@ public class FractalSettings implements Screen {
     @Override
     public void dispose() {
 
+    }
+    public double coverageCalc(){
+        double min =Double.parseDouble(minimum.getText());
+        double max = Double.parseDouble(maximum.getText());
+        if (min >= 0) return 0;
+        else return Math.abs(min) / (max - min);
+    }
+
+    public long getSeed(){
+        String val=seed.getText();
+        if(val.isBlank()||val.isEmpty()){
+            return System.currentTimeMillis();
+        }else{
+            return Long.parseLong(val);
+        }
     }
 }
