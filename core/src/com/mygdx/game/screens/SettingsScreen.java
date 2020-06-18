@@ -202,7 +202,7 @@ public class SettingsScreen implements Screen {
 */
         Table sett =new Table();
         sett.row().pad(90,10,0,10);
-        sett.add(tablel,tabler);
+        sett.add(tabler,tablel);
         table.add(sett);
         tablel.padRight(margine);
         tablel.padLeft(margine);
