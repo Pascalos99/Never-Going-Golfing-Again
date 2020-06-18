@@ -3,10 +3,7 @@ package com.mygdx.game.courses;
 import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.obstacles.Tree;
 import com.mygdx.game.obstacles.Wall;
-import com.mygdx.game.parser.AtomFunction2d;
-import com.mygdx.game.parser.BiLinearArrayFunction2d;
-import com.mygdx.game.parser.Function2d;
-import com.mygdx.game.parser.SandFunction2d;
+import com.mygdx.game.parser.*;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
@@ -51,10 +48,10 @@ public class CourseBuilder {
 
     public void addHeight(String raw_func) {
         if (raw_func.matches("\\s*fractal\\[?.*]?\\s*")) {
-            double roughness = 0.6;
+            double roughness = 0.5;
             BiLinearArrayFunction2d func = new FractalGenerator(System.currentTimeMillis()).biLinearFractal(
-                6000, 5, roughness, Variables.BOUNDED_WORLD_SIZE + 1,
-                    -5, 15, Variables.OUT_OF_BOUNDS_HEIGHT);
+                4000, 1, roughness, Variables.BOUNDED_WORLD_SIZE + 1,
+                    -10, 15, Variables.OUT_OF_BOUNDS_HEIGHT);
             func.setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
             addHeight(func);
         }
@@ -64,6 +61,10 @@ public class CourseBuilder {
     public void addHeight(Function2d func) {
         if (height_function==null) height_function = func;
         else height_function = height_function.add(func);
+        updateSandFunction();
+    }
+
+    private void updateSandFunction() {
         if (friction_function instanceof SandFunction2d) {
             SandFunction2d s = (SandFunction2d)friction_function;
             friction_function = new SandFunction2d(s.default_friction, s.sand_friction, height_function, s.sand);
@@ -211,8 +212,23 @@ public class CourseBuilder {
         return obstacles;
     }
 
-    // TODO add functionality of adding obstacles to the course
-    // TODO move random course generation to this class
+    public void setFractalHeight(long seed, double roughness, String resolution_setting, String smoothness_setting, double min_value, double max_value) {
+        int resolution = 4000;
+        switch(resolution_setting) {
+            case("Low"): resolution = 2000; break;
+            case("High"): resolution = 6000; break;
+        } int smoothness = 1;
+        switch(smoothness_setting) {
+            case("Low"): smoothness = 2; break;
+            case("Medium"): smoothness = 4; break;
+            case("High"): smoothness = 8; break;
+        }
+        height_function = new FractalGenerator(seed).biLinearFractal(resolution, smoothness, roughness,
+                Variables.BOUNDED_WORLD_SIZE + 1, min_value, max_value, Variables.OUT_OF_BOUNDS_HEIGHT);
+        ((ArrayFunction2d)height_function).setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
+        updateSandFunction();
+    }
+
     // (add functionality of generating start and goal positions based on course)
     // (add functionality of generating path between start and goal)
 

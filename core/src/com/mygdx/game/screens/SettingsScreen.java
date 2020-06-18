@@ -58,7 +58,7 @@ public class SettingsScreen implements Screen {
         table.setBackground(MENU_BKG);
 
         stage.addActor(table);
-        Gdx.input.setInputProcessor(stage);
+
         //right hand side
         Table tabler = new Table();
         //left hand side
@@ -73,6 +73,7 @@ public class SettingsScreen implements Screen {
         TextButton play=new TextButton("PLAY", MENU_SKIN);
         TextButton save = new TextButton("Save course to file", MENU_SKIN);
         TextButton customizeObstacles = new TextButton("Customize Obstacles", MENU_SKIN);
+        TextButton fractals = new TextButton("Use Fractal", MENU_SKIN);
         TextButton load = new TextButton("Load course from file", MENU_SKIN);
         TextButton backButton= new TextButton("BACK",MENU_SKIN);
         backButton.align(Align.bottomLeft);
@@ -84,6 +85,16 @@ public class SettingsScreen implements Screen {
             }
         });
 
+        fractals.addListener(new ChangeListener(){
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                MAX_SHOT_VELOCITY = getMaxV();
+                GameInfo g = getGameInfo();
+                cb.loadInfo(g);
+                parent.changeScreen(Menu.FRACTAL_SELECT);
+            }
+        });
         TextField savePath= new TextField("", MENU_SKIN);
         TextField loadPath =new TextField("", MENU_SKIN);
 
@@ -210,14 +221,13 @@ public class SettingsScreen implements Screen {
 
 
         table.row().pad(0, 0, 10, 0);
-        table.add(play);
-        table.add(customizeObstacles);
+        table.add(play,customizeObstacles);
         table.row().pad(0, 0, 10, 0);
-        table.add(save);
-        table.add(savePath);
+        table.add(fractals);
         table.row().pad(0, 0, 10, 0);
-        table.add(load);
-        table.add(loadPath);
+        table.add(save,savePath);
+        table.row().pad(0, 0, 10, 0);
+        table.add(load,loadPath);
 
 
         stage.addActor(backButton);
