@@ -76,4 +76,11 @@ public class Vector2d {
 
 	public double angle() { return Math.atan2(get_y(), get_x()); }
 
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof Vector2d)) return false;
+		Vector2d v = (Vector2d)o;
+		return v.x == x && v.y == y;
+	}
+
 }

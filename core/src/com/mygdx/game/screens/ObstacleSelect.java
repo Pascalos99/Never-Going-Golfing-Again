@@ -40,9 +40,7 @@ public class ObstacleSelect implements Screen {
     private final static int LARGE_TREE = 2;
     private final static int WALL_START = 3;
     private final static int WALL_END = 4;
-
-    private Vector2d dummy_start;
-    private Vector2d dummy_end;
+    
     private double selectedThickness;
     private final double thinThickness = 0.1;
     private final double thickThickness = 0.2;
@@ -106,9 +104,9 @@ public class ObstacleSelect implements Screen {
         obstacleT.row().pad(10, 10, 0, 10);
         obstacleT.add(largeTree);
         obstacleT.row().pad(10, 10, 0, 10);
-        obstacleT.add(thickWall);
-        obstacleT.row().pad(10, 10, 0, 10);
         obstacleT.add(thinWall);
+        obstacleT.row().pad(10, 10, 0, 10);
+        obstacleT.add(thickWall);
         obstacleT.row().pad(10, 10, 0, 10);
         obstacleT.add(resetObstacles);
         obstacleT.row().pad(10, 10, 0, 10);
@@ -204,6 +202,8 @@ public class ObstacleSelect implements Screen {
 
     }
 
+    private Vector2d last_mousePos = Vector2d.ZERO;
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1);
@@ -216,6 +216,18 @@ public class ObstacleSelect implements Screen {
         Vector2d pos_in_world = minimapDraw.getRealPos(pos_on_map);
         Rectangle2D map_rectangle = new Rectangle2D.Double(0, 0, map.getWidth(), map.getHeight());
         boolean is_on_map = map_rectangle.contains(pos_in_actor.get_x(), pos_in_actor.get_y());
+
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+            courseBuilder.cancelWall();
+            selected = WALL_START;
+            mapUpdate();
+        }
+
+        if (!mousePos.equals(last_mousePos) && courseBuilder.isBuildingWall()) {
+            courseBuilder.updateWall(pos_in_world, selectedThickness);
+            mapUpdate();
+        }
+        last_mousePos = mousePos;
 
         if(Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
 
@@ -231,13 +243,15 @@ public class ObstacleSelect implements Screen {
                     if (is_on_map) courseBuilder.addLargeTree(pos_in_world);
                     break;
                 case WALL_START:
-                    dummy_start=pos_in_world;
+                    if (is_on_map) courseBuilder.startWall(pos_in_world, selectedThickness);
                     selected=WALL_END;
                     break;
                 case WALL_END:
-                    dummy_end=pos_in_world;
-                    courseBuilder.addWall(dummy_start, dummy_end, selectedThickness);
-                    selected=WALL_START;
+                    if (is_on_map) courseBuilder.endWall(pos_in_world, selectedThickness);
+                    if (is_on_map) {
+                        courseBuilder.startWall(pos_in_world, selectedThickness);
+                        selected=WALL_END;
+                    } else selected=WALL_START;
                     break;
                 default: update_minimap = false;
             }

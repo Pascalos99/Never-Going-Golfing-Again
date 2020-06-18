@@ -83,6 +83,7 @@ public abstract class MiniMapDrawer {
         for (Drawable draw : course.obstacles) draw.visit(this);
         if (course.start != null) drawStartingPos(course.start);
         if (course.goal != null) drawGoalPos(course.goal);
+        if (course.temp_wall != null) course.temp_wall.visit(this);
     }
 
     public Vector2d getRealPos(Vector2d pos_in_image) {
