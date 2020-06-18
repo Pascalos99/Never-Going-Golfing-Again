@@ -44,31 +44,7 @@ public class MapGenUtils {
 	
 	public static boolean gradient_display = false;
 	
-	/** Approaches the scaling of the matrix m by the given factor (a 2x2 * 2 gives a 3x3, a 100x100 * 2 gives a 199x199) */
-	public static double[][] enlargeMatrix(double[][] m, int factor) {
-		factor = factor - 1;
-		int smallW = m.length, smallH = m[0].length;
-		int bigW = smallW + (smallW-1)*factor;
-		int bigH = smallH + (smallH-1)*factor;
-		double[][] result = new double[bigW][bigH];
-		int l = factor + 1;
-		for (int i=0; i < smallW; i++) {
-		    for (int j=0; j < smallH; j++) {
-		      result[i*l][j*l] = m[i][j];
-		      if (i < smallW-1) {
-		        for (int k=1; k < l; k++) {
-		          result[i*l+k][j*l] = ((l-k)*m[i][j] + k*m[i+1][j])/l;}}
-		      if (j < smallH-1) {
-		        for (int k=1; k < l; k++) {
-		          result[i*l][j*l+k] = ((l-k)*m[i][j] + k*m[i][j+1])/l;}}}}
-		  for (int i=0; i < smallW; i++) {
-		    for (int j=0; j < smallH; j++) {
-		      if (i < smallW-1 && j < smallH-1) {
-		        for (int k=1; k < l; k++) {
-		          for (int p=1; p < l; p++) {
-		            result[i*l+k][j*l+p] = ((l-p)*result[i*l+k][j*l] + p*result[i*l+k][j*l+l] + (l-k)*result[i*l][j*l+p] + k*result[i*l+l][j*l+p])/(2*l);}}}
-		  }} return result;
-	}
+
 	
 	public static double[][] fill(int width, int height, double filler) {
 		double[][] result = new double[width][height];
@@ -82,33 +58,6 @@ public class MapGenUtils {
 		for (int i=0; i < result.length; i++)
 			for (int j=0; j < result[i].length; j++) result[i][j] = function.evaluate((double)i, (double)j);
 		return result;
-	}
-	
-	/** designed for matrices that only contain numbers between 0 and 1*/
-	public static void applyRangeToMatrix(double[][] m, Range range) {
-		for (int i=0; i < m.length; i++)
-			for (int j=0; j < m[i].length; j++) m[i][j] = range.min + m[i][j]*(range.max - range.min);
-	}
-	
-	public static void testFunction(Function2d f, double x1, double y1, double x2, double y2, double interval_x, double interval_y) {
-		double y = y1, x = x1;
-		for (;y <= y2; y += interval_y) {
-			if (y==y1) {
-				String str = " y  x / ";
-				for (; x <= x2; x += interval_x) {
-					str += String.format("% .2f",x);
-					if (x <= x2-interval_x) str += " .";
-				} System.out.println(str);
-				String line = "";
-				while (line.length() < str.length() + 2) line += "-";
-				System.out.println(line);
-			} x = x1;
-			for (;x <= x2; x += interval_x) {
-				if (x==x1) System.out.format("% .2f [ ", y);
-				System.out.format("% .2f",f.evaluate(x, y));
-				if (x <= x2-interval_x) System.out.print(" |");
-			} System.out.println(" ]");
-		}
 	}
 	
 	public static int floor(double x) {
@@ -242,65 +191,4 @@ public class MapGenUtils {
 		return r;
 	}
 
-	public static ArrayFunction2d functionFromArray(double[][] m, Function2d out_of_bounds_value) {
-		double[][] m2 = new double[m.length + 2][m[0].length + 2];
-		for (int i=0; i < m2.length; i++)
-			for (int j=0; j < m2[i].length; j++)
-				if (i==0 || j==0 || i == m2.length-1 || j == m2.length-1) m2[i][j] = out_of_bounds_value.evaluate(i-1, j-1);
-				else m2[i][j] = m[i-1][j-1];
-		
-		return new ArrayFunction2d() {
-			double[][] original = m;
-			double[][] array = m2;
-			Function2d function = out_of_bounds_value;
-			@Override
-			public Vector2d gradient(double x, double y) {
-				if (x >= array.length - 2|| y >= array.length - 2 || x < -1 || y < -1) return function.gradient(x, y);
-				x++; y++;
-				double p = floor(x), q= floor(x+1);
-				double r = floor(y), s = floor(y+1);
-				double T = array[floor(x)][floor(y)];
-				double U = array[floor(x)][floor(y+1)]; 
-				double V = array[floor(x+1)][floor(y)];
-				double W = array[floor(x+1)][floor(y+1)];
-				return new Vector2d(
-						(r - y) * (U - W) + (s - y) * (V - T),
-						p * (V - W) + q * (U - T) + x * (T - U - V + W)
-					); // I trust WolframAlpha on this one...
-			}
-			@Override
-			public double evaluate(double x, double y) {
-				if (x >= array.length - 2|| y >= array.length - 2 || x < -1 || y < -1) return function.evaluate(x, y);
-				x++; y++;
-				double x1 = floor(x), x2 = floor(x+1);
-				double y1 = floor(y), y2 = floor(y+1);
-				
-				double Q11 = array[floor(x)][floor(y)];
-				double Q12 = array[floor(x)][floor(y+1)]; 
-				double Q21 = array[floor(x+1)][floor(y)];
-				double Q22 = array[floor(x+1)][floor(y+1)];
-				
-				double fx1 = (x2 - x) * Q11 + (x - x1) * Q21;
-				double fx2 = (x2 - x) * Q12 + (x - x1) * Q22;
-				return (y2 - y) * fx1 + (y - y1) * fx2;
-			}
-			@Override
-			public double[][] getArray() {
-				return original;
-			}
-		};
-	}
-
-	public static int evaluateMaterial(double x, double y, Function2d height, Function2d friction, Vector2d flag, Vector2d start, double hole_tolerance) {
-		double z_value = height.evaluate(x, y);
-		double f_value = friction.evaluate(x, y);
-		if (distance(flag.get_x(), flag.get_y(), x, y) <= hole_tolerance) return FLAG.index;
-		if (distance(start.get_x(), start.get_y(), x, y) <= 1) return STARTING_POINT.index;
-		if (z_value < 0) return WATER.index;
-		if (f_value <= ICE_FRICTION) return ICE.index;
-		if (f_value >= SAND_FRICTION) return SAND.index;
-		if (z_value >= MOUNTAIN_HEIGHT) return MOUNTAIN.index;
-		if (z_value >= HILL_HEIGHT) return HILL.index;
-		return GRASS.index;
-	}
 }

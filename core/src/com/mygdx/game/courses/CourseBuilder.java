@@ -4,6 +4,7 @@ import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.obstacles.Tree;
 import com.mygdx.game.obstacles.Wall;
 import com.mygdx.game.parser.AtomFunction2d;
+import com.mygdx.game.parser.BiLinearArrayFunction2d;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.parser.SandFunction2d;
 import com.mygdx.game.utils.Variables;
@@ -40,12 +41,24 @@ public class CourseBuilder {
     }
 
     public void loadInfo(GameInfo aspects) {
-        addHeight(new AtomFunction2d(aspects.getHeightFunction()));
+        addHeight(aspects.getHeightFunction());
         setStartAndGoalPos(aspects.getStart(), aspects.getGoal());
         setHoleTolerance(aspects.getTolerance());
         setMaximumVelocity(aspects.getMaxV());
         setGravity(aspects.getGravity());
         setSandFunction(new AtomFunction2d(aspects.getSandFunction()), aspects.friction, aspects.sandFriciton);
+    }
+
+    public void addHeight(String raw_func) {
+        if (raw_func.matches("\\s*fractal\\[?.*]?\\s*")) {
+            double roughness = 0.6;
+            BiLinearArrayFunction2d func = new FractalGenerator(System.currentTimeMillis()).biLinearFractal(
+                6000, 5, roughness, Variables.BOUNDED_WORLD_SIZE + 1,
+                    -5, 15, Variables.OUT_OF_BOUNDS_HEIGHT);
+            func.setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
+            addHeight(func);
+        }
+        else addHeight(new AtomFunction2d(raw_func));
     }
 
     public void addHeight(Function2d func) {
@@ -189,6 +202,7 @@ public class CourseBuilder {
         PuttingCourse course = new PuttingCourse(height_function, friction_function,
                 goal, start, hole_tolerance, maximum_velocity, gravity);
         for (Obstacle o : obstacles) course.obstacles.add(o);
+        System.out.println(height_function);
         return course;
     }
 

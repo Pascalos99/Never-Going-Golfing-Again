@@ -91,8 +91,8 @@ public class ObstacleSelect implements Screen {
         TextButton smallTree = new TextButton("Small Tree", MENU_SKIN);
         TextButton medTree = new TextButton("Medium Tree", MENU_SKIN);
         TextButton largeTree = new TextButton("Large Tree", MENU_SKIN);
-        TextButton thickWall = new TextButton("Thick Wall", MENU_SKIN);
         TextButton thinWall = new TextButton("Thin Wall", MENU_SKIN);
+        TextButton thickWall = new TextButton("Thick Wall", MENU_SKIN);
         TextButton resetObstacles = new TextButton(" Clear Obstacles", MENU_SKIN);
         Table obstacleT = new Table();
         obstacleT.add(selectionImage).prefSize(100).center();

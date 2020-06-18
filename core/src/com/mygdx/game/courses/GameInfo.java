@@ -81,8 +81,8 @@ public class GameInfo {
         return goalY;
     }
 
-    public String getSandFunction(){ return sandFunction; }
-    public double getSandFriction(){ return sandFriciton; }
+    String getSandFunction(){ return sandFunction; }
+    double getSandFriction(){ return sandFriciton; }
 
 
     /** should not be used for any other purpose than initializing the world, and thus is not supposed to be public */
