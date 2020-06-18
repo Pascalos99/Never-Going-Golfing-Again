@@ -82,6 +82,17 @@ public class CourseBuilder {
         else friction_function = friction_function.add(func);
     }
 
+    public Function2d getHeight() {
+        return height_function;
+    }
+
+    public Vector2d getStart() {
+        return start;
+    }
+    public Vector2d getGoal() {
+        return goal;
+    }
+
     public void setStartPos(Vector2d v) {
         start = v;
     }

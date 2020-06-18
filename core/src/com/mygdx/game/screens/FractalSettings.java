@@ -189,7 +189,6 @@ public class FractalSettings implements Screen {
 
     public String getSmoothingSetting(){
       return smoothingFactor.getSelected();
-
     }
 
     public double getMin(){

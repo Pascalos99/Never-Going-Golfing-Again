@@ -357,8 +357,18 @@ public class SettingsScreen implements Screen {
         return Double.parseDouble(sandFriciton.getText());
     }
 
-
-
+    private boolean isFlagInWater() {
+        return cb.getHeight().evaluate(cb.getGoal()) < 0;
+    }
+    private boolean isStartInWater() {
+        return cb.getHeight().evaluate(cb.getStart()) < 0;
+    }
+    private String getStartFlagWaterString() {
+        if (!isFlagInWater() && !isStartInWater()) return "";
+        return String.format("Warning:\nYour %s in water.\nYou should move the %s to\n make the game playable",
+                isFlagInWater()&&(!isStartInWater())?"flag position is":(isFlagInWater()?"flag and start position are":"start position is"),
+                isFlagInWater()&&(!isStartInWater())?"flag position":(isFlagInWater()?"flag and start position":"start position"));
+    }
 
     private boolean calculated_world_shift = false;
 
