@@ -123,7 +123,7 @@ public class FractalSettings implements Screen {
         Label title2 = new Label("Extra Information", MENU_SKIN);
 
         Label body= new Label(""+
-                "  Generates a fractal image to represent\n" +
+                "   Generates a fractal image to represent\n" +
                 "  a putting course. Bicubic interpolation\n" +
                 "  is used to get values in between the\n" +
                 "  image's data-points.\n\n" +
@@ -143,8 +143,10 @@ public class FractalSettings implements Screen {
                 ,MENU_SKIN);
 
         title.setAlignment(Align.center);
-        table.add(title).pad(0,0,10,0);
-        table.add(title2).row();
+        table.pad(50,0,10,0);
+        table.add(title);
+        table.add(title2);
+        table.row();
         inner.add(body);
         info.add(inner).minSize(fields.getPrefWidth()/2,fields.getPrefHeight());
 
