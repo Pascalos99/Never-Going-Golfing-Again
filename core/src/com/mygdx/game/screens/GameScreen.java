@@ -160,6 +160,7 @@ public class GameScreen implements Screen {
             replayButton.addListener(new ChangeListener(){
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
+                    //TODO: wall height doesnt reset, also camera angle does not reset
                     PlayerScreen.playerNumber=1;
                     PlayerScreen.playerTable=null;
                     parent.players=null;
