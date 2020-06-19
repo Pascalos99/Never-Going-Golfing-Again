@@ -113,6 +113,7 @@ public class FractalSettings implements Screen {
         Table inner=new Table();
         info.setBackground(BLANK_BKG);
         Label title= new Label("Fractal Settings", MENU_SKIN);
+        Label title2 = new Label("Extra Information", MENU_SKIN);
 
         Label body= new Label(""+
                 "  Generates a fractal image to represent\n" +
@@ -135,7 +136,8 @@ public class FractalSettings implements Screen {
                 ,MENU_SKIN);
 
         title.setAlignment(Align.center);
-        table.add(title).pad(0,0,10,0).row();
+        table.add(title).pad(0,0,10,0);
+        table.add(title2).row();
         inner.add(body);
         info.add(inner).minSize(fields.getPrefWidth()/2,fields.getPrefHeight());
 
