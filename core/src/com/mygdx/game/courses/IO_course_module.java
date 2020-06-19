@@ -213,11 +213,6 @@ public class IO_course_module {
         return "";
     }
 
-    public static void main(String[] args) {
-        IO_course_module io = new IO_course_module("core/testCourses/M");
-        System.out.println(io.getObstacles());
-    }
-
     public static void outputFile(File file, GameInfo aspects, List<Obstacle> obstacles) {
         String start_str = vector_to_string(aspects.getStart());
         String goal_str = vector_to_string(aspects.getGoal());

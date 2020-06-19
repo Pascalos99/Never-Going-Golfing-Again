@@ -95,6 +95,7 @@ public class FractalSettings implements Screen {
         Label inter = new Label("Interpolation: ", MENU_SKIN);
         interpolation = new SelectBox<String>(MENU_SKIN);
         interpolation.setItems("bi-linear","bi-cubic");
+        interpolation.setSelected("bi-cubic");
 
         waterCoverage=new Label("",MENU_SKIN);
         Table fields= new Table();

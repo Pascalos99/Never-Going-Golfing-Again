@@ -20,6 +20,8 @@ public class AI_Fedora extends AI_controller {
     private List<TestDataHolder> tests;
     private Vector2d old_ball_position;
 
+    public static boolean FEDORA_DEBUG = false;
+
     private static class Fedora {}
     public Fedora the_fedora;
 
@@ -44,7 +46,7 @@ public class AI_Fedora extends AI_controller {
 
             old_ball_position = new Vector2d(player.getBall().x, player.getBall().y);
             List<Vector2d> vectors = cast_vectors(player.getBall());
-            System.out.println("Using " + vectors.size() + " of " + VECTOR_COUNT + " vectors.");
+            if (FEDORA_DEBUG) System.out.println("Using " + vectors.size() + " of " + VECTOR_COUNT + " vectors.");
             tests = new ArrayList<TestDataHolder>(vectors.size());
 
             for(Vector2d v : vectors) {
@@ -70,7 +72,7 @@ public class AI_Fedora extends AI_controller {
             });
 
             double end = System.currentTimeMillis() * 0.001;
-            System.out.println("[FEDORA] Time span: " + (end - start));
+            if (FEDORA_DEBUG) System.out.println("[FEDORA] Time span: " + (end - start));
         }
 
         if(!tests.isEmpty()){
@@ -78,11 +80,11 @@ public class AI_Fedora extends AI_controller {
             tests.remove(tests.size() - 1);
             setShotVelocity(select.speed);
             setShotAngle(select.direction.angle());
-            System.out.println("[FEDORA] Select: " + select.weight);
+            if (FEDORA_DEBUG) System.out.println("[FEDORA] Select: " + select.weight);
         }
 
         else{
-            System.out.println("[FEDORA] No options left.");
+            if (FEDORA_DEBUG) System.out.println("[FEDORA] No options left.");
         }
 
     }

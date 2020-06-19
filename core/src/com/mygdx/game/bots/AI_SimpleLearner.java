@@ -91,7 +91,7 @@ public class AI_SimpleLearner extends AI_controller {
             resetVMODs(player);
         }
         int select = VMODs.get(player).get(VMODs.get(player).size() / 2);
-        System.out.println("selected "+velocity_modifiers[select]);
+//        System.out.println("selected "+velocity_modifiers[select]);
         return select;
     }
 

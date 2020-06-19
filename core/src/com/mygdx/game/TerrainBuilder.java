@@ -216,7 +216,7 @@ public class TerrainBuilder {
         try {
             func = WORLD.height_function;
         } catch (Error e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
         Texture terrainTexture = new Texture(Gdx.files.internal("tx.png"));

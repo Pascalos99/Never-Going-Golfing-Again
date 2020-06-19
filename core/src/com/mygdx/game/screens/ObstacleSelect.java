@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.courses.CourseBuilder;
+import com.mygdx.game.courses.CourseBuilderListener;
 import com.mygdx.game.courses.IO_course_module;
 import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.utils.Vector2d;
@@ -58,6 +59,7 @@ public class ObstacleSelect implements Screen {
     private Image selectionImage;
 
     private CourseBuilder courseBuilder;
+    private CourseBuilderListener minimapUpdater;
 
     private int selected = -1;
 
@@ -68,7 +70,10 @@ public class ObstacleSelect implements Screen {
         Table overall = new Table();
         overall.setFillParent(true);
         courseBuilder = SettingsScreen.cb;
+        minimapUpdater = new CourseBuilderListener();
+        courseBuilder.addListener(minimapUpdater);
         minimapDraw = MiniMapDrawer.defaultDrawer(20, 20, 30, Vector2d.ZERO.sub(WORLD_SHIFT));
+        minimapDraw.setListener(minimapUpdater);
         minimapDraw.draw(courseBuilder);
         minimapTexture = minimapDraw.getTexture();
 
@@ -164,8 +169,7 @@ public class ObstacleSelect implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                selectionImage.setDrawable(wallThickSelectDraw);
-                selectedThickness = thickThickness;
+                //selectionImage.setDrawable(wallThickSelectDraw); // TODO extra image
                 selected = 5;
             }
         });
@@ -173,8 +177,7 @@ public class ObstacleSelect implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                selectionImage.setDrawable(wallThickSelectDraw);
-                selectedThickness = thickThickness;
+                //selectionImage.setDrawable(wallThickSelectDraw); // TODO extra image
                 selected = 6;
             }
         });
@@ -278,10 +281,10 @@ public class ObstacleSelect implements Screen {
                     } else selected=WALL_START;
                     break;
                 case CHANGE_START:
-                    //TODO: fillout
+                    if (is_on_map) courseBuilder.setStartPos(pos_in_world);
                     break;
                 case CHANGE_GOAL:
-                    //TODO: fillout
+                    if (is_on_map) courseBuilder.setGoalPos(pos_in_world);
                     break;
                 default: update_minimap = false;
             }
