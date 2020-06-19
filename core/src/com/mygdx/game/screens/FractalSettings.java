@@ -168,7 +168,7 @@ public class FractalSettings implements Screen {
                 updateFractalInfo();
                 try{
                     File f = new File(savePath.getText());
-                    if (!f.createNewFile()) {
+                    if (!IO_course_module.isDefaultCourseName(savePath.getText()) && !f.createNewFile()) {
                         f.delete();
                         f.createNewFile();
                     }

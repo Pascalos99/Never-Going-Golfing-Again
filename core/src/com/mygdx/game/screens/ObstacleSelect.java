@@ -206,7 +206,7 @@ public class ObstacleSelect implements Screen {
                 GAME_ASPECTS.goalY = courseBuilder.getGoal().get_y();
                 try{
                     File f = new File(savePath.getText());
-                    if (!f.createNewFile()) {
+                    if (!IO_course_module.isDefaultCourseName(savePath.getText()) && !f.createNewFile()) {
                         f.delete();
                         f.createNewFile();
                     }
