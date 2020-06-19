@@ -193,9 +193,11 @@ public class SettingsScreen implements Screen {
         sandFunction= new TextField("sin(x)+cos(y)", MENU_SKIN);
         Label sf= new Label("Sand function: ", MENU_SKIN);
 
-
         sandFriciton = new TextField(""+ DEFAULT_SAND_FRICTION, MENU_SKIN);
         Label sandCoeff =new Label("Coefficient of friction for sand: ", MENU_SKIN);
+
+        if (GAME_ASPECTS != null) loadGameInfo(GAME_ASPECTS);
+
         int margine =10;
        /* tablel.row().pad(margine, 0, 0, 0);
         tabler.row().pad(margine, 0, 0, 0);
@@ -388,10 +390,26 @@ public class SettingsScreen implements Screen {
 
 
     public GameInfo getGameInfo(){
-        return new GameInfo(parent.players.getPlayers(),getGravity(),getMassofBall(),
+        GameInfo info = new GameInfo(parent.players.getPlayers(),getGravity(),getMassofBall(),
                 getFrictionc(),getMaxV(),getTolerance(),getStartX(),
                 getStartY(),getGoalX(),getGoalY(),getHeightFunction(),
                 getSandFriction(),getSandFunction());
+        if (GAME_ASPECTS != null) info.fractalInfo = GAME_ASPECTS.fractalInfo;
+        return info;
+    }
+    public void loadGameInfo(GameInfo info) {
+        gravity.setText("" + info.getGravity());
+        ballMass.setText("" + info.getMassofBall());
+        coefff.setText(("" + info.getFriction()));
+        sandFriciton.setText("" + info.getSandFriction());
+        vMax.setText(""+info.getMaxV());
+        tolerance.setText(""+info.getTolerance());
+        startX.setText(""+info.getStartX());
+        startY.setText(""+info.getStartY());
+        goalX.setText(""+info.getGoalX());
+        goalY.setText(""+info.getGoalY());
+        height.setText(""+info.getHeightFunction());
+        sandFunction.setText("" + info.getSandFunction());
     }
     public static class ColorSelection {
         public String name;

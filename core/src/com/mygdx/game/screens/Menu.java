@@ -4,6 +4,7 @@ package com.mygdx.game.screens;
 import com.badlogic.gdx.Game;
 import com.mygdx.game.courses.CourseBuilder;
 import com.mygdx.game.courses.GameInfo;
+import com.mygdx.game.utils.Variables;
 
 
 public class Menu extends Game {
@@ -103,6 +104,7 @@ public class Menu extends Game {
 				break;
 			case FRACTAL_SELECT:
 				fractalSettings= new FractalSettings(this);
+				fractalSettings.loadInfo(Variables.GAME_ASPECTS.fractalInfo);
 				this.setScreen(fractalSettings);
 				break;
 			case WARNING_SCREEN:

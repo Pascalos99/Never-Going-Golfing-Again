@@ -9,15 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.game.courses.CourseBuilder;
-import com.mygdx.game.courses.FractalGenerator;
-import com.mygdx.game.courses.GameInfo;
-import com.mygdx.game.courses.IO_course_module;
+import com.mygdx.game.courses.*;
 import com.mygdx.game.parser.BiLinearArrayFunction2d;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
 import java.io.File;
+import java.util.Random;
 
 import static com.mygdx.game.utils.Variables.*;
 
@@ -36,6 +34,16 @@ public class FractalSettings implements Screen {
 
     Label waterCoverage;
 
+    public void loadInfo(FractalInfo info) {
+        if (info == null) return;
+        seed.setText(info.seed+"");
+        roughness.setText(info.roughness+"");
+        minimum.setText(info.minimum+"");
+        maximum.setText(info.maximum+"");
+        resolution.setSelected(info.resolution_setting);
+        smoothingFactor.setSelected(info.smoothness_setting);
+        interpolation.setSelected(info.resolution_setting);
+    }
 
     public FractalSettings(Menu menu){
         parent=menu;
@@ -50,6 +58,7 @@ public class FractalSettings implements Screen {
         backButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                updateFractalInfo();
                 parent.changeScreen(Menu.CUSTOM_GAME);
             }
         });
@@ -58,6 +67,7 @@ public class FractalSettings implements Screen {
         play.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                updateFractalInfo();
                 cb.setFractalHeight(getSeed(),getRoughness(),getResSetting(),getSmoothingSetting(), getInterpolation(),getMin(),getMax());
                 parent.changeScreen(Menu.PLAY);
             }
@@ -67,6 +77,7 @@ public class FractalSettings implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                updateFractalInfo();
                 cb.setFractalHeight(getSeed(),getRoughness(),getResSetting(),getSmoothingSetting(), getInterpolation(),getMin(),getMax());
                 parent.changeScreen(Menu.CUSTOMIZE_OBSTACLES);
             }
@@ -152,7 +163,7 @@ public class FractalSettings implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
+                updateFractalInfo();
                 try{
                     File f = new File(savePath.getText());
                     if (!f.createNewFile()) {
@@ -245,7 +256,7 @@ public class FractalSettings implements Screen {
     public long getSeed(){
         String val=seed.getText();
         if(val.isBlank()||val.isEmpty()){
-            return System.currentTimeMillis();
+            return new Random(System.currentTimeMillis()).nextLong();
         }else{
             return Long.parseLong(val);
         }
@@ -261,7 +272,7 @@ public class FractalSettings implements Screen {
     }
 
     public String getSmoothingSetting(){
-      return smoothingFactor.getSelected();
+        return smoothingFactor.getSelected();
     }
 
     public double getMin(){
@@ -274,6 +285,14 @@ public class FractalSettings implements Screen {
 
     public String getInterpolation() {
         return interpolation.getSelected();
+    }
+
+    public FractalInfo getInfo() {
+        return new FractalInfo(getSeed(), getRoughness(), getResSetting(), getSmoothingSetting(), getInterpolation(), getMin(), getMax());
+    }
+
+    private void updateFractalInfo() {
+        GAME_ASPECTS.fractalInfo = getInfo();
     }
 
 }
