@@ -22,6 +22,7 @@ public class GameInfo {
     private String heightFunction;
 
     public FractalInfo fractalInfo;
+    public boolean use_fractals;
 
 
     public GameInfo(ArrayList<Player> players, double gravity, double ballMass,double friction, double maxVelocity,

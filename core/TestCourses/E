@@ -1,10 +1,5 @@
-g = 9.81;
-m = 45.93;
-mu = 0.131;
-vmax = 6.0;
-tol = 0.5;
-start = (1.0, 2.0);
-goal = (3.0, 3.0);
-height = sin(2x+y) + cos(2y+y) + 3 - 0.2(x-3)^2 - 0.2(y-3)^2 +5;
-sand = 0;
-mu_sand =0.6;
+g = 9.81; m = 45.93; mu = 0.131; mu-sand = 0.578; vmax = 6.0; tol = 0.5;
+start = ( 1.0000,  2.0000); goal = ( 3.0000,  3.0000); world-shift = ( 8.0000,  7.5000);
+height = sin(2x+y) + cos(2y+y) + 3 - 0.2(x-3)^2 - 0.2(y-3)^2 +5; sand = 0
+using_fractals = false;
+

@@ -138,23 +138,25 @@ public class FractalSettings implements Screen {
         Label title2 = new Label("Extra Information", MENU_SKIN);
 
         Label body= new Label(""+
-                "   Generates a fractal image to represent\n" +
-                "  a putting course. Bicubic interpolation\n" +
-                "  is used to get values in between the\n" +
-                "  image's data-points.\n\n" +
-                "    Any course with a unique seed will\n" +
-                "  also be a unique course.\n\n" +
-                "    The roughness specifies the amount of\n" +
-                "  distortion in between the gradients of\n" +
-                "  two determined values in the image.\n" +
-                "  This value lies typically between 0 and 1.\n\n" +
-                "    The resolution specifies how many\n" +
-                "  data-points are used for the image.\n\n" +
-                "    The smoothing factor lowers the resolution\n" +
-                "  while introducing a layer of bilinear interpolation\n\n" +
-                "    The minimum and maximum specify what\n" +
-                "  the lowest and highest points in the course will\n" +
-                "  be and dictates the overall scale of the world."
+                "   Generates a fractal image to represent a putting\n" +
+                "   course. Bicubic or Bilinear interpolation is used to\n" +
+                "   compute the values in between discrete data-points.\n\n" +
+                "     Any course with a unique seed will be practically\n" +
+                "   unique as a course overall. Leaving the \"seed\" field\n" +
+                "   empty results in a random seed being used. The\n\n" +
+                "     roughness specifies the amount of distortion in between   \n" +
+                "   the gradients of two determined values in the image.\n" +
+                "   Roughness affects the distortion on every 'level' or\n" +
+                "   'depth' of the fractal, which is generated recursively.\n" +
+                "   This roughness value typically lies between 0 and 1.\n\n" +
+                "     The resolution specifies how many data-points are used   \n" +
+                "   for the fractal image; over which is being interpolated.\n\n" +
+                "     The smoothing factor lowers the resolution while\n" +
+                "   introducing a layer of bilinear interpolation, which\n" +
+                "   improves overall performance while reducing quality.\n\n" +
+                "     The minimum and maximum specify what the lowest\n" +
+                "   and highest points in the course will be and\n" +
+                "   dictates the overall scale of the world."
                 ,MENU_SKIN);
 
         TextButton save= new TextButton("Save",MENU_SKIN);
@@ -170,7 +172,7 @@ public class FractalSettings implements Screen {
                         f.delete();
                         f.createNewFile();
                     }
-                    IO_course_module.outputFile(f, GAME_ASPECTS, cb.getObstacles());
+                    IO_course_module.outputFile(f, GAME_ASPECTS);
 
                 }catch(Exception e){
                     e.printStackTrace();

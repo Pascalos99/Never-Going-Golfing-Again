@@ -48,6 +48,10 @@ public class CourseBuilder {
         setMaximumVelocity(aspects.getMaxV());
         setGravity(aspects.getGravity());
         setSandFunction(new AtomFunction2d(aspects.getSandFunction()), aspects.friction, aspects.sandFriciton);
+        if (aspects.use_fractals) {
+            FractalInfo f = aspects.fractalInfo;
+            setFractalHeight(f.seed, f.roughness, f.resolution_setting, f.smoothness_setting, f.interpolation_setting, f.minimum, f.maximum);
+        }
     }
 
     public void addHeight(Function2d func) {
@@ -98,6 +102,12 @@ public class CourseBuilder {
     public void setGoalPos(Vector2d v) {
         goal = v;
         notifyListeners(UPDATE_GOAL);
+    }
+    public Vector2d getStart() {
+        return start;
+    }
+    public Vector2d getGoal() {
+        return goal;
     }
     public void setStartAndGoalPos(Vector2d start, Vector2d goal) {
         setStartPos(start);

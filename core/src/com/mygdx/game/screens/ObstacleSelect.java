@@ -200,6 +200,10 @@ public class ObstacleSelect implements Screen {
         save.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                GAME_ASPECTS.startX = courseBuilder.getStart().get_x();
+                GAME_ASPECTS.startY = courseBuilder.getStart().get_y();
+                GAME_ASPECTS.goalX = courseBuilder.getGoal().get_x();
+                GAME_ASPECTS.goalY = courseBuilder.getGoal().get_y();
                 try{
                     File f = new File(savePath.getText());
                     if (!f.createNewFile()) {
