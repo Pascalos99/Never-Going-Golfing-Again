@@ -39,7 +39,7 @@ public class Ball extends TopDownPhysicsObject {
     public int ticks;
     public Vector3 frozen_direction;
 
-    private AxisAllignedBoundingBox aabb;
+    private List<CollisionData> global_collisions;
 
     Ball(double x_pos, double y_pos, ModelInstance model, Player owner) {
         this.mass = GAME_ASPECTS.getMassofBall() * 0.001;
@@ -62,16 +62,21 @@ public class Ball extends TopDownPhysicsObject {
         travel_distance = 0d;
         rolling_distance = 0d;
         ticks = 0;
+
+        global_collisions = new ArrayList<CollisionData>();
     }
 
     public void step(double delta, List<TopDownPhysicsObject> ents) {
 
         if(is_moving) {
+            System.out.println("Ball at " + getPhysicsPosition().toString());
+            global_collisions = isColliding();
+
             Function2d h = world.height_function;
             Vector2d gradient = h.gradient(new Vector2d(x, y));
             double initial_x = x;
             double initial_y = y;
-            double initial_height = h.evaluate(initial_x, initial_y);
+            double initial_height = h.evaluate(initial_x, initial_y) + BALL_RADIUS;
             ticks += 1;
 
             if(flight_state == ROLL) {
@@ -98,10 +103,16 @@ public class Ball extends TopDownPhysicsObject {
                 Vector2d gradients = h.gradient(initial_x, initial_y);
                 double predicted_height = initial_height + gradients.get_x()*x_diff + gradients.get_y()*y_diff;
 
-                double final_height = h.evaluate(x, y);
+                double final_height = height;
 
-                height_velocity = predicted_height - final_height - mass*world.gravity*delta;
-//                System.out.println(height_velocity);
+                height_velocity = predicted_height - final_height;
+                /*System.out.println("|------------------|");
+                System.out.println("landGRavity = " + landGravity());
+                System.out.println("landGRavity x delta = " + delta*landGravity());
+                System.out.println("predicted_height = " + predicted_height);
+                System.out.println("final_height = " + final_height);
+                System.out.println("height_velocity = " + height_velocity);
+                System.out.println("|------------------|");*/
 
                 frozen_direction = new Vector3((float)velocity.get_x(), (float)height_velocity, (float)velocity.get_y());
 
@@ -118,11 +129,8 @@ public class Ball extends TopDownPhysicsObject {
                     velocity = new Vector2d(0, 0);
                 }
 
-                if (ALLOW_FLIGHT) {
-
-                    if (height_velocity > 0 && gradientTest(h, new Vector2d(initial_x, initial_y), new Vector2d(x, y)) && velocity.get_length() > 0d)
-                        flight_state = LAUNCH;
-
+                if (ALLOW_FLIGHT && height_velocity > 0) {
+                    flight_state = LAUNCH;
                 }
 
             }
@@ -155,6 +163,8 @@ public class Ball extends TopDownPhysicsObject {
 
             }
 
+            global_collisions.clear();
+
             Vector2d start = new Vector2d(initial_x, initial_y);
             Vector2d end = new Vector2d(x, y);
             int steps = 3;
@@ -170,20 +180,10 @@ public class Ball extends TopDownPhysicsObject {
                         break;
                     }
 
-                    List<CollisionData> collisions = isColliding();
-
-                    if(!collisions.isEmpty()){
-                        System.out.println("Hey! I found a collision here.");
-                    }
-
             }
 
         }
 
-    }
-
-    public int getTick_count() {
-        return ticks;
     }
 
     private boolean ballVsFenceCollision(){
@@ -218,21 +218,6 @@ public class Ball extends TopDownPhysicsObject {
         }
 
         return r;
-    }
-
-    private  boolean gradientTest(Function2d height_f, Vector2d old, Vector2d xy){
-        Vector2d initial_gradient = height_f.gradient(old);
-        Vector2d final_gradient = height_f.gradient(xy);
-
-        Vector2d difference = xy.sub(old);
-        double dx = difference.get_x() / Math.abs(difference.get_x());
-        double dy = difference.get_y() / Math.abs(difference.get_y());
-        Vector2d direction = new Vector2d(dx, dy);
-
-        boolean c1 = initial_gradient.get_x() * direction.get_x() > final_gradient.get_x() * direction.get_x();
-        boolean c2 = initial_gradient.get_y() * direction.get_y() > final_gradient.get_y() * direction.get_y();
-
-        return c1 || c2;
     }
 
     public void addVelocity(Vector2d v) {
@@ -285,6 +270,38 @@ public class Ball extends TopDownPhysicsObject {
         return out;
     }
 
+    public double evalHeightAt(double x, double y){
+
+        for(CollisionData collision : global_collisions){
+
+            if(collision.atop)
+                return collision.obstacle.getHeightAt(x, y);
+
+        }
+
+        return world.height_function.evaluate(x, y);
+    }
+
+    public double evalFrictionAt(double x, double y){
+
+        for(CollisionData collision : global_collisions){
+
+            if(collision.atop)
+                return collision.obstacle.getFrictionAt(x, y);
+
+        }
+
+        return world.friction_function.evaluate(x, y);
+    }
+
+    public double evalHeightAt(Vector2d pos, List<CollisionData> collisions){
+        return evalHeightAt(pos.get_x(), pos.get_y());
+    }
+
+    public double evalFrictionAt(Vector2d pos, List<CollisionData> collisions){
+        return evalFrictionAt(pos.get_x(), pos.get_y());
+    }
+
     @Override
     public double getOrientation() {
         return 0;
@@ -293,22 +310,24 @@ public class Ball extends TopDownPhysicsObject {
     public List<CollisionData> isColliding(){
         List<CollisionData> collisions = new ArrayList<CollisionData>();
 
-        for(TopDownPhysicsObject body : engine.getBodies()){
+        for(TopDownPhysicsObject body : world.getObstacles()){
 
             if(body instanceof Obstacle){
                 Obstacle obstacle = (Obstacle) body;
 
                 CollisionData data = obstacle.isColliding(this);
 
-                if(data.contact){
+                if(data != null){
                     this.x += data.clipping_correction.get_x();
                     this.y += data.clipping_correction.get_z();
-                    this.height = data.clipping_correction.get_y();
+                    this.height += data.clipping_correction.get_y();
 
-                    this.velocity.add(new Vector2d(data.bounce.get_x(), data.bounce.get_z()));
-                    this.height_velocity += data.bounce.get_y();
+                    this.velocity = new Vector2d(data.bounce.get_x(), data.bounce.get_z());
+                    this.height_velocity = data.bounce.get_y();
 
                     collisions.add(data);
+
+                    System.out.println("Hey! Collision here!");
                 }
 
             }
@@ -362,7 +381,7 @@ public class Ball extends TopDownPhysicsObject {
 
     private Vector2d f(Vector2d pos, Vector2d vel){
         Function2d h = world.height_function;
-        double gravity = world.gravity;
+        double gravity = landGravity();
         double friction = world.friction_function.evaluate(x, y);
 
         if(isOnWater()){
@@ -428,8 +447,10 @@ public class Ball extends TopDownPhysicsObject {
     }
 
     public double flightGravity(){
-        return world.gravity * 8d;
+        return world.gravity*7d;
     }
+
+    public double landGravity() { return world.gravity; }
 
     public static Vector2d correctHitVector(Vector2d direction, double speed){
         return new Vector2d(direction.get_x() * speed * SPEED_CORRECTION, direction.get_y() * speed * SPEED_CORRECTION);
@@ -472,16 +493,14 @@ public class Ball extends TopDownPhysicsObject {
     }
 
     public AxisAllignedBoundingBox getBoundingBox() {
+        Vector3d physics_pos = getPhysicsPosition();
 
-        if(aabb == null)
-            aabb = new AxisAllignedBoundingBox(
-                    new Vector3d(x - BALL_RADIUS, height - BALL_RADIUS, y - BALL_RADIUS),
+        return new AxisAllignedBoundingBox(
+                    new Vector3d(physics_pos.get_x() - BALL_RADIUS, physics_pos.get_y() - BALL_RADIUS, physics_pos.get_z() - BALL_RADIUS),
                     BALL_RADIUS*2,
                     BALL_RADIUS*2,
                     BALL_RADIUS*2
                     );
-
-        return aabb;
     }
 
     @Override

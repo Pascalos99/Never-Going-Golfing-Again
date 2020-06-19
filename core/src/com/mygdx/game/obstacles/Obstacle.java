@@ -3,6 +3,7 @@ package com.mygdx.game.obstacles;
 import com.mygdx.game.Ball;
 import com.mygdx.game.physics.TopDownPhysicsObject;
 import com.mygdx.game.utils.Vector2d;
+import com.mygdx.game.utils.Vector3d;
 
 public abstract class Obstacle extends TopDownPhysicsObject {
 
@@ -17,11 +18,14 @@ public abstract class Obstacle extends TopDownPhysicsObject {
     }
 
     public CollisionData isColliding(Ball ball) {
+        System.out.println(toString());
+
         AxisAllignedBoundingBox box = getBoundingBox();
         AxisAllignedBoundingBox ball_box = ball.getBoundingBox();
 
-        if(box.collides(ball_box))
+        if(box != null && box.collides(ball_box)) {
             return isShapeColliding(ball);
+        }
 
         return null;
     }
@@ -32,11 +36,17 @@ public abstract class Obstacle extends TopDownPhysicsObject {
     public TopDownPhysicsObject dupe() {
         return (TopDownPhysicsObject)this;
     }
-//TODO for dennis, problems occured, pls help -AG
-    //public abstract double getHeightAt(double x, double y);
 
-//   // public double getHeightAt(Vector2d pos){
-//        return getHeightAt(pos.get_x(), pos.get_y());
-//    }
+    public abstract double getHeightAt(double x, double y);
+
+    public double getHeightAt(Vector2d pos){
+        return getHeightAt(pos.get_x(), pos.get_y());
+    }
+
+    public abstract  double getFrictionAt(double x, double y);
+
+    public double getFrictionAt(Vector2d pos){
+        return getFrictionAt(pos.get_x(), pos.get_y());
+    }
 
 }

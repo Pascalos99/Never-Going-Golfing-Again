@@ -4,16 +4,15 @@ import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
 
 public class CollisionData {
-    public Vector3d clipping_correction;
-    public boolean contact;
-    public Vector3d bounce;
-    public boolean is_on_land;
+    public Vector3d clipping_correction, bounce;
+    public boolean atop;
+    public Obstacle obstacle;
 
-    CollisionData(){
+    CollisionData(Obstacle obstacle){
         clipping_correction = new Vector3d(0, 0, 0);
-        contact = false;
         bounce = new Vector3d(0, 0, 0);
-        is_on_land = false;
+        atop = false;
+        this.obstacle = obstacle;
     }
 
 }
