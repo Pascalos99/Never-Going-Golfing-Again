@@ -12,9 +12,12 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.courses.CourseBuilder;
 import com.mygdx.game.courses.FractalGenerator;
 import com.mygdx.game.courses.GameInfo;
+import com.mygdx.game.courses.IO_course_module;
 import com.mygdx.game.parser.BiLinearArrayFunction2d;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
+
+import java.io.File;
 
 import static com.mygdx.game.utils.Variables.*;
 
@@ -143,6 +146,27 @@ public class FractalSettings implements Screen {
                 "  be and dictates the overall scale of the world."
                 ,MENU_SKIN);
 
+        TextButton save= new TextButton("Save",MENU_SKIN);
+        TextField savePath=new TextField("",MENU_SKIN);
+        save.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+
+                try{
+                    File f = new File(savePath.getText());
+                    if (!f.createNewFile()) {
+                        f.delete();
+                        f.createNewFile();
+                    }
+                    IO_course_module.outputFile(f, GAME_ASPECTS, cb.getObstacles());
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        });
         title.setAlignment(Align.center);
         table.pad(50,0,10,0);
         table.add(title);
@@ -158,6 +182,10 @@ public class FractalSettings implements Screen {
         navigation.row().pad(0,10,10,10);
         navigation.add(backButton,play,customizeObstacles);
         navigation.align(Align.bottomLeft);
+
+        table.row().pad(0,10,0,10);
+        table.add(save);
+        table.add(savePath);
 
         stage.addActor(navigation);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
