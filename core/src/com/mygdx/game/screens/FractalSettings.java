@@ -114,12 +114,28 @@ public class FractalSettings implements Screen {
         info.setBackground(BLANK_BKG);
         Label title= new Label("Fractal Settings", MENU_SKIN);
 
-        //TODO: fill the empty string
-        Label body= new Label("",MENU_SKIN);
-
+        Label body= new Label(""+
+                "  Generates a fractal image to represent\n" +
+                "  a putting course. Bicubic interpolation\n" +
+                "  is used to get values in between the\n" +
+                "  image's data-points.\n\n" +
+                "    Any course with a unique seed will\n" +
+                "  also be a unique course.\n\n" +
+                "    The roughness specifies the amount of\n" +
+                "  distortion in between the gradients of\n" +
+                "  two determined values in the image.\n" +
+                "  This value lies typically between 0 and 1.\n\n" +
+                "    The resolution specifies how many\n" +
+                "  data-points are used for the image.\n\n" +
+                "    The smoothing factor lowers the resolution\n" +
+                "  while introducing a layer of bilinear interpolation\n\n" +
+                "    The minimum and maximum specify what\n" +
+                "  the lowest and highest points in the course will\n" +
+                "  be and dictates the overall scale of the world."
+                ,MENU_SKIN);
 
         title.setAlignment(Align.center);
-        inner.add(title);
+        table.add(title).pad(0,0,10,0).row();
         inner.add(body);
         info.add(inner).minSize(fields.getPrefWidth()/2,fields.getPrefHeight());
 
