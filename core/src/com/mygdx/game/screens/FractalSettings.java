@@ -25,6 +25,7 @@ public class FractalSettings implements Screen {
 
     SelectBox<String>resolution;
     SelectBox<String>smoothingFactor;
+    SelectBox<String>interpolation;
     TextField seed;
     TextField roughness;
     TextField minimum;
@@ -54,7 +55,7 @@ public class FractalSettings implements Screen {
         play.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                cb.setFractalHeight(getSeed(),getRoughness(),getResSetting(),getSmoothingSetting(),getMin(),getMax());
+                cb.setFractalHeight(getSeed(),getRoughness(),getResSetting(),getSmoothingSetting(), getInterpolation(),getMin(),getMax());
                 parent.changeScreen(Menu.PLAY);
             }
         });
@@ -63,7 +64,7 @@ public class FractalSettings implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                cb.setFractalHeight(getSeed(),getRoughness(),getResSetting(),getSmoothingSetting(),getMin(),getMax());
+                cb.setFractalHeight(getSeed(),getRoughness(),getResSetting(),getSmoothingSetting(), getInterpolation(),getMin(),getMax());
                 parent.changeScreen(Menu.CUSTOMIZE_OBSTACLES);
             }
         });
@@ -91,6 +92,10 @@ public class FractalSettings implements Screen {
         Label max = new Label("Maximum :",MENU_SKIN);
         maximum=new TextField("15",MENU_SKIN);
 
+        Label inter = new Label("Interpolation: ", MENU_SKIN);
+        interpolation = new SelectBox<String>(MENU_SKIN);
+        interpolation.setItems("bi-linear","bi-cubic");
+
         waterCoverage=new Label("",MENU_SKIN);
         Table fields= new Table();
         fields.setBackground(TABLE_BKG);
@@ -102,6 +107,8 @@ public class FractalSettings implements Screen {
         fields.add(res,resolution);
         fields.row().pad(10,10,10,10);
         fields.add(smoothingf,smoothingFactor);
+        fields.row().pad(10,10,10,10);
+        fields.add(inter, interpolation);
         fields.row().pad(10,10,10,10);
         fields.add(min,minimum);
         fields.row().pad(10,10,10,10);
@@ -234,7 +241,8 @@ public class FractalSettings implements Screen {
         return Double.parseDouble(maximum.getText());
     }
 
-
-
+    public String getInterpolation() {
+        return interpolation.getSelected();
+    }
 
 }

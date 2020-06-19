@@ -30,8 +30,7 @@ public abstract class ArrayFunction2d implements Function2d {
 		double x = ((_x - shift_x) / real_width) * array.length;
 		double y = ((_y - shift_y) / real_height) * array[0].length;
 		if (x >= array.length - 2|| y >= array.length - 2 || x < -1 || y < -1) return out_of_bounds.evaluate(x, y);
-		x++; y++;
-		return evaluateInBounds(x, y);
+		return evaluateInBounds(x + 1, y + 1);
 	}
 
 	@Override
@@ -39,8 +38,7 @@ public abstract class ArrayFunction2d implements Function2d {
 		double x = ((_x - shift_x) / real_width) * array.length;
 		double y = ((_y - shift_y) / real_height) * array[0].length;
 		if (x >= array.length - 2|| y >= array.length - 2 || x < -1 || y < -1) return out_of_bounds.gradient(x, y);
-		x++; y++;
-		return gradientInBounds(x, y);
+		return gradientInBounds(x + 1, y + 1);
 	}
 
 	public abstract double evaluateInBounds(double x, double y);
@@ -58,6 +56,13 @@ public abstract class ArrayFunction2d implements Function2d {
 	}
 	public void setShift(Vector2d shift) {
 		setShift(shift.get_x(), shift.get_y());
+	}
+
+	protected double gridX() {
+		return real_width / original.length;
+	}
+	protected double gridY() {
+		return real_height / original[0].length;
 	}
 
 	public static double[][] deepCopy(double[][] array) {

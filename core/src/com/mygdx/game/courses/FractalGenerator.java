@@ -1,5 +1,7 @@
 package com.mygdx.game.courses;
 
+import com.mygdx.game.parser.ArrayFunction2d;
+import com.mygdx.game.parser.BiCubicArrayFunction2d;
 import com.mygdx.game.parser.BiLinearArrayFunction2d;
 import com.mygdx.game.parser.Function2d;
 
@@ -16,10 +18,16 @@ public class FractalGenerator {
         this.random = random;
     }
 
-    public BiLinearArrayFunction2d biLinearFractal(int desired_origin_size, int smoothing_factor, double roughness, double real_size, double minimum_value, double maximum_value, Function2d out_of_bounds) {
+    public ArrayFunction2d biLinearFractal(int desired_origin_size, int smoothing_factor, double roughness, double real_size, double minimum_value, double maximum_value, Function2d out_of_bounds) {
         double[][] fractal = smoothenedFractalMap(desired_origin_size, smoothing_factor, roughness);
         applyRangeToMatrix(fractal, minimum_value, maximum_value);
         return new BiLinearArrayFunction2d(fractal, out_of_bounds, real_size, real_size);
+    }
+
+    public ArrayFunction2d biCubicFractal(int desired_origin_size, int smoothing_factor, double roughness, double real_size, double minimum_value, double maximum_value, Function2d out_of_bounds) {
+        double[][] fractal = smoothenedFractalMap(desired_origin_size, smoothing_factor, roughness);
+        applyRangeToMatrix(fractal, minimum_value, maximum_value);
+        return new BiCubicArrayFunction2d(fractal, out_of_bounds, real_size, real_size);
     }
 
     /**

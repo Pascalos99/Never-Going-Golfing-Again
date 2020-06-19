@@ -7,6 +7,7 @@ import com.mygdx.game.parser.*;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,24 +39,12 @@ public class CourseBuilder {
     }
 
     public void loadInfo(GameInfo aspects) {
-        addHeight(aspects.getHeightFunction());
+        addHeight(new AtomFunction2d(aspects.getHeightFunction()));
         setStartAndGoalPos(aspects.getStart(), aspects.getGoal());
         setHoleTolerance(aspects.getTolerance());
         setMaximumVelocity(aspects.getMaxV());
         setGravity(aspects.getGravity());
         setSandFunction(new AtomFunction2d(aspects.getSandFunction()), aspects.friction, aspects.sandFriciton);
-    }
-
-    public void addHeight(String raw_func) {
-        if (raw_func.matches("\\s*fractal\\[?.*]?\\s*")) {
-            double roughness = 0.5;
-            BiLinearArrayFunction2d func = new FractalGenerator(System.currentTimeMillis()).biLinearFractal(
-                4000, 1, roughness, Variables.BOUNDED_WORLD_SIZE + 1,
-                    -10, 15, Variables.OUT_OF_BOUNDS_HEIGHT);
-            func.setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
-            addHeight(func);
-        }
-        else addHeight(new AtomFunction2d(raw_func));
     }
 
     public void addHeight(Function2d func) {
@@ -225,8 +214,11 @@ public class CourseBuilder {
         return obstacles;
     }
 
-    public void setFractalHeight(long seed, double roughness, String resolution_setting, String smoothness_setting, double min_value, double max_value) {
-        int resolution = 4000;
+    public void setFractalHeight(long seed, double roughness, String resolution_setting, String smoothness_setting, String interpolation_setting, double min_value, double max_value) {
+        boolean cubic = false;
+        switch (interpolation_setting) {
+            case("bi-cubic"): cubic = true; break;
+        } int resolution = 4000;
         switch(resolution_setting) {
             case("Low"): resolution = 2000; break;
             case("High"): resolution = 6000; break;
@@ -236,8 +228,14 @@ public class CourseBuilder {
             case("Medium"): smoothness = 4; break;
             case("High"): smoothness = 8; break;
         }
-        height_function = new FractalGenerator(seed).biLinearFractal(resolution, smoothness, roughness,
+        if (cubic) resolution /= 4;
+
+        FractalGenerator frac = new FractalGenerator(seed);
+        if (cubic) height_function = frac.biCubicFractal(resolution, smoothness, roughness,
                 Variables.BOUNDED_WORLD_SIZE + 1, min_value, max_value, Variables.OUT_OF_BOUNDS_HEIGHT);
+        else height_function = frac.biLinearFractal(resolution, smoothness, roughness,
+                Variables.BOUNDED_WORLD_SIZE + 1, min_value, max_value, Variables.OUT_OF_BOUNDS_HEIGHT);
+
         ((ArrayFunction2d)height_function).setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
         updateSandFunction();
     }
