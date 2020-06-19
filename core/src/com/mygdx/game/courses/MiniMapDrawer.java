@@ -130,7 +130,11 @@ public abstract class MiniMapDrawer {
         } if (cbl.reset(UPDATE_GOAL) && cbl.cb.goal != null) {
             drawStartAndGoalPos(cbl.cb.start, cbl.cb.goal);
             cbl.reset(UPDATE_START);
-        } if (cbl.reset(UPDATE_TEMP_WALL) && cbl.cb.temp_wall != null) cbl.cb.temp_wall.visit(this);
+        } if (cbl.cb.temp_wall != null && cbl.reset(UPDATE_TEMP_WALL)) cbl.cb.temp_wall.visit(this);
+        if (cbl.reset(UPDATE_TEMP_WALL)) {
+            tempwall_image.setColor(Color.CLEAR);
+            tempwall_image.fill();
+        }
         if (cbl.reset(UPDATE_OBSTACLES)) {
             obstacles_image.setColor(Color.CLEAR);
             obstacles_image.fill();
