@@ -89,8 +89,8 @@ public class SettingsScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 MAX_SHOT_VELOCITY = getMaxV();
-                GameInfo g = getGameInfo();
-                cb.loadInfo(g);
+                GAME_ASPECTS = getGameInfo();
+                cb.loadInfo(GAME_ASPECTS);
                 parent.changeScreen(Menu.FRACTAL_SELECT);
             }
         });
@@ -103,7 +103,7 @@ public class SettingsScreen implements Screen {
                public void changed(ChangeEvent event, Actor actor) {
                    MAX_SHOT_VELOCITY = getMaxV();
                    GAME_ASPECTS = getGameInfo();
-                   cb.loadInfo(getGameInfo());
+                   cb.loadInfo(GAME_ASPECTS);
                    parent.changeScreen(Menu.CUSTOMIZE_OBSTACLES);
                }
        });

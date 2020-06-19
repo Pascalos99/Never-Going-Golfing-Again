@@ -64,6 +64,7 @@ public class ObstacleSelect implements Screen {
     public ObstacleSelect(Menu menu) {
         parent = menu;
         stage = new Stage(new ScreenViewport());
+
         Gdx.input.setInputProcessor(stage);
         Table overall = new Table();
         overall.setFillParent(true);
