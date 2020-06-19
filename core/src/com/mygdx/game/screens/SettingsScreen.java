@@ -46,7 +46,7 @@ public class SettingsScreen implements Screen {
     private TextField sandFunction;
     private TextField sandFriciton;
     private CheckBox usingFractal;
-    private CheckBox allignOrigin;
+    private Button allignOrigin;
 
     private boolean shift_updated = true;
     static CourseBuilder cb;
@@ -295,7 +295,7 @@ public class SettingsScreen implements Screen {
         Table fileConfig = new Table();
         Table buttons = new Table();
         buttons.row().pad(20,0,10,10);
-        buttons.add(allignOrigin);
+        //buttons.add(allignOrigin);
         buttons.add(play).minWidth(customizeObstacles.getPrefWidth());
         buttons.add(customizeObstacles);
         table.row().pad(0, 0, 10, 0);
