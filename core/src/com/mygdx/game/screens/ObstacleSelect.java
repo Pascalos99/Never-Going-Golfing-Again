@@ -94,6 +94,8 @@ public class ObstacleSelect implements Screen {
         TextButton largeTree = new TextButton("Large Tree", MENU_SKIN);
         TextButton thinWall = new TextButton("Thin Wall", MENU_SKIN);
         TextButton thickWall = new TextButton("Thick Wall", MENU_SKIN);
+        TextButton changeStart = new TextButton("Change Start", MENU_SKIN);
+        TextButton changeEnd = new TextButton("Change Goal", MENU_SKIN);
         TextButton resetObstacles = new TextButton(" Clear Obstacles", MENU_SKIN);
         Table obstacleT = new Table();
         obstacleT.add(selectionImage).prefSize(100).center();
@@ -109,8 +111,11 @@ public class ObstacleSelect implements Screen {
         obstacleT.row().pad(10, 10, 0, 10);
         obstacleT.add(thickWall);
         obstacleT.row().pad(10, 10, 0, 10);
-        obstacleT.add(resetObstacles);
+        obstacleT.add(changeStart);
         obstacleT.row().pad(10, 10, 0, 10);
+        obstacleT.add(changeEnd);
+        obstacleT.row().pad(10, 10, 0, 10);
+        obstacleT.add(resetObstacles);
 
         smallTree.addListener(new ChangeListener() {
 
@@ -153,6 +158,24 @@ public class ObstacleSelect implements Screen {
                 selectionImage.setDrawable(wallThickSelectDraw);
                 selectedThickness = thickThickness;
                 selected = 3;
+            }
+        });
+        changeStart.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                selectionImage.setDrawable(wallThickSelectDraw);
+                selectedThickness = thickThickness;
+                selected = 5;
+            }
+        });
+        changeEnd.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                selectionImage.setDrawable(wallThickSelectDraw);
+                selectedThickness = thickThickness;
+                selected = 6;
             }
         });
 
@@ -253,6 +276,12 @@ public class ObstacleSelect implements Screen {
                         courseBuilder.startWall(pos_in_world, selectedThickness);
                         selected=WALL_END;
                     } else selected=WALL_START;
+                    break;
+                case CHANGE_START:
+                    //TODO: fillout
+                    break;
+                case CHANGE_GOAL:
+                    //TODO: fillout
                     break;
                 default: update_minimap = false;
             }
