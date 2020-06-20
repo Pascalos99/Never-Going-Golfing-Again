@@ -20,6 +20,7 @@ import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.physics.PuttingCoursePhysics;
 import com.mygdx.game.screens.GameScreen;
+import com.mygdx.game.utils.ColorProof;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
 
@@ -94,9 +95,9 @@ public class CrazyPutting  implements ApplicationListener {
         skySprite = terrainBuilder.initSky(waterTexture);
         flagInstances = terrainBuilder.initFlag(course); //0 is pole, 1 is flag, 2 is range
         arrowInstance = terrainBuilder.initArrow();
-        terrainInstance = TerrainBuilder.buildTerrain();
-        waterInstance = TerrainBuilder.buildWater();
-        wallInstance = TerrainBuilder.buildWalls();
+        terrainInstance = terrainBuilder.buildTerrain();
+        waterInstance = terrainBuilder.buildWater();
+        wallInstance = terrainBuilder.buildWalls();
 
         //initialize physics
         world_physics = new PuttingCoursePhysics();
@@ -296,7 +297,7 @@ public class CrazyPutting  implements ApplicationListener {
                 lastShotVelocity = SHOT_VELOCITY;
                 ModelBuilder modelBuilder = new ModelBuilder();
                 arrow = modelBuilder.createBox((float)((2 * SHOT_VELOCITY) / MAX_SHOT_VELOCITY), 0.05f, 0.05f,
-                        new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
+                        new Material(new ColorAttribute(ColorAttribute.Emissive, ColorProof.SHOT_ARROW())),
                         Usage.Position | Usage.Normal
                 );
                 arrowInstance = new ModelInstance(arrow, 0, 0, 0);

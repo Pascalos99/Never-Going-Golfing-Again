@@ -15,14 +15,10 @@ import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.screens.SettingsScreen;
 
+import static com.mygdx.game.utils.ColorProof.*;
 import static com.mygdx.game.physics.PhysicsSetting.*;
 
 public final class Variables {
-	// MATERIAL SETTINGS
-	public static final double 	SAND_FRICTION = 0.178;
-	public static final double	ICE_FRICTION = 0.0839;
-	public static final double	MOUNTAIN_HEIGHT = 2;
-	public static final double 	HILL_HEIGHT = 1;
 
 	// DEFAULT CONSTRUCTOR OF PUTTINGCOURSE SETTINGS
 	public static final double 	DEFAULT_FRICTION = 0.131;
@@ -32,55 +28,26 @@ public final class Variables {
 	public static final double 	DEFAULT_SAND_FRICTION = 0.578;
 	public static final double	DEFAULT_MASS = 50;
 
-	public static final String	FLAG_TEXTURE = ".\\textures\\Flag.png";
-	public static final String	START_TEXTURE = ".\\textures\\Start.png";
-
 	// MAP GENERATION SETTINGS
 	// World-border settings
 	public static final Function2d OUT_OF_BOUNDS_FRICTION = Function2d.getConstant(100000);
-	public static final	Function2d 	OUT_OF_BOUNDS_HEIGHT = new AtomFunction2d("-sin(y/8 - x/8)/8 - cos(x/8 + y/4)/8 - 2");
+	public static final	Function2d 	OUT_OF_BOUNDS_HEIGHT = new AtomFunction2d("-sin(y - x)/8 - cos(x + y)/8 - 2");
 	public static final float BOUNDED_WORLD_SIZE = 20.0f;
 
-	// Settings for path generation
-	public static final int 	NUM_FLAG_POS_TRIES = 2000;
-	public static final double 	START_PLATFORM_RADIUS = 3;
-	public static final double 	FLAG_PLATFORM_RADIUS = 3;
-	public static final double 	PATH_RADIUS = 1.5;
-	public static final double 	MIN_FLAG_DISTANCE = 0.5; // percentage of diagonal length of map
-	public static final double	PATH_BUMPINESS = 0.2; // a value of 0 is completely smooth, anything above 1 is incredibly noisy (affects height)
-	public static final double	PATH_ROUGHNESS = 0.4; // a value of 0 is completely smooth, anything above 1 is incredibly noisy (affects friction)
-
-	// Value ranges for fractal generation
-	public static final double 	MINIMUM_HEIGHT = -1;
-	public static final double 	MAXIMUM_HEIGHT = 3;
-	public static final double 	MINIMUM_FRICTION = 0.065;
-	public static final double 	MAXIMUM_FRICTION = 0.196;
-
-	// Settings for valid flag and start positions
-	public static final double	MINIMUM_START_HEIGHT = 0.5; // inclusive
-	public static final double	MAXIMUM_START_HEIGHT = 1.5; // exclusive
-	public static final double	MINIMUM_FLAG_HEIGHT = 0.5; // inclusive
-	public static final double	MAXIMUM_FLAG_HEIGHT = 1.5; // exclusive
-
-	public static final double	MINIMUM_START_FRICTION = 0.0933; // inclusive
-	public static final double	MAXIMUM_START_FRICTION = 0.169; // exclusive
-	public static final double	MINIMUM_FLAG_FRICTION = 0.0933; // inclusive
-	public static final double	MAXIMUM_FLAG_FRICTION = 0.169; // exclusive
-
 	// Ball color
-	public static SettingsScreen.ColorSelection[] BALL_COLORS = {
-			new SettingsScreen.ColorSelection("White", Color.WHITE),
-			new SettingsScreen.ColorSelection("Yellow", Color.YELLOW),
-			new SettingsScreen.ColorSelection("Pink", Color.PINK),
-			new SettingsScreen.ColorSelection("Red", Color.RED),
-			new SettingsScreen.ColorSelection("Purple", Color.PURPLE),
-			new SettingsScreen.ColorSelection("Cyan", Color.CYAN),
-			new SettingsScreen.ColorSelection("Blue", Color.BLUE),
-			new SettingsScreen.ColorSelection("Black", Color.BLACK)
+	public static final SettingsScreen.ColorSelection[] BALL_COLORS = {
+			new SettingsScreen.ColorSelection("White", "White", WHITE),
+			new SettingsScreen.ColorSelection("Pink", "Light Gray", PINK),
+			new SettingsScreen.ColorSelection("Red", "Gray", RED),
+			new SettingsScreen.ColorSelection("Purple", "Dark Blue", PURPLE),
+			new SettingsScreen.ColorSelection("Blue", "Blue", BLUE),
+			new SettingsScreen.ColorSelection("Cyan", "Light Blue", CYAN),
+			new SettingsScreen.ColorSelection("Yellow", "Yellow", YELLOW),
+			new SettingsScreen.ColorSelection("Black", "Black", BLACK)
 	};
 
 	// Default player names
-	public static String[] PLAYER_NAMES = {
+	public static final String[] PLAYER_NAMES = {
 			"Lightning", "Blitz", "DQBO", "Some Player", "Putting Crazy", "Lord Putter", "Harry Potter", "Pheonix"
 		};
 
@@ -95,25 +62,14 @@ public final class Variables {
 	public static Vector2d WORLD_SHIFT;
 
 	//skins
-	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("orange/uiskin.json"));
-	public static Skin 	GLASSY = new Skin(Gdx.files.internal("glassy/glassy-ui.json"));
-		public static Skin QUANTUM_SKIN =new Skin(Gdx.files.internal("quantum/quantum-horizon-ui.json"));
+	public static final Skin MENU_SKIN = new Skin(Gdx.files.internal("orange/uiskin.json"));
+	public static final Skin GLASSY = new Skin(Gdx.files.internal("glassy/glassy-ui.json"));
+	public static final Skin QUANTUM_SKIN =new Skin(Gdx.files.internal("quantum/quantum-horizon-ui.json"));
 
-	//assets
-	public static Texture CROSS;
-	static {
-		try {
-			CROSS = new Texture(Gdx.files.internal("misc/better_cross.png"));
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("it gave error with message: \""+e.getMessage()+"\"");
-		}
-	}
-
-	public static BackgroundColor TABLE_BKG=new BackgroundColor("highlight.png");
-	public static BackgroundColor BLANK_BKG= new BackgroundColor("highlight.png");
-	public static BackgroundColor EXTRA_BKG= new BackgroundColor("highlight.png");
-	public static BackgroundColor MENU_BKG= new BackgroundColor("MenuBKG.png");
+	public static final BackgroundColor TABLE_BKG=new BackgroundColor("highlight.png");
+	public static final BackgroundColor BLANK_BKG= new BackgroundColor("highlight.png");
+	public static final BackgroundColor EXTRA_BKG= new BackgroundColor("highlight.png");
+	public static final BackgroundColor MENU_BKG= new BackgroundColor("MenuBKG.png");
 
 	//PHYSICS
 	public static final double GRADIENT_CUTTOFF = 1d; // no clue what unit this is
@@ -124,6 +80,22 @@ public final class Variables {
 	public static double PITCH = Math.PI * 2/9d;
 	public static double YAW = Math.PI * 0.75;
 	public static double VIEW_ZOOM = 7;
+
+	public static void reset() {
+		MAX_SHOT_VELOCITY = 6d;
+		SHOT_VELOCITY = MAX_SHOT_VELOCITY/2d;
+		PITCH = Math.PI * 2/9d;
+		YAW = Math.PI * 0.75;
+		VIEW_ZOOM = 7;
+		CURRENT_PHYSICS_SETTING = Verlet;
+		ALLOW_FLIGHT = true;
+		CAST_SHADOWS = false;
+		GAME = null;
+		CAMERA = null;
+		GAME_ASPECTS = null;
+		WORLD = null;
+		WORLD_SHIFT = null;
+	}
 
 	public static final double SPEED_CORRECTION = 1d / 50d; // in m/s
 	public static final double AIR_FRICTION = 0.5d;
@@ -139,8 +111,8 @@ public final class Variables {
 		Vector2d dir = new Vector2d(CAMERA.direction.x, CAMERA.direction.z).normalize();
 		return dir.angle();
 	}
-	public static double AI_SHOT_ANGLE_BOUND = 0.03;
-	public static AI_controller[] AVAILABLE_BOTS = {new AI_Basic(), new AI_SimpleLearner(), new AI_Gaussian(), new AI_Fedora(), new AI_Sherlock()};
+	public static final double AI_SHOT_ANGLE_BOUND = 0.03;
+	public static final AI_controller[] AVAILABLE_BOTS = {new AI_Basic(), new AI_SimpleLearner(), new AI_Gaussian(), new AI_Fedora(), new AI_Sherlock()};
 
 	public static final int TURN_STATE_START = 0;
 	public static final int TURN_STATE_WAIT = 1;
@@ -153,4 +125,27 @@ public final class Variables {
 	public static final double DELTA = 0.01d;
 
 	public static final double WALL_BASE = -10d;
+
+	// The rest is all Deprecated
+	// can't remove yet, because some of the code using these may be useful later
+	@Deprecated
+	public static final int 	NUM_FLAG_POS_TRIES = 2000;@Deprecated
+	public static final double 	START_PLATFORM_RADIUS = 3;@Deprecated
+	public static final double 	FLAG_PLATFORM_RADIUS = 3;@Deprecated
+	public static final double 	PATH_RADIUS = 1.5;@Deprecated
+	public static final double 	MIN_FLAG_DISTANCE = 0.5;@Deprecated // percentage of diagonal length of map
+	public static final double	PATH_BUMPINESS = 0.2;@Deprecated // a value of 0 is completely smooth, anything above 1 is incredibly noisy (affects height)
+	public static final double	PATH_ROUGHNESS = 0.4; @Deprecated
+	public static final double 	MINIMUM_HEIGHT = -1;@Deprecated
+	public static final double 	MAXIMUM_HEIGHT = 3;@Deprecated
+	public static final double 	MINIMUM_FRICTION = 0.065;@Deprecated
+	public static final double 	MAXIMUM_FRICTION = 0.196;@Deprecated
+	public static final double	MINIMUM_START_HEIGHT = 0.5;@Deprecated // inclusive
+	public static final double	MAXIMUM_START_HEIGHT = 1.5;@Deprecated // exclusive
+	public static final double	MINIMUM_FLAG_HEIGHT = 0.5;@Deprecated // inclusive
+	public static final double	MAXIMUM_FLAG_HEIGHT = 1.5;@Deprecated // exclusive
+	public static final double	MINIMUM_START_FRICTION = 0.0933;@Deprecated // inclusive
+	public static final double	MAXIMUM_START_FRICTION = 0.169;@Deprecated // exclusive
+	public static final double	MINIMUM_FLAG_FRICTION = 0.0933;@Deprecated // inclusive
+	public static final double	MAXIMUM_FLAG_FRICTION = 0.169; // exclusive
 }

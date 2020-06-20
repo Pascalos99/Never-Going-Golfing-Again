@@ -88,8 +88,8 @@ public abstract class Player {
         Color ball_color = null;
 
         for (int i=0; i < BALL_COLORS.length; i++)
-            if (this.getBallColor().equals(BALL_COLORS[i].name)) {
-                ball_color = BALL_COLORS[i].color;
+            if (this.getBallColor().equals(BALL_COLORS[i].getName())) {
+                ball_color = BALL_COLORS[i].color.get();
                 break;
             }
         Model ball = modelBuilder.createSphere(BALL_RADIUS * WORLD_SCALING * 2, BALL_RADIUS * WORLD_SCALING * 2, BALL_RADIUS * WORLD_SCALING * 2, 30, 30,

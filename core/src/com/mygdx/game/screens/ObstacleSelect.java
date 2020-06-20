@@ -20,6 +20,7 @@ import com.mygdx.game.courses.CourseBuilder;
 import com.mygdx.game.courses.CourseBuilderListener;
 import com.mygdx.game.courses.IO_course_module;
 import com.mygdx.game.courses.MiniMapDrawer;
+import com.mygdx.game.utils.ColorProof;
 import com.mygdx.game.utils.Vector2d;
 
 
@@ -55,8 +56,8 @@ public class ObstacleSelect implements Screen {
     private Drawable lTreeSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/LargeTreeSelect.png"))));
     private Drawable wallSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/WallSelect.png"))));
     private Drawable wallThickSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/WallSelectThick.png"))));
-    private Drawable startSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/StartSelect.png"))));
-    private Drawable flagSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/FlagSelect.png"))));
+    private Drawable startSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/"+(ColorProof.COLOR_BLIND_MODE?"cb-":"")+"StartSelect.png"))));
+    private Drawable flagSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/"+(ColorProof.COLOR_BLIND_MODE?"cb-":"")+"FlagSelect.png"))));
 
     private Image selectionImage;
 

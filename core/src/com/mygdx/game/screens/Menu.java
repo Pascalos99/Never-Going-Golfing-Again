@@ -78,6 +78,9 @@ public class Menu extends Game {
 			case RANDOM_GAME:
 				System.out.println("Random GAME");
 				settings = SettingsScreen.randomGame(this);
+				GameInfo g2 = settings.getGameInfo();
+				System.out.println(Variables.WORLD_SHIFT);
+				SettingsScreen.cb=new CourseBuilder(g2);
 				changeScreen(PLAY);
 				break;
 			case PLAYER_SELECT:

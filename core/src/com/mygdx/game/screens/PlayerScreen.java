@@ -2,7 +2,9 @@ package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -12,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.Player;
+import com.mygdx.game.utils.ColorProof;
 import com.mygdx.game.utils.Variables;
 
 
@@ -31,15 +34,22 @@ public class PlayerScreen implements Screen {
     private Label bot_description;
     private ClickListener hover_listener;
 
+    private Texture cross;
+
+    private static boolean last_color_blind_setting = false;
+
     public PlayerScreen(Menu menu){
+
         parent=menu;
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         Table buttons = new Table();
         Table overall= new Table();
         overall.setBackground(MENU_BKG);
-        if(playerTable==null)
+        if(playerTable==null || last_color_blind_setting != ColorProof.COLOR_BLIND_MODE) {
             playerTable = new Table();
+            playerNumber = 1;
+        }
         bot_description = new Label("", MENU_SKIN);
         addColorSelect();
        // buttons.setDebug(true);
@@ -52,14 +62,23 @@ public class PlayerScreen implements Screen {
         overall.add(buttons);
         stage.addActor(overall);
 
+        try {
+            if (ColorProof.COLOR_BLIND_MODE) cross = new Texture(Gdx.files.internal("misc/cb-better_cross.png"));
+            else cross = new Texture(Gdx.files.internal("misc/better_cross.png"));
+            last_color_blind_setting = ColorProof.COLOR_BLIND_MODE;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("cross could not be loaded: \""+e.getMessage()+"\"");
+        }
+
         playerTable.row().pad(0, 0, 5, 0);
         if(playerNumber==1)
             enterPlayer();
         TextButton addPlayer = new TextButton("Add Player", MENU_SKIN);
         TextButton chooseGameMode = new TextButton("Choose Game Mode", MENU_SKIN);
         buttons.add(addPlayer);
-        buttons.row().padBottom(10);
-        buttons.add(chooseGameMode).expandX();
+        buttons.row();
+        buttons.add(chooseGameMode).pad(10,0,0,0).expandX();
 
         addPlayer.addListener(new ChangeListener() {
 
@@ -135,9 +154,9 @@ public class PlayerScreen implements Screen {
                 TextField name = new TextField(pickName(), MENU_SKIN);
                 playerTable.add(id);
                 playerTable.add(name);
-                playerTable.add(addColorSelect());
-                playerTable.add(addPlayerTypeSelect());
-                playerTable.add(addPlayerRemove(playerNumber - 1));
+                playerTable.add(addColorSelect()).maxHeight(name.getPrefHeight()).padLeft(5);
+                playerTable.add(addPlayerTypeSelect()).maxHeight(name.getPrefHeight()).padLeft(5);
+                playerTable.add(addPlayerRemove(playerNumber - 1)).maxHeight(name.getPrefHeight());
                 playerTable.row().pad(0, 0, 5, 0);
                 ++playerNumber;
                 addHoverListener();
@@ -185,7 +204,7 @@ public class PlayerScreen implements Screen {
         SelectBox<String> color_select = new SelectBox<>(MENU_SKIN);
         Array<String> items = new Array<>();
         for (int i=0; i < BALL_COLORS.length; i++)
-            items.add(BALL_COLORS[i].name);
+            items.add(BALL_COLORS[i].getName());
         color_select.setItems(items);
         color_select.setSelectedIndex(next_color_selected++);
         if (next_color_selected >= BALL_COLORS.length) next_color_selected = 0;
@@ -204,7 +223,7 @@ public class PlayerScreen implements Screen {
     }
 
     private ImageButton addPlayerRemove(int index) {
-        Sprite sprite = new Sprite(CROSS);
+        Sprite sprite = new Sprite(cross);
         sprite.setSize(50f, 50f);
         Drawable draw = new SpriteDrawable(sprite);
         ImageButton button = new ImageButton(draw);
@@ -214,6 +233,7 @@ public class PlayerScreen implements Screen {
     }
 
     private class RemoveListener extends ClickListener {
+        TextField tf = new TextField("playername",MENU_SKIN);
         int index;
         public RemoveListener(int index) {
             this.index = index;
@@ -250,7 +270,7 @@ public class PlayerScreen implements Screen {
             // make sure to add in the row breaks at the right intervals!
             for (int i=0; i < to_replace.size()/cols; i++) {
                 playerTable.row().pad(0, 0, 5, 0);
-                for (int j=0; j < cols; j++) playerTable.add(to_replace.get(k++));
+                for (int j=0; j < cols; j++) playerTable.add(to_replace.get(k++)).maxHeight(tf.getPrefHeight()).padLeft(5);;
                 playerTable.row().pad(0, 0, 5, 0);
             }
 

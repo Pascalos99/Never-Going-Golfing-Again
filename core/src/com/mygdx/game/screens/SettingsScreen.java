@@ -15,9 +15,12 @@ import com.mygdx.game.courses.CourseBuilder;
 import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.courses.IO_course_module;
+import com.mygdx.game.parser.Function2d;
+import com.mygdx.game.utils.ColorProof;
 import com.mygdx.game.utils.Vector2d;
 
 import java.io.File;
+import java.util.Random;
 import java.util.TimerTask;
 
 import static com.mygdx.game.utils.Variables.*;
@@ -320,6 +323,7 @@ public class SettingsScreen implements Screen {
         fileConfig.add(loadPath);
         table.add(fileConfig);
 
+        WORLD_SHIFT = new Vector2d(Double.parseDouble(shiftX.getText()), Double.parseDouble(shiftY.getText()));
 
         stage.addActor(backButton);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
@@ -337,8 +341,18 @@ public class SettingsScreen implements Screen {
     public static SettingsScreen randomGame(Menu menu) {
         SettingsScreen scr = new SettingsScreen(menu);
         String func = AtomFunction2d.randomPolynomial(System.currentTimeMillis());
+        String func2 = AtomFunction2d.randomPolynomial(System.currentTimeMillis());
+        Function2d test = new AtomFunction2d(func).shift(WORLD_SHIFT);
+        while (test.evaluate(scr.getStartX(), scr.getStartY()) < 0 ||
+            test.evaluate(scr.getGoalX(), scr.getGoalY()) < 0 ||
+                test.gradient(scr.getGoalX(), scr.getGoalY()).get_length() > GRADIENT_CUTTOFF) {
+            func = AtomFunction2d.randomPolynomial(new Random(System.currentTimeMillis()).nextLong());
+            test = new AtomFunction2d(func).shift(WORLD_SHIFT);
+        }
         scr.height.setText(func);
+        scr.sandFunction.setText(func2);
         System.out.println("random function = "+func);
+        System.out.println("sand function = "+func2);
         return scr;
     }
 
@@ -469,6 +483,7 @@ public class SettingsScreen implements Screen {
                 getSandFriction(),getSandFunction());
         if (GAME_ASPECTS != null) info.fractalInfo = GAME_ASPECTS.fractalInfo;
         if (info.fractalInfo != null && usingFractal.isChecked()) info.use_fractals = true;
+        if (WORLD_SHIFT == null) WORLD_SHIFT = new Vector2d(Double.parseDouble(shiftX.getText()), Double.parseDouble(shiftY.getText()));
         return info;
     }
 
@@ -491,10 +506,16 @@ public class SettingsScreen implements Screen {
 
     public static class ColorSelection {
         public String name;
-        public Color color;
-        public ColorSelection(String name, Color color) {
+        public String cb_name;
+        public ColorProof color;
+        public ColorSelection(String name, String cb_name, ColorProof color) {
             this.name = name;
+            this.cb_name = cb_name;
             this.color = color;
+        }
+        public String getName() {
+            if (ColorProof.COLOR_BLIND_MODE) return cb_name;
+            return name;
         }
     }
 

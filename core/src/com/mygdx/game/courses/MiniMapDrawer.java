@@ -11,6 +11,7 @@ import com.mygdx.game.obstacles.Tree;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.parser.SandFunction2d;
 import com.mygdx.game.physics.TopDownPhysicsObject;
+import com.mygdx.game.utils.ColorProof;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
@@ -238,9 +239,13 @@ public abstract class MiniMapDrawer {
                     Color color;
                     if (h.evaluate(x, y) <= 0)
                         color = new Color(20/255f, 20/255f, (float)((200d + h.evaluate(x, y) * 25d)/255d),1f);
-                    else
-                        color = new Color(20/255f, (float)((200-150* (h.evaluate(x, y)/heightBarrier))/255d), 20/255f,1f);
-
+                    else {
+                        color = new Color(20 / 255f, (float) ((200 - 150 * (h.evaluate(x, y) / heightBarrier)) / 255d), 20 / 255f, 1f);
+                        if (ColorProof.COLOR_BLIND_MODE) {
+                            float c = (float)((200 - 150*(h.evaluate(x, y) / heightBarrier))/255d);
+                            color = new Color(c, c, c, 1f);
+                        }
+                    }
                     height_image.setColor(color);
                     height_image.drawPixel(i, j);
                 }
@@ -254,7 +259,7 @@ public abstract class MiniMapDrawer {
                 for (int j=0; j < height; j++) {
                     double y = toPhysicsY(j);
                     if (s.isSandAt(x, y) && s.main.evaluate(x, y) > 0) {
-                        sand_image.setColor(new Color(180/255f, 180/255f, 0f, 1f));
+                        sand_image.setColor(ColorProof.SAND());
                         sand_image.drawPixel(i, j);
                     }
                 }
@@ -340,7 +345,7 @@ public abstract class MiniMapDrawer {
             String ball_color = ball.owner.getBallColor();
             for (int i=0; i < Variables.BALL_COLORS.length; i++)
                 if (Variables.BALL_COLORS[i].name.equals(ball_color)) {
-                    Color c = Variables.BALL_COLORS[i].color;
+                    Color c = Variables.BALL_COLORS[i].color.get();
                     assembleImage();
                     main_image.setColor(c);
                     main_image.fillCircle(ball_x, ball_y, (size_x > size_y)?size_x:size_y);
@@ -351,8 +356,13 @@ public abstract class MiniMapDrawer {
         public void drawStartAndGoalPos(Vector2d start, Vector2d flag) {
             start_and_goal_image.setColor(Color.CLEAR);
             start_and_goal_image.fill();
-            if (start != null) drawImageAtWorldPos("misc/Start.png", start.get_x(), start.get_y(), start_and_goal_image);
-            if (flag != null) drawImageAtWorldPos("misc/Flag.png", flag.get_x(), flag.get_y(), start_and_goal_image);
+            if (start != null) {
+                drawImageAtWorldPos("misc/"+(ColorProof.COLOR_BLIND_MODE?"cb-":"")+"Start.png", start.get_x(), start.get_y(), start_and_goal_image);
+            }
+            if (flag != null) {
+                drawImageAtWorldPos("misc/"+(ColorProof.COLOR_BLIND_MODE?"cb-":"")+"Flag.png",
+                        flag.get_x(), flag.get_y(), start_and_goal_image);
+            }
         }
 
     }
