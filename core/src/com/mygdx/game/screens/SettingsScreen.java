@@ -342,12 +342,12 @@ public class SettingsScreen implements Screen {
         SettingsScreen scr = new SettingsScreen(menu);
         String func = AtomFunction2d.randomPolynomial(System.currentTimeMillis());
         String func2 = AtomFunction2d.randomPolynomial(System.currentTimeMillis());
-        Function2d test = new AtomFunction2d(func).shift(WORLD_SHIFT);
+        Function2d test = new AtomFunction2d(func);
         while (test.evaluate(scr.getStartX(), scr.getStartY()) < 0 ||
             test.evaluate(scr.getGoalX(), scr.getGoalY()) < 0 ||
                 test.gradient(scr.getGoalX(), scr.getGoalY()).get_length() > GRADIENT_CUTTOFF) {
             func = AtomFunction2d.randomPolynomial(new Random(System.currentTimeMillis()).nextLong());
-            test = new AtomFunction2d(func).shift(WORLD_SHIFT);
+            test = new AtomFunction2d(func);
         }
         scr.height.setText(func);
         scr.sandFunction.setText(func2);

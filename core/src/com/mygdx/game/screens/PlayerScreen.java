@@ -71,7 +71,7 @@ public class PlayerScreen implements Screen {
             System.out.println("cross could not be loaded: \""+e.getMessage()+"\"");
         }
 
-        playerTable.row().pad(0, 0, 5, 0);
+        playerTable.row();
         if(playerNumber==1)
             enterPlayer();
         TextButton addPlayer = new TextButton("Add Player", MENU_SKIN);
@@ -157,7 +157,7 @@ public class PlayerScreen implements Screen {
                 playerTable.add(addColorSelect()).maxHeight(name.getPrefHeight()).padLeft(5);
                 playerTable.add(addPlayerTypeSelect()).maxHeight(name.getPrefHeight()).padLeft(5);
                 playerTable.add(addPlayerRemove(playerNumber - 1)).maxHeight(name.getPrefHeight());
-                playerTable.row().pad(0, 0, 5, 0);
+                playerTable.row();
                 ++playerNumber;
                 addHoverListener();
             }
@@ -269,9 +269,9 @@ public class PlayerScreen implements Screen {
             int k = 0;
             // make sure to add in the row breaks at the right intervals!
             for (int i=0; i < to_replace.size()/cols; i++) {
-                playerTable.row().pad(0, 0, 5, 0);
+                playerTable.row();
                 for (int j=0; j < cols; j++) playerTable.add(to_replace.get(k++)).maxHeight(tf.getPrefHeight()).padLeft(5);;
-                playerTable.row().pad(0, 0, 5, 0);
+                playerTable.row();
             }
 
             // return to previous screen if we suddenly have 0 players left

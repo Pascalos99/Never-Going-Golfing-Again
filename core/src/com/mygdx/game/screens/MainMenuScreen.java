@@ -37,6 +37,7 @@ public class MainMenuScreen implements Screen {
 
         CheckBox color_blind_mode = new CheckBox("  Enable Color-blind Mode",MENU_SKIN);
         color_blind_mode.setChecked(ColorProof.COLOR_BLIND_MODE);
+        if (ColorProof.COLOR_BLIND_MODE) color_blind_mode.setText("  Disable Color-blind Mode");
         color_blind_mode.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
