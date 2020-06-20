@@ -53,7 +53,7 @@ public class GameScreen implements Screen {
         winners= new ArrayList<>();
         stage = new Stage(new ScreenViewport());
         for(Player p:gameAspects.players)
-            playerLabels.add(new Label(p.getName(),MENU_SKIN));
+            playerLabels.add(new Label(p.getName(),ORANGE));
 
         Gdx.input.setInputProcessor(stage);
         //table
@@ -72,7 +72,7 @@ public class GameScreen implements Screen {
             Table p = new Table();
             p.add(player);
             p.getCells().get(0).padRight(10);
-            p.add(new Label("0", MENU_SKIN));
+            p.add(new Label("0", ORANGE));
             playerOverview.add(p);
             playerOverview.row();
         }
@@ -153,7 +153,6 @@ public class GameScreen implements Screen {
             replayButton.addListener(new ChangeListener(){
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    //TODO: wall height doesnt reset, also camera angle does not reset, also world shift is re-applied
                     PlayerScreen.playerNumber=1;
                     PlayerScreen.playerTable=null;
                     parent.players=null;

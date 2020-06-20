@@ -41,6 +41,18 @@ public class MainMenuScreen implements Screen {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
                 ColorProof.COLOR_BLIND_MODE = color_blind_mode.isChecked();
+                if (ColorProof.COLOR_BLIND_MODE) {
+                    if (MENU_SKIN != COLOR_BLIND_SKIN) {
+                        MENU_SKIN = COLOR_BLIND_SKIN;
+                        parent.changeScreen(Menu.MAIN_MENU);
+                    }
+                }
+                else {
+                    if (MENU_SKIN != DEFAULT_SKIN) {
+                        MENU_SKIN = DEFAULT_SKIN;
+                        parent.changeScreen(Menu.MAIN_MENU);
+                    }
+                }
             }
         });
 

@@ -62,9 +62,12 @@ public final class Variables {
 	public static Vector2d WORLD_SHIFT;
 
 	//skins
-	public static final Skin MENU_SKIN = new Skin(Gdx.files.internal("orange/uiskin.json"));
+	public static Skin MENU_SKIN = new Skin(Gdx.files.internal("orange/uiskin.json"));
+	public static final Skin ORANGE = new Skin(Gdx.files.internal("orange/uiskin.json"));
 	public static final Skin GLASSY = new Skin(Gdx.files.internal("glassy/glassy-ui.json"));
 	public static final Skin QUANTUM_SKIN =new Skin(Gdx.files.internal("quantum/quantum-horizon-ui.json"));
+	public static final Skin DEFAULT_SKIN = ORANGE;
+	public static final Skin COLOR_BLIND_SKIN = QUANTUM_SKIN;
 
 	public static final BackgroundColor TABLE_BKG=new BackgroundColor("highlight.png");
 	public static final BackgroundColor BLANK_BKG= new BackgroundColor("highlight.png");
