@@ -50,10 +50,15 @@ public class FractalSettings implements Screen {
         cb=SettingsScreen.cb;
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
+        Table overall=new Table();
+        overall.setBackground(EXTRA_BKG);
+        EXTRA_BKG.setColor(0,0,0,150);
         Table table = new Table();
         table.setFillParent(true);
         table.setBackground(MENU_BKG);
+        MENU_BKG.setColor(0,0,0,100);
         stage.addActor(table);
+        table.add(overall);
         TextButton backButton= new TextButton("BACK",MENU_SKIN);
         backButton.addListener(new ChangeListener(){
             @Override
@@ -180,25 +185,26 @@ public class FractalSettings implements Screen {
 
             }
         });
+
         title.setAlignment(Align.center);
-        table.pad(50,0,10,0);
-        table.add(title);
-        table.add(title2);
-        table.row();
+        overall.pad(0,0,10,0);
+        overall.add(title);
+        overall.add(title2);
+        overall.row();
         inner.add(body);
         info.add(inner).minSize(fields.getPrefWidth()/2,fields.getPrefHeight());
 
-        table.row().pad(0,10,0,10);
-        table.add(fields);
-        table.add(info);
+        overall.row().pad(0,10,0,10);
+        overall.add(fields);
+        overall.add(info);
         Table navigation=new Table();
         navigation.row().pad(0,10,10,10);
         navigation.add(backButton,play,customizeObstacles);
         navigation.align(Align.bottomLeft);
 
-        table.row().pad(0,10,0,10);
-        table.add(save);
-        table.add(savePath);
+        overall.row().pad(0,10,0,10);
+        overall.add(save).maxHeight(savePath.getPrefHeight());
+        overall.add(savePath);
 
         stage.addActor(navigation);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));

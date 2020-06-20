@@ -60,7 +60,7 @@ public class SettingsScreen implements Screen {
 
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
-        //tables
+        //overall screen table
         Table table = new Table();
         table.setFillParent(true);
         table.setBackground(MENU_BKG);
@@ -71,11 +71,13 @@ public class SettingsScreen implements Screen {
         Table tableLeft = new Table();
         //left hand side
         Table tableRight = new Table();
-        TABLE_BKG.setColor(0,0,0,100);
+        TABLE_BKG.setColor(0,0,0,200);
         tableRight.setBackground(TABLE_BKG);
-        BLANK_BKG.setColor(0,0,0,100);
+        BLANK_BKG.setColor(0,0,0,200);
         tableLeft.setBackground(BLANK_BKG);
         table.setFillParent(true);
+        tableLeft.padTop(10);
+        tableRight.padTop(10);
 
         TextButton play=new TextButton("PLAY", MENU_SKIN);
         TextButton save = new TextButton("Save course to file", MENU_SKIN);
@@ -175,7 +177,7 @@ public class SettingsScreen implements Screen {
             }
         });
 
-        usingFractal = new CheckBox(" fractals enabled", MENU_SKIN);
+        usingFractal = new CheckBox(" Fractals Enabled", MENU_SKIN);
         if (GAME_ASPECTS != null && GAME_ASPECTS.use_fractals) usingFractal.setChecked(true);
 
         gravity = new TextField("9.81", MENU_SKIN);
@@ -281,7 +283,7 @@ public class SettingsScreen implements Screen {
         addToTable(tableLeft,cf,coefff,0,0,margine,0);
         addToTable(tableLeft,vm,vMax,0,0,margine,0);
         addToTable(tableLeft,t,tolerance,0,0,margine,0);
-        addToTable(tableLeft,originX,shiftX,margine,0,margine,0);
+        addToTable(tableLeft,originX,shiftX,0,0,margine,0);
         addToTable(tableLeft,originY,shiftY,margine,0,margine,0);
         addToTable(tableRight,sX,startX,margine,0,margine,0);
         addToTable(tableRight,sY,startY,0,0,margine,0);
@@ -294,17 +296,21 @@ public class SettingsScreen implements Screen {
 
         Table fileConfig = new Table();
         Table buttons = new Table();
-        buttons.row().pad(20,0,10,10);
+        Table chkbx=new Table();
+        chkbx.setBackground(EXTRA_BKG);
+        EXTRA_BKG.setColor(0,0,0,200);
+        buttons.row().pad(15,13,10,10);
         //buttons.add(allignOrigin);
         buttons.add(play).minWidth(customizeObstacles.getPrefWidth());
         buttons.add(customizeObstacles);
         table.row().pad(0, 0, 10, 0);
         table.add(buttons);
-        table.row().pad(0, 0, 10, 0);
+       // table.row().pad(0, 0, 10, 0);
         Table fractal = new Table();
-        fractal.add(fractals);
-        fractal.add(usingFractal).pad(0,20,0,0);
-        table.add(fractal);
+        fractal.add(fractals).pad(0,0,0,10);
+        chkbx.add(usingFractal).pad(16,10,16,5);
+        fractal.add(chkbx);
+        buttons.add(fractal);
         table.row().pad(0,0,10,0);
         fileConfig.row().pad(0, 5, 10, 5);
         fileConfig.add(save).minWidth(load.getPrefWidth()).maxHeight(savePath.getPrefHeight());
