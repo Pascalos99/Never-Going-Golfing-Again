@@ -43,12 +43,6 @@ public class AxisAllignedBoundingBox {
         return true;
     }
 
-    public boolean contains(double x, double y, double z) {
-        if (origin.get_x() > x || origin.get_y() > y || origin.get_z() > z) return false;
-        if (origin.get_x() + width < x || origin.get_y() + depth < y || origin.get_z() + height < z) return false;
-        return true;
-    }
-
     @Override
     public String toString(){
         return "AABB from " + origin.toString() + " to " + origin.add(new Vector3d(width, height, depth)).toString();

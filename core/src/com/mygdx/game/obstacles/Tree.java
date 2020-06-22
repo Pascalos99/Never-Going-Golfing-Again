@@ -124,13 +124,14 @@ public class Tree extends Obstacle {
 
     @Override
     public AxisAllignedBoundingBox getBoundingBox() {
-        if(aabb == null) {
-            Vector3d physics_pos = getPhysicsPosition();
+        Vector3d physics_pos = getPhysicsPosition();
+
+        if(aabb == null)
             aabb = new AxisAllignedBoundingBox(
                     new Vector3d(physics_pos.get_x() - radius, height + physics_pos.get_y(), physics_pos.get_z() - radius),
-                    radius * 2, height + physics_pos.get_y() + 10, radius * 2
+                    radius*2, height + physics_pos.get_y() + 10, radius*2
             );
-        }
+
         return aabb;
     }
 

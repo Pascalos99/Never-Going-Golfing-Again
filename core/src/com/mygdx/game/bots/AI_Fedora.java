@@ -12,9 +12,6 @@ import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.Ball;
 import java.util.AbstractMap.SimpleEntry;
 
-/**
- * aka. Heuristic Sample Search | HSS
- */
 public class AI_Fedora extends AI_controller {
     private final int VECTOR_COUNT = 360; //1000
     private final double VELOCITY_PARTITIONS = 100d; //100

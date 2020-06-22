@@ -65,24 +65,6 @@ public class Ball extends TopDownPhysicsObject {
         previous_position = position;
     }
 
-    // DEBUGGING CODE TODO check time consumption per part of physics simulation step;
-    // TODO build estimate simulation method that minimizes time consumption by simplifying the expensive parts of the computation
-    private long last_time_ns = 0;
-    private void startTimeCalc() {
-        last_time_ns = System.nanoTime();
-    }
-    private long getTimeSpent() {
-        return System.nanoTime() - last_time_ns;
-    }
-    public static boolean DEBUG = true;
-    private static void debug(String str) {
-        if (DEBUG) System.out.println("[PHYSICS]: "+str);
-    }
-    private static void debug(String format, Object... parameters) {
-        debug(String.format(format, parameters));
-    }
-    // END OF DEBUGGING CODE
-
     public void step(double delta, List<TopDownPhysicsObject> ents) {
 
         if(is_moving) {
