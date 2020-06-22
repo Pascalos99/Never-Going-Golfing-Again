@@ -3,7 +3,7 @@ package com.mygdx.game.bots.tree_search;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Node {
+public abstract class Node <T> implements Comparable<T> {
     /**
      * @param estimate_quality the estimated value of the heuristic that determines the order of simulation execution.<br>
      *                         the actual value of the estimated_heuristic will never be compared with the heuristic_value
@@ -108,5 +108,14 @@ public abstract class Node {
     }
     public final Node[] getChildren() {
         return children.toArray(new Node[children.size()]);
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof Node)) return 0;
+        Node n = (Node)o;
+        if (n.estimate_heuristic > estimate_heuristic) return -1;
+        if (n.estimate_heuristic == estimate_heuristic) return 0;
+        return 1;
     }
 }
