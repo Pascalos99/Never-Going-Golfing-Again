@@ -43,7 +43,7 @@ public class TerrainBuilder {
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(ColorProof.BROWN())));
-        builder.cylinder(0.1f, FLAGPOLE_HEIGHT, 0.1f, 30);
+        builder.cylinder(1f, FLAGPOLE_HEIGHT, 1f, 30);
         Model pole = modelBuilder.end();
         modelBuilder = new ModelBuilder();
         modelBuilder.begin();

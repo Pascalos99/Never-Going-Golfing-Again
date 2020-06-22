@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.SphereShapeBuilder;
 import com.mygdx.game.Ball;
 import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.utils.Vector2d;
@@ -17,7 +18,6 @@ import static com.mygdx.game.utils.Variables.*;
 
 public class Tree extends Obstacle {
     public  static  final double RESTITUTION = 0.4;
-
     public static final int TEXTURE_NOT_SPECIFIED = 0;
     public static final int TEXTURE_SMALL = 1;
     public static final double HEIGHT_SMALL = 15;
@@ -69,9 +69,7 @@ public class Tree extends Obstacle {
 
                 return data;
             }
-
         }
-
         return null;
     }
 
@@ -110,15 +108,24 @@ public class Tree extends Obstacle {
     }
 
     @Override
-    public ModelInstance getModel() {
+    public ModelInstance[] getModel() {
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part("tree", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.BROWN)));
         new CylinderShapeBuilder().build(builder,(float)toWorldScale(this.radius*2f), (float)(this.height+rootHeight), (float)toWorldScale(this.radius*2f), 20);
-//        builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.GREEN)));
-//        builder.sphere((float)this.radius*2f, (float)this.height, (float)this.radius*2f, 20,20);
-        Model tree = modelBuilder.end();
-        ModelInstance treeInstance = new ModelInstance(tree, (float)this.getGraphicsPosition().get_x(), (float)this.getGraphicsPosition().get_y(), (float)this.getGraphicsPosition().get_z());
+        Model trunk = modelBuilder.end();
+
+        modelBuilder = new ModelBuilder();
+        modelBuilder.begin();
+        builder = modelBuilder.part("leaves", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.GREEN)));
+        new SphereShapeBuilder().build(builder,(float)(this.height/2), (float)(this.height/2),(float)(this.height/2), 40,40);
+        Model leaves = modelBuilder.end();
+
+        ModelInstance trunkInstance = new ModelInstance(trunk, (float)this.getGraphicsPosition().get_x(), (float)this.getGraphicsPosition().get_y(), (float)this.getGraphicsPosition().get_z());
+        ModelInstance leavesInstance = new ModelInstance(leaves, (float)this.getGraphicsPosition().get_x(), (float)(this.getGraphicsPosition().get_y()+this.height-(this.height/3f)), (float)this.getGraphicsPosition().get_z());
+
+        ModelInstance[] treeInstance= new ModelInstance[]{trunkInstance,leavesInstance};
+
         return treeInstance;
     }
 
@@ -128,7 +135,7 @@ public class Tree extends Obstacle {
             Vector3d physics_pos = getPhysicsPosition();
             aabb = new AxisAllignedBoundingBox(
                     new Vector3d(physics_pos.get_x() - radius, height + physics_pos.get_y(), physics_pos.get_z() - radius),
-                    radius * 2, height + physics_pos.get_y() + 10, radius * 2
+                    radius * 2, (height + physics_pos.get_y() + 10), radius * 2
             );
         }
         return aabb;
@@ -137,6 +144,7 @@ public class Tree extends Obstacle {
     public double getHeight() {
         return height;
     }
+
     public double getRadius() {
         return radius;
     }
