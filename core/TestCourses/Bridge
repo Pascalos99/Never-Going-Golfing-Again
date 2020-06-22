@@ -3,6 +3,6 @@ start = (-29.9667, -40.1833); goal = (-30.1000, -25.0500); world-shift = ( 42.30
 height = -0.01x+0.003x^2+0.04y; sand = sin(x)+cos(y)
 using_fractals = true;
 seed = -6163199898274800472; roughness = 0.500000;
-minimum = -10.000000; maximum = 15.000000
-resolution = bi-cubic; smoothness = None;
+minimum = -9.500000; maximum = 15.000000
+resolution = Low; smoothness = None;
 interpolation = bi-cubic;
