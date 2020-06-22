@@ -46,8 +46,8 @@ public class Tree extends Obstacle {
         Vector3d physics_pos = getPhysicsPosition();
         Vector2d topdown_pos = new Vector2d(physics_pos.get_x(), physics_pos.get_z());
 
-        if (ball.height - BALL_RADIUS < height + physics_pos.get_y()) {
-            Vector2d ball_position = new Vector2d(ball.x, ball.y);
+        if (ball.position.get_y() < height + physics_pos.get_y()) {
+            Vector2d ball_position = new Vector2d(ball.position.get_x(), ball.position.get_z());
 
             if (ball_position.distance(topdown_pos) < radius + BALL_RADIUS) {
                 CollisionData data = new CollisionData(this);
@@ -57,7 +57,8 @@ public class Tree extends Obstacle {
                 Vector2d clipping_correction = unclipped_position.sub(ball_position);
                 data.clipping_correction = new Vector3d(clipping_correction.get_x(), 0, clipping_correction.get_y());
 
-                Vector2d entrance_normal = ball.velocity.normalize();
+                Vector2d topdown_vel = new Vector2d(ball.velocity.get_x(), ball.position.get_z());
+                Vector2d entrance_normal = topdown_vel.normalize();
 
                 double dotp = entrance_normal.dot(clipping_normal);
                 Vector2d scaled_normal = clipping_normal.scale(2*dotp);
@@ -82,6 +83,11 @@ public class Tree extends Obstacle {
     @Override
     public double getFrictionAt(double x, double y) {
         return 0;
+    }
+
+    @Override
+    public Vector2d getGradientsAt(double x, double y){
+        return new Vector2d(0, 0);
     }
 
     @Override

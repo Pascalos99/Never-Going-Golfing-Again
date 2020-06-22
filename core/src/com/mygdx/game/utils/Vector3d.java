@@ -26,6 +26,23 @@ public class Vector3d {
         return new Vector3d(x + v.get_x(),y + v.get_y(),z + v.get_z());
     }
 
+    public Vector3d normalize() {
+        double len = get_length();
+        return new Vector3d(x/len, z/len, y/len);
+    }
+
+    public Vector3d sub(Vector3d v){
+        return new Vector3d(x - v.get_x(),y - v.get_y(),z - v.get_z());
+    }
+
+    public  double distance(Vector3d o){
+        return  o.sub(this).get_length();
+    }
+
+    public Vector3d scale(double scalar){
+        return new Vector3d(get_x()*scalar, get_y()*scalar, get_z()*scalar);
+    }
+
     public String toString() {
         return String.format("(% f, % f, % f)", x, y, z);
     }

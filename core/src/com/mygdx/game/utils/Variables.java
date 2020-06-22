@@ -124,7 +124,7 @@ public final class Variables {
 	public static double YAW = Math.PI * 0.75;
 	public static double VIEW_ZOOM = 7;
 
-	public static final double SPEED_CORRECTION = 1d / 50d; // in m/s
+	public static final double SPEED_CORRECTION = 50 * 1d / 50d; // in m/s
 	public static final double AIR_FRICTION = 0.5d;
 	public static final double VELOCITY_CUTTOFF = 0.1d * SPEED_CORRECTION; // in m/s
 
@@ -146,7 +146,7 @@ public final class Variables {
 	public static final int TURN_STATE_END = 2;
 
 	public static CrazyPutting GAME = null;
-	public static boolean ALLOW_FLIGHT = true;
+	public static boolean ALLOW_FLIGHT = false;
 	public static boolean CAST_SHADOWS = false;
 
 	public static final double DELTA = 0.01d;
