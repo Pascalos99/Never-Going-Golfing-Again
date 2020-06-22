@@ -3,6 +3,7 @@ package com.mygdx.game.bots;
 import com.mygdx.game.Ball;
 import com.mygdx.game.Player;
 import com.mygdx.game.bots.tree_search.*;
+import com.mygdx.game.utils.DebugModule;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
@@ -10,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AI_Sherlock extends AI_controller {
+
+    private static boolean DEBUG = true;
+
     public String getName() { return "Estimated Suite-step Search"; }
 
     public String getDescription() { return "Heuristic bot that uses A* and MCTS based tree search to find the optimal set of shots"; }
@@ -18,6 +22,11 @@ public class AI_Sherlock extends AI_controller {
 
     protected void calculate(Player player) {
         if (last_node == null) last_node = initial_node(player.getBall());
+        else {
+            Vector2d error = ((GolfNode)last_node).resulting_ball.topDownPosition().sub(player.getBall().topDownPosition());
+            debug.debug("got an error of %.3f from last shot", error.get_length());
+            if (error.get_length() > 0.001) last_node = initial_node(player.getBall());
+        }
         setupTreeSearch(initial_node(player.getBall()));
         last_node = getFirstShotToNode(tree_search.completeTreeSearch(MAX_TICKS, 0));
         GolfNode shot = (GolfNode)last_node;
@@ -165,5 +174,12 @@ public class AI_Sherlock extends AI_controller {
         }
 
     }
+
+    // DEBUGGING CODE
+    public static DebugModule debug;
+    static {
+        debug = DebugModule.get("sherlock", DEBUG);
+    }
+    // END OF DEBUGGING CODE
 
 }

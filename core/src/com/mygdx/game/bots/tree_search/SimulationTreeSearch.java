@@ -5,7 +5,7 @@ import java.util.*;
 public class SimulationTreeSearch {
     private Node root_node;
     private List<Node> endorsed_nodes;
-    private List<Node> suggested_nodes;
+    private PriorityQueue<Node> suggested_nodes;
     private Node best_node;
     private double total_cost;
     private double maximum_cost;
@@ -32,7 +32,7 @@ public class SimulationTreeSearch {
         this.suite_maker = suite_maker;
         this.stop_condition = stop_condition;
         endorsed_nodes = new ArrayList<>();
-        suggested_nodes = auto_sorted_node_list();
+        suggested_nodes = new PriorityQueue<>();
         root_node = initial_node;
         total_cost = 0;
         simulateNode(root_node, true);
@@ -133,7 +133,7 @@ public class SimulationTreeSearch {
      */
     private Node selectSuggestedNode() {
         if (suggested_nodes.size() <= 0) makeSuite(root_node);
-        return suggested_nodes.get(0);
+        return suggested_nodes.poll();
     }
 
     /**
@@ -199,43 +199,6 @@ public class SimulationTreeSearch {
     private void makeSuite(Node from) {
         List<Node> suite = suite_maker.makeSuite(from, this, from.current_suite_count++);
         for (Node node : suite) suggested_nodes.add(node);
-    }
-
-    /**
-     * implements a simple version of an auto-sorted linked-list
-     * @return a LinkedList that automatically sorts incoming elements
-     */
-    private LinkedList<Node> auto_sorted_node_list() {
-        return new LinkedList<Node>() {
-            @Override
-            public boolean add(Node node) {
-                ListIterator<Node> iter = this.listIterator();
-                boolean is_inserted = false;
-                while (iter.hasNext()) {
-                    Node current = iter.next();
-                    if (node.estimate_heuristic > current.estimate_heuristic) {
-                        iter.previous();
-                        iter.add(node);
-                        is_inserted = true;
-                        break;
-                    }
-                }
-                if (!is_inserted) iter.add(node);
-                return true;
-            }
-
-            @Override
-            public boolean addAll(Collection<? extends Node> elements) {
-                for (Node node : elements) add(node);
-                return true;
-            }
-
-            @Override
-            public boolean addAll(int index, Collection<? extends Node> elements) {
-                // there is no use in changing the starting index, because the list needs to remain sorted
-                return addAll(elements);
-            }
-        };
     }
 }
 
