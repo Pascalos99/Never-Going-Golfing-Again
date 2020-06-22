@@ -44,10 +44,10 @@ public class AI_Fedora extends AI_controller {
     @Override
     public void calculate(Player player) {
 
-        if(old_ball_position == null || (old_ball_position.get_x() != player.getBall().x && old_ball_position.get_y() != player.getBall().y)) {
+        if(old_ball_position == null || (old_ball_position.get_x() != player.getBall().position.get_x() && old_ball_position.get_y() != player.getBall().position.get_z())) {
             double start = System.currentTimeMillis() * 0.001;
 
-            old_ball_position = new Vector2d(player.getBall().x, player.getBall().y);
+            old_ball_position = new Vector2d(player.getBall().position.get_x(), player.getBall().position.get_z());
             List<Vector2d> vectors = cast_vectors(player.getBall());
             if (FEDORA_DEBUG) System.out.println("Using " + vectors.size() + " of " + VECTOR_COUNT + " vectors.");
             tests = new ArrayList<TestDataHolder>(vectors.size());
@@ -97,7 +97,7 @@ public class AI_Fedora extends AI_controller {
     }
 
     private List<Vector2d> cast_vectors(Ball ball){
-        Vector2d real_ball_position = new Vector2d(ball.x, ball.y);
+        Vector2d real_ball_position = new Vector2d(ball.position.get_x(), ball.position.get_z());
         List<Vector2d> points = new ArrayList<Vector2d>(VECTOR_COUNT);
         Vector2d to_flag = getWorld().flag_position.sub(real_ball_position).normalize();
         Vector2d anchor = (new Vector2d(getWorld().flag_position.distance(real_ball_position), 0)).rotate(to_flag.angle());
@@ -141,9 +141,9 @@ public class AI_Fedora extends AI_controller {
         for(double speed_i = VELOCITY_INCREASE; speed_i <= MAX_SHOT_VELOCITY; speed_i += VELOCITY_INCREASE){
             Ball test_ball = ball.simulateHit(direction, speed_i, MAX_TICKS, DELTA);
 
-            double displacement = (new Vector2d(test_ball.x, test_ball.y)).distance(new Vector2d(ball.x, ball.y));
-            double old_distance_to_flag = getWorld().flag_position.distance(new Vector2d(ball.x, ball.y));
-            double new_distance_to_flag = getWorld().flag_position.distance(new Vector2d(test_ball.x, test_ball.y));
+            double displacement = (new Vector2d(test_ball.position.get_x(), test_ball.position.get_z())).distance(new Vector2d(ball.position.get_x(), ball.position.get_z()));
+            double old_distance_to_flag = getWorld().flag_position.distance(new Vector2d(ball.position.get_x(), ball.position.get_z()));
+            double new_distance_to_flag = getWorld().flag_position.distance(new Vector2d(test_ball.position.get_x(), test_ball.position.get_z()));
 
             if(
                     (!test_ball.isTouchingFlag() && test_ball.isStuck())
