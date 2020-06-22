@@ -107,8 +107,7 @@ public class Tree extends Obstacle {
         return 0;
     }
 
-    @Override
-    public ModelInstance[] getModel() {
+    private ModelInstance[] generateModel() {
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part("tree", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.BROWN)));
@@ -127,6 +126,19 @@ public class Tree extends Obstacle {
         ModelInstance[] treeInstance= new ModelInstance[]{trunkInstance,leavesInstance};
 
         return treeInstance;
+    }
+
+    private ModelInstance trunk;
+    private ModelInstance leaves;
+
+    @Override
+    public ModelInstance[] getModel() {
+        if (trunk == null || leaves == null) {
+            ModelInstance[] models = generateModel();
+            trunk = models[0];
+            leaves = models[1];
+        }
+        return new ModelInstance[]{trunk, leaves};
     }
 
     @Override
