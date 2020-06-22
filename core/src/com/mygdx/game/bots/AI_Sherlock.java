@@ -9,10 +9,14 @@ import com.mygdx.game.utils.Vector2d;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class AI_Sherlock extends AI_controller {
 
     private static boolean DEBUG = true;
+
+    private long unique_seed = new Random(System.currentTimeMillis()).nextLong();
+    private double max_distance;
 
     public String getName() { return "Estimated Suite-step Search"; }
 
@@ -21,6 +25,7 @@ public class AI_Sherlock extends AI_controller {
     Node last_node = null;
 
     protected void calculate(Player player) {
+        max_distance = getWorld().start_position.distance(getWorld().flag_position);
         if (last_node == null) last_node = initial_node(player.getBall());
         else {
             Vector2d error = ((GolfNode)last_node).resulting_ball.topDownPosition().sub(player.getBall().topDownPosition());
@@ -41,7 +46,7 @@ public class AI_Sherlock extends AI_controller {
     }
 
     private static int TICK_INTERVAL = 1000;
-    private static int MAX_TICKS = 1000000;
+    private static int MAX_TICKS = 500000;
     private static double STEP_SIZE = Variables.DELTA;
     private static double CHILD_IMPROVEMENT = 0.8;
 
@@ -67,20 +72,38 @@ public class AI_Sherlock extends AI_controller {
             return parent + previous_distance - current_distance;
         };
 
+        // FEDORA heuristic
+        /*heuristic = n -> {
+            GolfNode node = (GolfNode)n;
+            if (!node.simulation_successful || node.resulting_ball.isStuck()) return -Double.MAX_VALUE;
+            double dis = node.displacement;
+            double _old = node.old_distance_to_flag;
+            double _new = node.new_distance_to_flag;
+            double trav = node.resulting_ball.travel_distance;
+            double displacement_test = 1-(dis*dis + _old*_old - 2*_old*dis);
+            double change_in_distance = 1-_new*_new;
+//            double tick_test = 1 - (((double)test_ball.ticks) / ((double)MAX_TICKS));
+            double flag_test = node.resulting_ball.isTouchingFlag()? 1:0;
+            double travel_test = 1 - (trav*trav + _old*_old - _old*trav);
+            double total = displacement_test + change_in_distance + flag_test + travel_test;
+            return total / 4d;
+        };*/
+
         stopCondition = n -> {
             GolfNode node = (GolfNode)n;
-            return node.getDepth() <= 1 && node.resulting_ball.isTouchingFlag();
+            return node.new_distance_to_flag < getWorld().hole_tolerance && node.getDepth() >= 1;
         };
 
     }
 
     private boolean first_tree = true;
     private void setupTreeSearch(Node root) {
-        /*if (first_tree)*/ tree_search = new SimulationTreeSearch(root, heuristic, suiteMaker, stopCondition);
-        /*else {
+        if (first_tree) tree_search = new SimulationTreeSearch(root, heuristic, suiteMaker, stopCondition);
+        else {
+            tree_search.resetCost();
             tree_search.rebase(root);
             tree_search.resetCost();
-        }*/
+        }
     }
 
     private GolfNode initial_node(Ball current) {
@@ -97,6 +120,9 @@ public class AI_Sherlock extends AI_controller {
 
         Ball start_ball;
         Ball resulting_ball = null;
+        double old_distance_to_flag;
+        double new_distance_to_flag;
+        double displacement;
         private Vector2d direction;
         private double velocity;
 
@@ -108,6 +134,7 @@ public class AI_Sherlock extends AI_controller {
             this.direction = direction;
             this.velocity = velocity;
             setHeuristic(heuristic);
+            old_distance_to_flag = start_ball.topDownPosition().distance(getWorld().flag_position);
         }
 
         @Override
@@ -124,6 +151,8 @@ public class AI_Sherlock extends AI_controller {
                     if (!resulting_ball.is_moving) done_calculating = true;
                 }
             } simulation_successful = done_calculating;
+            new_distance_to_flag = resulting_ball.topDownPosition().distance(getWorld().flag_position);
+            displacement = (new Vector2d(resulting_ball.x, resulting_ball.y)).distance(new Vector2d(start_ball.x, start_ball.y));
             return cost;
         }
 
@@ -139,12 +168,11 @@ public class AI_Sherlock extends AI_controller {
 
     class GolfSuite extends SuiteMaker {
 
-        @Override
-        protected List<Node> makeBareSuite(Node p, SimulationTreeSearch tree, long seed) {
+        private List<Node> suiteOld(Node p, SimulationTreeSearch tree, long seed) {
             GolfNode parent = (GolfNode)p;
             // TODO improve size selection and speed factors
             int size = 10;
-            double[] speed_factors = AIUtils.linearSpacing(0.1, 1.2, 10);
+            double[] speed_factors = AIUtils.linearSpacing(0.1, 1, 10);
             int nums = speed_factors.length;
             List<Node> nodes = new ArrayList<Node>(size);
             double angle_range = Math.PI/2d + seed * 0.45;
@@ -154,7 +182,7 @@ public class AI_Sherlock extends AI_controller {
                 Vector2d toFlag = getWorld().flag_position.sub(parent.start_ball.topDownPosition());
                 double angle_mod = interval * (i/nums) - angle_range/2d;
                 double angle = toFlag.angle() + angle_mod;
-                double speed = speed_factors[i%nums] * toFlag.get_length();
+                double speed = speed_factors[i%nums] * getWorld().maximum_velocity;
                 if (speed > getWorld().maximum_velocity) {
                     speed = getWorld().maximum_velocity;
                     i += nums - i%nums;
@@ -163,14 +191,61 @@ public class AI_Sherlock extends AI_controller {
                 boolean path_is_clear = AIUtils.isClearPath(parent.start_ball.topDownPosition(),
                         parent.start_ball.topDownPosition().add(direction.scale(speed)),
                         getWorld().height_function, 500, getWorld().hole_tolerance);
-                double estimate = createEstimate(parent, angle_mod);
+                double estimate = createEstimate(parent, angle_mod, speed);
                 if (path_is_clear) nodes.add(new GolfNode(estimate, parent.resulting_ball, direction, speed));
             }
             return nodes;
         }
 
-        public double createEstimate(GolfNode node, double angle_mod) {
-            return Math.random() * 3 - node.getDepth() - 2*Math.abs(angle_mod);
+        private List<Node> gaussianSuite(Node p, SimulationTreeSearch tree, long seed) {
+            Random rand = new Random(unique_seed + seed);
+            GolfNode parent = (GolfNode)p;
+            Vector2d currentPos = parent.resulting_ball.topDownPosition();
+            Vector2d toFlag = getWorld().flag_position.sub(currentPos);
+            double distance = toFlag.get_length();
+            List<Node> nodes = new ArrayList<>();
+            int speed_partitions = (int)(10 + (max_distance / distance) * 2.5);
+            int angle_partitions = (int)(25 - (max_distance / distance) * 0.5);
+            if (angle_partitions < 5) angle_partitions = 5;
+            //debug.debug("taking %d speed and %d angle partititons for distance %.3f",speed_partitions, angle_partitions, distance);
+            double[] speed_factors = AIUtils.linearSpacing(0.1, 1, speed_partitions);
+            double[] angle_partition = new double[angle_partitions];
+            angle_partition[0] = 0;
+            double sigma = g(currentPos, getWorld().flag_position);
+            for (int i=1; i < angle_partition.length; i++) {
+                double val = 2*Math.PI;
+                int n = 0;
+                while ((val > Math.PI || val < -Math.PI) && (n < 10)) { val = rand.nextGaussian() * sigma; n++; }
+                angle_partition[i] = val;
+            }
+            for (int i=0; i < angle_partition.length; i++) {
+                Vector2d direction = toFlag.normalize().rotate(angle_partition[i]);
+                for (int j=0; j < speed_factors.length; j++) {
+                    double speed = speed_factors[j] * getWorld().maximum_velocity;
+                    boolean path_is_clear = AIUtils.isClearPath(parent.start_ball.topDownPosition(),
+                            parent.start_ball.topDownPosition().add(direction.scale(speed)),
+                            getWorld().height_function, 200, getWorld().hole_tolerance);
+                    if (!path_is_clear) continue;
+                    double quality = createEstimate(parent, angle_partition[i], speed);
+                    GolfNode child = new GolfNode(quality, parent.resulting_ball, direction, speed);
+                    nodes.add(child);
+                }
+            }
+            return nodes;
+        }
+
+        private double g(Vector2d c, Vector2d d) {
+            double current_distance = c.distance(d);
+            return 1.5 * current_distance / max_distance;
+        }
+
+        @Override
+        protected List<Node> makeBareSuite(Node parent, SimulationTreeSearch tree, long seed) {
+            return gaussianSuite(parent, tree, seed);
+        }
+
+        public double createEstimate(GolfNode node, double angle_mod, double speed) {
+            return node.getHeuristic() - angle_mod;
         }
 
     }

@@ -83,7 +83,7 @@ public final class Variables {
 	public static double PITCH = Math.PI * 2/9d;
 	public static double YAW = Math.PI * 0.75;
 	public static double VIEW_ZOOM = 7;
-	
+
 	public static void reset() {
 		MAX_SHOT_VELOCITY = 6d;
 		SHOT_VELOCITY = MAX_SHOT_VELOCITY/2d;
@@ -115,7 +115,7 @@ public final class Variables {
 		return dir.angle();
 	}
 	public static final double AI_SHOT_ANGLE_BOUND = 0.03;
-	public static final AI_controller[] AVAILABLE_BOTS = {new AI_Basic(), new AI_SimpleLearner(), new AI_Gaussian(), new AI_Fedora(), new AI_Sherlock()};
+	public static final AI_controller[] AVAILABLE_BOTS = {new AI_TopHat(), new AI_Fedora(), new AI_Sherlock(),  new AI_Gaussian(), new AI_Basic(), new AI_SimpleLearner()};
 
 	public static final int TURN_STATE_START = 0;
 	public static final int TURN_STATE_WAIT = 1;

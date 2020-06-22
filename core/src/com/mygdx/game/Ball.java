@@ -69,7 +69,6 @@ public class Ball extends TopDownPhysicsObject {
     public void step(double delta, List<TopDownPhysicsObject> ents) {
 
         if(is_moving) {
-            System.out.println("Ball at " + getPhysicsPosition().toString());
             global_collisions = isColliding();
 
             Function2d h = world.height_function;

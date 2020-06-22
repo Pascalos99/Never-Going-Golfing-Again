@@ -101,10 +101,16 @@ public class SimulationTreeSearch {
         this.minimum_improvement = minimum_improvement;
         this.maximum_cost = max_cost;
         stop_simulation = false;
+        for (Node n : endorsed_nodes) if (stop_condition.isSolution(n)) {
+            best_node = n;
+            System.out.println("SIMULATION CANCELED\nfound a solution");
+            return;
+        }
         while (total_cost <= max_cost && !stop_simulation) {
             Node next_simulation = selectSuggestedNode();
             simulateNode(next_simulation, true);
         }
+        System.out.println("SIMULATION STOPPED\ntotal cost = "+total_cost+"\nsimulation stopped = "+stop_simulation);
         //validateBestNode();
     }
 
