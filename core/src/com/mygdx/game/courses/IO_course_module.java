@@ -80,6 +80,7 @@ public class IO_course_module {
     }
 
     private void readValues(List<String> clumped_pre) throws IllegalArgumentException {
+        FractalInfo.FractalInfoBuilder fri = FractalInfo.getEmpty();
         for (int i=0; i < clumped_pre.size(); i++) {
             if (clumped_pre.get(i).equals("")) continue;
             String[] setting = clumped_pre.get(i).split(" *= *", 2);
@@ -88,7 +89,7 @@ public class IO_course_module {
             if (name.equals("g")) g = Double.parseDouble(value);
             if (name.equals("m")) m = Double.parseDouble(value);
             if (name.equals("mu")) mu = Double.parseDouble(value);
-            if (name.equals("mu_sand")) mu_sand = Double.parseDouble(value);
+            if (name.equals("mu-sand")) mu_sand = Double.parseDouble(value);
             if (name.equals("vmax")) vmax = Double.parseDouble(value);
             if (name.equals("tol")) tol = Double.parseDouble(value);
             if (name.equals("start")) start = parseVector2d(value);
@@ -97,7 +98,17 @@ public class IO_course_module {
             if (name.equals("sand")) sand = value;
             if (name.equals("tree")) obstacles.add(parseTree(value.replaceAll("(\\{[;\\s]*)|([;\\s]*})", "")));
             if (name.equals("wall")) obstacles.add(parseWall(value.replaceAll("(\\{[;\\s]*)|([;\\s]*})", "")));
+            if (name.equals("using_fractals")) using_fractals = Boolean.parseBoolean(value);
+            if (name.equals("seed")) fri.addSeed(Long.parseLong(value));
+            if (name.equals("roughness")) fri.addRoughness(Double.parseDouble(value));
+            if (name.equals("minimum")) fri.addMin(Double.parseDouble(value));
+            if (name.equals("maximum")) fri.addMax(Double.parseDouble(value));
+            if (name.equals("resolution")) fri.addResolution(value);
+            if (name.equals("smoothness")) fri.addResolution(value);
+            if (name.equals("interpolation")) fri.addResolution(value);
+            if (name.equals("world-shift")) world_shift = parseVector2d(value);
         }
+        if (using_fractals) fractal = fri.get();
     }
 
     private Obstacle parseTree(String compound) {
@@ -144,11 +155,14 @@ public class IO_course_module {
     private Vector2d goal = new Vector2d(5, 5);
     private String height = "sin(x) + cos(y)";
     private String sand = "sin(x-1) + cos(y-1)";
+    private boolean using_fractals = false;
+    private FractalInfo fractal = null;
+    private Vector2d world_shift = Vector2d.ZERO;
 
     private List<Obstacle> obstacles;
 
     public String toString() {
-        return String.format("g = %s\nm = %s\nmu = %s\nmu_sand = %s\nvmax = %s\ntol = %s\nstart = %s\ngoal = %s\nheight = %s\nsand = %s\nobstacles = %s",
+        return String.format("g = %s\nm = %s\nmu = %s\nmu-sand = %s\nvmax = %s\ntol = %s\nstart = %s\ngoal = %s\nheight = %s\nsand = %s\nobstacles = %s",
                 g, m, mu, mu_sand, vmax, tol, start, goal, height, sand, obstacles);
     }
 
@@ -197,6 +211,17 @@ public class IO_course_module {
 
     public List<Obstacle> getObstacles() { return obstacles; }
 
+    public boolean useFractals() {
+        return using_fractals;
+    }
+    public FractalInfo getFractalInfo() {
+        return fractal;
+    }
+
+    public Vector2d getWorldShift() {
+        return world_shift;
+    }
+
     public static String vector_to_string(Vector2d v) {
         return String.format("(% .4f, % .4f)", v.get_x(), v.get_y());
     }
@@ -213,44 +238,45 @@ public class IO_course_module {
         return "";
     }
 
-    public static void main(String[] args) {
-        IO_course_module io = new IO_course_module("core/testCourses/M");
-        System.out.println(io.getObstacles());
+    private static String toOutputString(GameInfo info) {
+        String start_str = vector_to_string(info.getStart());
+        String goal_str = vector_to_string(info.getGoal());
+        String shift_str = vector_to_string(WORLD_SHIFT);
+        StringBuilder sb = new StringBuilder(String.format("g = %s; m = %s; mu = %s; mu-sand = %s; vmax = %s; tol = %s;" +
+                        "\nstart = %s; goal = %s; world-shift = %s;\nheight = %s; sand = %s\n" +
+                        "using_fractals = %s;\n",
+                info.gravity, info.ballMass, info.friction, info.sandFriciton, info.maxVelocity, info.tol, start_str, goal_str, shift_str,
+                info.getHeightFunction(), info.getSandFunction(), info.use_fractals));
+        if (info.use_fractals) {
+            FractalInfo f = info.fractalInfo;
+            sb.append(String.format("seed = %d; roughness = %f;\nminimum = %f; maximum = %f\n" +
+                    "resolution = %s; smoothness = %s;\ninterpolation = %s;", f.seed, f.roughness,
+                    f.minimum, f.maximum, f.resolution_setting, f.smoothness_setting, f.interpolation_setting));
+        }
+        return sb.toString();
+    }
+
+    private static void outputToFile(File file, String... str) {
+        if (isDefaultCourseName(file.getName())) file = new File(default_courses_path+file.getName());
+        PrintWriter writer;
+        try {
+            writer = new PrintWriter(new FileWriter(file));
+            for (int i=0; i < str.length; i++) writer.println(str[i]);
+            writer.close();
+        } catch (IOException e) {
+            System.err.println("Given file ("+file+") is invalid");
+            e.printStackTrace();
+        }
     }
 
     public static void outputFile(File file, GameInfo aspects, List<Obstacle> obstacles) {
-        String start_str = vector_to_string(aspects.getStart());
-        String goal_str = vector_to_string(aspects.getGoal());
-        PrintWriter writer;
-        try {
-            writer = new PrintWriter(new FileWriter(file));
-            writer.format("g = %s; m = %s; mu = %s; mu_sand = %s; vmax = %s; tol = %s;\nstart = %s; goal = %s;\nheight = %s; sand = %s\n",
-                    aspects.gravity, aspects.ballMass, aspects.friction, aspects.sandFriciton, aspects.maxVelocity,
-                    aspects.tol, start_str, goal_str, aspects.getHeightFunction(), aspects.getSandFunction());
-            if (obstacles.size() > 0) {
-                writer.println();
-                for (Obstacle o : obstacles) writer.println(obstacle_to_string(o));
-            }
-            writer.close();
-        } catch (IOException e) {
-            System.err.println("Given file is invalid");
-            e.printStackTrace();
-        }
+        String[] str = new String[obstacles.size()];
+        for (int i=0; i < str.length; i++) str[i] = obstacle_to_string(obstacles.get(i));
+        outputToFile(file, toOutputString(aspects));
     }
 
-    public static void outputFile(File file, double g, double m, double mu, double mu_sand, double vmax, double tol, Vector2d start, Vector2d goal, String height, String sand) {
-        String start_str = vector_to_string(start);
-        String goal_str = vector_to_string(goal);
-        PrintWriter writer;
-        try {
-            writer = new PrintWriter(new FileWriter(file));
-            writer.format("g = %s; m = %s; mu = %s; mu_sand = %s; vmax = %s; tol = %s;\nstart = %s; goal = %s;\nheight = %s; sand = %s ",
-                    g, m, mu, mu_sand, vmax, tol, start_str, goal_str, height, sand);
-            writer.close();
-        } catch (IOException e) {
-            System.err.println("Given file is invalid");
-            e.printStackTrace();
-        }
+    public static void outputFile(File file, GameInfo info) {
+        outputToFile(file, toOutputString(info));
     }
 
 }

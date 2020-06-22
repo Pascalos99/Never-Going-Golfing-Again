@@ -9,12 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.game.courses.CourseBuilder;
-import com.mygdx.game.courses.FractalGenerator;
-import com.mygdx.game.courses.GameInfo;
+import com.mygdx.game.courses.*;
 import com.mygdx.game.parser.BiLinearArrayFunction2d;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
+
+import java.io.File;
+import java.util.Random;
 
 import static com.mygdx.game.utils.Variables.*;
 
@@ -33,20 +34,36 @@ public class FractalSettings implements Screen {
 
     Label waterCoverage;
 
+    public void loadInfo(FractalInfo info) {
+        if (info == null) return;
+        seed.setText(info.seed+"");
+        roughness.setText(info.roughness+"");
+        minimum.setText(info.minimum+"");
+        maximum.setText(info.maximum+"");
+        resolution.setSelected(info.resolution_setting);
+        smoothingFactor.setSelected(info.smoothness_setting);
+        interpolation.setSelected(info.resolution_setting);
+    }
 
     public FractalSettings(Menu menu){
         parent=menu;
         cb=SettingsScreen.cb;
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
+        Table overall=new Table();
+        overall.setBackground(EXTRA_BKG);
+        EXTRA_BKG.setColor(0,0,0,150);
         Table table = new Table();
         table.setFillParent(true);
         table.setBackground(MENU_BKG);
+        MENU_BKG.setColor(0,0,0,100);
         stage.addActor(table);
+        table.add(overall);
         TextButton backButton= new TextButton("BACK",MENU_SKIN);
         backButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                updateFractalInfo();
                 parent.changeScreen(Menu.CUSTOM_GAME);
             }
         });
@@ -55,6 +72,7 @@ public class FractalSettings implements Screen {
         play.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                updateFractalInfo();
                 cb.setFractalHeight(getSeed(),getRoughness(),getResSetting(),getSmoothingSetting(), getInterpolation(),getMin(),getMax());
                 parent.changeScreen(Menu.PLAY);
             }
@@ -64,6 +82,7 @@ public class FractalSettings implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                updateFractalInfo();
                 cb.setFractalHeight(getSeed(),getRoughness(),getResSetting(),getSmoothingSetting(), getInterpolation(),getMin(),getMax());
                 parent.changeScreen(Menu.CUSTOMIZE_OBSTACLES);
             }
@@ -95,6 +114,7 @@ public class FractalSettings implements Screen {
         Label inter = new Label("Interpolation: ", MENU_SKIN);
         interpolation = new SelectBox<String>(MENU_SKIN);
         interpolation.setItems("bi-linear","bi-cubic");
+        interpolation.setSelected("bi-cubic");
 
         waterCoverage=new Label("",MENU_SKIN);
         Table fields= new Table();
@@ -123,40 +143,68 @@ public class FractalSettings implements Screen {
         Label title2 = new Label("Extra Information", MENU_SKIN);
 
         Label body= new Label(""+
-                "   Generates a fractal image to represent\n" +
-                "  a putting course. Bicubic interpolation\n" +
-                "  is used to get values in between the\n" +
-                "  image's data-points.\n\n" +
-                "    Any course with a unique seed will\n" +
-                "  also be a unique course.\n\n" +
-                "    The roughness specifies the amount of\n" +
-                "  distortion in between the gradients of\n" +
-                "  two determined values in the image.\n" +
-                "  This value lies typically between 0 and 1.\n\n" +
-                "    The resolution specifies how many\n" +
-                "  data-points are used for the image.\n\n" +
-                "    The smoothing factor lowers the resolution\n" +
-                "  while introducing a layer of bilinear interpolation\n\n" +
-                "    The minimum and maximum specify what\n" +
-                "  the lowest and highest points in the course will\n" +
-                "  be and dictates the overall scale of the world."
+                "   Generates a fractal image to represent a putting\n" +
+                "   course. Bicubic or Bilinear interpolation is used to\n" +
+                "   compute the values in between discrete data-points.\n\n" +
+                "     Any course with a unique seed will be practically\n" +
+                "   unique as a course overall. Leaving the \"seed\" field\n" +
+                "   empty results in a random seed being used. The\n\n" +
+                "     roughness specifies the amount of distortion in between   \n" +
+                "   the gradients of two determined values in the image.\n" +
+                "   Roughness affects the distortion on every 'level' or\n" +
+                "   'depth' of the fractal, which is generated recursively.\n" +
+                "   This roughness value typically lies between 0 and 1.\n\n" +
+                "     The resolution specifies how many data-points are used   \n" +
+                "   for the fractal image; over which is being interpolated.\n\n" +
+                "     The smoothing factor lowers the resolution while\n" +
+                "   introducing a layer of bilinear interpolation, which\n" +
+                "   improves overall performance while reducing quality.\n\n" +
+                "     The minimum and maximum specify what the lowest\n" +
+                "   and highest points in the course will be and\n" +
+                "   dictates the overall scale of the world."
                 ,MENU_SKIN);
 
+        TextButton save= new TextButton("Save",MENU_SKIN);
+        TextField savePath=new TextField("",MENU_SKIN);
+        save.addListener(new ChangeListener() {
+
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                updateFractalInfo();
+                try{
+                    File f = new File(savePath.getText());
+                    if (!IO_course_module.isDefaultCourseName(savePath.getText()) && !f.createNewFile()) {
+                        f.delete();
+                        f.createNewFile();
+                    }
+                    IO_course_module.outputFile(f, GAME_ASPECTS);
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
         title.setAlignment(Align.center);
-        table.pad(50,0,10,0);
-        table.add(title);
-        table.add(title2);
-        table.row();
+        overall.pad(0,0,10,0);
+        overall.add(title);
+        overall.add(title2);
+        overall.row();
         inner.add(body);
         info.add(inner).minSize(fields.getPrefWidth()/2,fields.getPrefHeight());
 
-        table.row().pad(0,10,0,10);
-        table.add(fields);
-        table.add(info);
+        overall.row().pad(0,10,0,10);
+        overall.add(fields);
+        overall.add(info);
         Table navigation=new Table();
         navigation.row().pad(0,10,10,10);
         navigation.add(backButton,play,customizeObstacles);
         navigation.align(Align.bottomLeft);
+
+        overall.row().pad(0,10,0,10);
+        overall.add(save).maxHeight(savePath.getPrefHeight());
+        overall.add(savePath);
 
         stage.addActor(navigation);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
@@ -216,7 +264,7 @@ public class FractalSettings implements Screen {
     public long getSeed(){
         String val=seed.getText();
         if(val.isBlank()||val.isEmpty()){
-            return System.currentTimeMillis();
+            return new Random(System.currentTimeMillis()).nextLong();
         }else{
             return Long.parseLong(val);
         }
@@ -232,7 +280,7 @@ public class FractalSettings implements Screen {
     }
 
     public String getSmoothingSetting(){
-      return smoothingFactor.getSelected();
+        return smoothingFactor.getSelected();
     }
 
     public double getMin(){
@@ -245,6 +293,14 @@ public class FractalSettings implements Screen {
 
     public String getInterpolation() {
         return interpolation.getSelected();
+    }
+
+    public FractalInfo getInfo() {
+        return new FractalInfo(getSeed(), getRoughness(), getResSetting(), getSmoothingSetting(), getInterpolation(), getMin(), getMax());
+    }
+
+    private void updateFractalInfo() {
+        GAME_ASPECTS.fractalInfo = getInfo();
     }
 
 }

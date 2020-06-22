@@ -22,6 +22,7 @@ import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.parser.Function2d;
+import com.mygdx.game.utils.ColorProof;
 import com.mygdx.game.utils.Vector2d;
 
 import java.util.ArrayList;
@@ -31,28 +32,28 @@ import static com.mygdx.game.utils.Variables.*;
 
 public class TerrainBuilder {
 
-    private static ArrayList<Vector3> borderPoints1 = new ArrayList<Vector3>();
-    private static ArrayList<Vector3> borderPoints2 = new ArrayList<Vector3>();
-    private static ArrayList<Vector3> borderPoints3 = new ArrayList<Vector3>();
-    private static ArrayList<Vector3> borderPoints4 = new ArrayList<Vector3>();
-    private static float scalingFactor = GRAPHICS_SCALING;
-    private static float resolution = 0.2f * scalingFactor;
+    private ArrayList<Vector3> borderPoints1 = new ArrayList<Vector3>();
+    private ArrayList<Vector3> borderPoints2 = new ArrayList<Vector3>();
+    private ArrayList<Vector3> borderPoints3 = new ArrayList<Vector3>();
+    private ArrayList<Vector3> borderPoints4 = new ArrayList<Vector3>();
+    private float scalingFactor = GRAPHICS_SCALING;
+    private float resolution = 0.2f * scalingFactor;
 
     public ModelInstance[] initFlag(PuttingCourse course) {
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
-        MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.BROWN)));
+        MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(ColorProof.BROWN())));
         builder.cylinder(0.1f, FLAGPOLE_HEIGHT, 0.1f, 30);
         Model pole = modelBuilder.end();
         modelBuilder = new ModelBuilder();
         modelBuilder.begin();
-        builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.RED)));
+        builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(ColorProof.FLAG())));
         builder.box(0.5f, 3.1f, 0, 1f, 0.7f, 0.03f);
         Model flag = modelBuilder.end();
         ModelInstance poleInstance = new ModelInstance(pole, (float) course.flag_position.get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.flag_position.get_x(), course.flag_position.get_y())), (float) course.flag_position.get_y() * WORLD_SCALING);
         ModelInstance flagInstance = new ModelInstance(flag, (float) course.flag_position.get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.flag_position.get_x(), course.flag_position.get_y())), (float) course.flag_position.get_y() * WORLD_SCALING);
         float side = (float) (2 * GAME_ASPECTS.getTolerance()) * WORLD_SCALING;
-        Model poleRange = modelBuilder.createCylinder(side, FLAGPOLE_HEIGHT, side, 40, new Material(ColorAttribute.createDiffuse(new Color(1, 0.4f, 1, 1f)), new BlendingAttribute(0.3f)),
+        Model poleRange = modelBuilder.createCylinder(side, FLAGPOLE_HEIGHT, side, 40, new Material(ColorAttribute.createDiffuse(ColorProof.POLE_RANGE()), new BlendingAttribute(0.3f)),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
         ModelInstance flagRangeInstance = new ModelInstance(poleRange, (float) course.flag_position.get_x() * WORLD_SCALING, (float) (WORLD_SCALING * course.getHeightAt(course.flag_position.get_x(), (float) course.flag_position.get_y())), (float) course.flag_position.get_y() * WORLD_SCALING);
         ModelInstance[] flagInstances = new ModelInstance[]{poleInstance, flagInstance, flagRangeInstance};
@@ -77,11 +78,11 @@ public class TerrainBuilder {
         return skySprite;
     }
 
-    public static ModelInstance buildWater() {
+    public ModelInstance buildWater() {
         ModelBuilder modelBuilder = new ModelBuilder();
 
         modelBuilder.begin();
-        MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(new Color(0.2f, 0.2f, 1, 1f)), new BlendingAttribute(0.5f)));
+        MeshPartBuilder builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(ColorProof.WATER()), new BlendingAttribute(0.5f)));
 
         Vector3 pos1 = new Vector3(0, 0, 0);
         Vector3 pos2 = new Vector3(0, 0, 50 * scalingFactor);
@@ -99,14 +100,14 @@ public class TerrainBuilder {
         return waterInstance;
     }
 
-    public static ModelInstance buildWalls() {
+    public ModelInstance buildWalls() {
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part(
                 "grid",
                 GL20.GL_TRIANGLES,
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
-                new com.badlogic.gdx.graphics.g3d.Material(IntAttribute.createCullFace(GL20.GL_NONE), ColorAttribute.createDiffuse(Color.BROWN))
+                new com.badlogic.gdx.graphics.g3d.Material(IntAttribute.createCullFace(GL20.GL_NONE), ColorAttribute.createDiffuse(ColorProof.BROWN()))
         );
         MeshPartBuilder.VertexInfo v1, v2, v3, v4;
         Vector3 nor1 = new Vector3(-1, 0, 0);
@@ -189,9 +190,7 @@ public class TerrainBuilder {
 
     public static float grid_spacing = 100f / (bigDepth + bigWidth);
 
-    public static boolean sand_grid = true;
-
-    public static ModelInstance[] buildTerrain() {
+    public ModelInstance[] buildTerrain() {
         Vector3 pos1, pos2, pos3, pos4;
         Vector3 nor1, nor2, nor3, nor4;
         Vector2d vec1, vec2, vec3, vec4;
@@ -203,23 +202,17 @@ public class TerrainBuilder {
 
         Function2d func = new AtomFunction2d("sin(x)+cos(y)");
 
-        Function<Vector2d, Boolean> sand = v -> WORLD.isSandAt(v.get_x(), v.get_y());
-        // TODO maybe you can use this,
-        //  usage:
-        //  if (sand.apply(new Vector2d(x, y))) then it is sand at the physics position (x,y) in [0, 20] x [0, 20]
-
-        Color grass_color = new Color(0.2f, 1f, 0.2f, 1f);
-        Color sand_color = new Color(0.9f, 1f, 0.4f, 1f);
-
         double y_scalar = WORLD_SCALING;
 
         try {
             func = WORLD.height_function;
         } catch (Error e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
-        Texture terrainTexture = new Texture(Gdx.files.internal("tx.png"));
+        Texture terrainTexture;
+        if (ColorProof.COLOR_BLIND_MODE) terrainTexture = new Texture(Gdx.files.internal("cb-tx.png"));
+        else terrainTexture = new Texture(Gdx.files.internal("tx.png"));;
 
         for (int a = 0; a < bigWidth; a++) {
             for (int b = 0; b < bigDepth; b++) {
@@ -233,10 +226,6 @@ public class TerrainBuilder {
 
                 for (int i = 0; i < gridWidth; i++) {
                     for (int k = 0; k < gridDepth; k++) {
-
-                        /*if (sand_grid && sand.apply(new Vector2d((i + (a * gridWidth)) * gw, (k + (b * gridDepth)) * gd)))
-                            color = sand_color;
-                        else color = grass_color;*/
 
                         float posx1 = (i + (a * gridWidth)) * gw;
                         float posy1 = (k + (b * gridDepth)) * gd;
@@ -328,7 +317,7 @@ public class TerrainBuilder {
     public ModelInstance initArrow() {
         ModelBuilder modelBuilder = new ModelBuilder();
         Model arrow = modelBuilder.createBox((float) ((2 * SHOT_VELOCITY) / MAX_SHOT_VELOCITY), 0.05f, 0.05f,
-                new Material(new ColorAttribute(ColorAttribute.Emissive, Color.YELLOW)),
+                new Material(new ColorAttribute(ColorAttribute.Emissive, ColorProof.SHOT_ARROW())),
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal
         );
         ModelInstance arrowInstance = new ModelInstance(arrow, 0, 0, 0);

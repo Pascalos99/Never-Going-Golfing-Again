@@ -38,8 +38,8 @@ public class AtomFunction2d implements Function2d {
 		Random rand = new Random(seed);
 		final double[] poly_f_mins = {0.02, 0.005, 0.001};
 		final double[] poly_f_maxs = {2d, 0.5, 0.1};
-		final double[] poly_chances_for_x = {0.8, 0.5, 0.3};
-		final double[] poly_chances_for_y = {0.6, 0.5, 0.3};
+		final double[] poly_chances_for_x = {0.8, 1, 0.7};
+		final double[] poly_chances_for_y = {0.6, 1, 0.5};
 		StringBuilder func = new StringBuilder();
 
 		for (int i=0; i < poly_chances_for_x.length; i++) {

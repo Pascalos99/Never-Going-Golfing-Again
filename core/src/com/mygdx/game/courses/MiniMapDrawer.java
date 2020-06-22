@@ -11,18 +11,31 @@ import com.mygdx.game.obstacles.Tree;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.parser.SandFunction2d;
 import com.mygdx.game.physics.TopDownPhysicsObject;
+import com.mygdx.game.utils.ColorProof;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
+import static com.mygdx.game.courses.CourseBuilderListener.*;
+
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Comparator;
 
 public abstract class MiniMapDrawer {
 
     protected final double scale_X, scale_Y;
     protected final int width, height;
-    protected Pixmap pm;
+
+    protected Pixmap main_image;
+    protected Pixmap height_image;
+    protected Pixmap sand_image;
+    protected Pixmap obstacles_image;
+    protected Pixmap start_and_goal_image;
+    protected Pixmap tempwall_image;
+
     private Vector2d anchor;
+
+    private static double HEIGHT_BARRIER = 5;
 
     public static MiniMapDrawer defaultDrawer(double course_width, double course_height, int pixels_per_unit, Vector2d bottom_left_corner) {
         MiniMapDrawer mmd = new DefaultMiniMap(
@@ -48,7 +61,12 @@ public abstract class MiniMapDrawer {
         height = image_height;
         scale_X = image_width / course_width;
         scale_Y = image_height / course_height;
-        pm = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        main_image = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        height_image = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        sand_image = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        obstacles_image = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        start_and_goal_image = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        tempwall_image = new Pixmap(width, height, Pixmap.Format.RGBA8888);
     }
 
     public void setAnchor(Vector2d bottom_left_corner) {
@@ -59,7 +77,7 @@ public abstract class MiniMapDrawer {
     }
 
     public Pixmap getPixmap() {
-        return pm;
+        return main_image;
     }
 
     private Comparator<Obstacle> obstacleSort = (o1, o2) -> {
@@ -69,21 +87,76 @@ public abstract class MiniMapDrawer {
     };
 
     public void draw(PuttingCourse course) {
-        drawHeight(course.height_function, 5);
+        drawHeight(course.height_function, HEIGHT_BARRIER);
         if (course.friction_function instanceof SandFunction2d) drawSand((SandFunction2d) course.friction_function);
         course.obstacles.sort(obstacleSort);
         for (Drawable draw : course.obstacles) draw.visit(this);
-        drawStartingPos(course.start_position);
-        drawGoalPos(course.flag_position);
+        drawStartAndGoalPos(course.start_position, course.flag_position);
     }
     public void draw(CourseBuilder course) {
-        if (course.height_function != null) drawHeight(course.height_function, 5 * Variables.WORLD_SCALING);
+        if (cbl != null && cbl.cb == course) {
+            redraw();
+            return;
+        }
+        if (course.height_function != null) drawHeight(course.height_function, HEIGHT_BARRIER * Variables.WORLD_SCALING);
         if (course.friction_function instanceof SandFunction2d) drawSand((SandFunction2d) course.friction_function);
         course.obstacles.sort(obstacleSort);
         for (Drawable draw : course.obstacles) draw.visit(this);
-        if (course.start != null) drawStartingPos(course.start);
-        if (course.goal != null) drawGoalPos(course.goal);
+        drawStartAndGoalPos(course.start, course.goal);
         if (course.temp_wall != null) course.temp_wall.visit(this);
+    }
+
+    private CourseBuilderListener cbl;
+
+    public void setListener(CourseBuilderListener cbl) {
+        this.cbl = cbl;
+        cbl.setAll(true);
+    }
+    public boolean notify(int update_code) {
+        if (cbl != null) return cbl.reset(update_code);
+        return false;
+    }
+    public void update() {
+        if (cbl == null) return;
+
+        if (cbl.reset(UPDATE_HEIGHT) && cbl.cb.height_function != null)
+            drawHeight(cbl.cb.height_function, HEIGHT_BARRIER * Variables.WORLD_SCALING);
+
+        if (cbl.reset(UPDATE_FRICTION) && cbl.cb.friction_function instanceof SandFunction2d)
+            drawSand((SandFunction2d) cbl.cb.friction_function);
+
+        if (cbl.reset(UPDATE_START) && cbl.cb.start != null) {
+            drawStartAndGoalPos(cbl.cb.start, cbl.cb.goal);
+            cbl.reset(UPDATE_GOAL);
+        } if (cbl.reset(UPDATE_GOAL) && cbl.cb.goal != null) {
+            drawStartAndGoalPos(cbl.cb.start, cbl.cb.goal);
+            cbl.reset(UPDATE_START);
+        } if (cbl.cb.temp_wall != null && cbl.reset(UPDATE_TEMP_WALL)) cbl.cb.temp_wall.visit(this);
+        if (cbl.reset(UPDATE_TEMP_WALL)) {
+            tempwall_image.setColor(Color.CLEAR);
+            tempwall_image.fill();
+        }
+        if (cbl.reset(UPDATE_OBSTACLES)) {
+            obstacles_image.setColor(Color.CLEAR);
+            obstacles_image.fill();
+            cbl.obstacles = new ArrayList<>(cbl.cb.obstacles);
+            cbl.set(ADD_OBSTACLE, true);
+        }
+        if (cbl.reset(ADD_OBSTACLE))
+            for (Obstacle o : cbl.consumeObstacles()) o.visit(this);
+    }
+    public void assembleImage() {
+        main_image.drawPixmap(height_image, 0, 0);
+        main_image.drawPixmap(sand_image, 0, 0);
+        main_image.drawPixmap(obstacles_image, 0, 0);
+        main_image.drawPixmap(tempwall_image, 0, 0);
+        main_image.drawPixmap(start_and_goal_image, 0, 0);
+    }
+    public boolean redraw() {
+        if (cbl == null) return false;
+        update();
+        assembleImage();
+        return true;
     }
 
     public Vector2d getRealPos(Vector2d pos_in_image) {
@@ -111,7 +184,7 @@ public abstract class MiniMapDrawer {
     }
 
     public Texture getTexture() {
-        return new Texture(pm);
+        return new Texture(main_image);
     }
 
     // TODO make a drawer that implements these methods and then returns an image (like in the builder pattern)
@@ -123,6 +196,7 @@ public abstract class MiniMapDrawer {
     public abstract void draw(TopDownPhysicsObject unspecified_object);
 
     public abstract void draw(Vector2d from, Vector2d to, double thickness);
+    public abstract void drawTemp(Vector2d from, Vector2d to, double thickness);
 
     public abstract void draw(Ball ball);
 
@@ -131,21 +205,19 @@ public abstract class MiniMapDrawer {
     public abstract void drawMedium(Tree tree);
     public abstract void drawLarge(Tree tree);
 
-    public abstract void drawStartingPos(Vector2d start);
+    public abstract void drawStartAndGoalPos(Vector2d start, Vector2d flag);
 
-    public abstract void drawGoalPos(Vector2d flag);
-
-    public void drawAtWorldPos(Texture texture, double x, double y) {
+    public void drawAtWorldPos(Texture texture, double x, double y, Pixmap pm) {
         TextureData td = texture.getTextureData();
         td.prepare();
         Pixmap tm = td.consumePixmap();
         pm.drawPixmap(tm, toMiniMapX(x) - td.getWidth() / 2, toMiniMapY(y)-td.getHeight());
     }
-    public void drawImageAtWorldPos(String internal_path, double x, double y) {
+    public void drawImageAtWorldPos(String internal_path, double x, double y, Pixmap pm) {
         Texture texture;
         try {
             texture = new Texture(Gdx.files.internal(internal_path));
-            drawAtWorldPos(texture, x, y);
+            drawAtWorldPos(texture, x, y, pm);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("could not load image "+internal_path+": \""+e.getMessage()+"\"");
@@ -167,11 +239,15 @@ public abstract class MiniMapDrawer {
                     Color color;
                     if (h.evaluate(x, y) <= 0)
                         color = new Color(20/255f, 20/255f, (float)((200d + h.evaluate(x, y) * 25d)/255d),1f);
-                    else
-                        color = new Color(20/255f, (float)((200-150* (h.evaluate(x, y)/heightBarrier))/255d), 20/255f,1f);
-
-                    pm.setColor(color);
-                    pm.drawPixel(i, j);
+                    else {
+                        color = new Color(20 / 255f, (float) ((200 - 150 * (h.evaluate(x, y) / heightBarrier)) / 255d), 20 / 255f, 1f);
+                        if (ColorProof.COLOR_BLIND_MODE) {
+                            float c = (float)((200 - 150*(h.evaluate(x, y) / heightBarrier))/255d);
+                            color = new Color(c, c, c, 1f);
+                        }
+                    }
+                    height_image.setColor(color);
+                    height_image.drawPixel(i, j);
                 }
             }
         }
@@ -183,8 +259,8 @@ public abstract class MiniMapDrawer {
                 for (int j=0; j < height; j++) {
                     double y = toPhysicsY(j);
                     if (s.isSandAt(x, y) && s.main.evaluate(x, y) > 0) {
-                        pm.setColor(new Color(180/255f, 180/255f, 0f, 1f));
-                        pm.drawPixel(i, j);
+                        sand_image.setColor(ColorProof.SAND());
+                        sand_image.drawPixel(i, j);
                     }
                 }
             }
@@ -195,8 +271,7 @@ public abstract class MiniMapDrawer {
             System.err.println("implementation for MiniMapDrawer incomplete");
         }
 
-        @Override
-        public void draw(Vector2d from, Vector2d to, double thickness) {
+        private void draw(Vector2d from, Vector2d to, double thickness, Pixmap pm) {
 
             Vector2d short_line = to.sub(from).normalize().rotate(Math.PI/2).scale(thickness);
 
@@ -208,15 +283,27 @@ public abstract class MiniMapDrawer {
             Polygon poly = new Polygon(new int[]{
                     toMiniMapX(v1.get_x()), toMiniMapX(v2.get_x()),
                     toMiniMapX(v3.get_x()), toMiniMapX(v4.get_x())},
-                new int[]{
-                    toMiniMapY(v1.get_y()), toMiniMapY(v2.get_y()),
-                    toMiniMapY(v3.get_y()), toMiniMapY(v4.get_y())
-            }, 4);
+                    new int[]{
+                            toMiniMapY(v1.get_y()), toMiniMapY(v2.get_y()),
+                            toMiniMapY(v3.get_y()), toMiniMapY(v4.get_y())
+                    }, 4);
 
             pm.setColor(new Color(0.2f, 0.2f, 0.2f, 1f));
             for (int i=0; i < width; i++)
                 for (int j=0; j < height; j++)
                     if (poly.contains(i, j)) pm.drawPixel(i, j);
+        }
+
+        @Override
+        public void draw(Vector2d from, Vector2d to, double thickness) {
+            draw(from, to, thickness, obstacles_image);
+        }
+
+        @Override
+        public void drawTemp(Vector2d from, Vector2d to, double thickness) {
+            tempwall_image.setColor(Color.CLEAR);
+            tempwall_image.fill();
+            draw(from, to, thickness, tempwall_image);
         }
 
         @Override
@@ -234,19 +321,19 @@ public abstract class MiniMapDrawer {
         @Override
         public void drawSmall(Tree tree) {
             drawImageAtWorldPos("misc/SmallTree.png",
-                    tree.getPhysicsPosition().get_x(), tree.getPhysicsPosition().get_z());
+                    tree.getPhysicsPosition().get_x(), tree.getPhysicsPosition().get_z(), obstacles_image);
         }
 
         @Override
         public void drawMedium(Tree tree) {
             drawImageAtWorldPos("misc/MediumTree.png",
-                    tree.getPhysicsPosition().get_x(), tree.getPhysicsPosition().get_z());
+                    tree.getPhysicsPosition().get_x(), tree.getPhysicsPosition().get_z(), obstacles_image);
         }
 
         @Override
         public void drawLarge(Tree tree) {
             drawImageAtWorldPos("misc/LargeTree.png",
-                    tree.getPhysicsPosition().get_x(), tree.getPhysicsPosition().get_z());
+                    tree.getPhysicsPosition().get_x(), tree.getPhysicsPosition().get_z(), obstacles_image);
         }
 
         @Override
@@ -258,20 +345,24 @@ public abstract class MiniMapDrawer {
             String ball_color = ball.owner.getBallColor();
             for (int i=0; i < Variables.BALL_COLORS.length; i++)
                 if (Variables.BALL_COLORS[i].name.equals(ball_color)) {
-                    Color c = Variables.BALL_COLORS[i].color;
-                    pm.setColor(c);
-                    pm.fillCircle(ball_x, ball_y, (size_x > size_y)?size_x:size_y);
+                    Color c = Variables.BALL_COLORS[i].color.get();
+                    assembleImage();
+                    main_image.setColor(c);
+                    main_image.fillCircle(ball_x, ball_y, (size_x > size_y)?size_x:size_y);
                 }
         }
 
         @Override
-        public void drawStartingPos(Vector2d start) {
-            drawImageAtWorldPos("misc/Start.png", start.get_x(), start.get_y());
-        }
-
-        @Override
-        public void drawGoalPos(Vector2d flag) {
-            drawImageAtWorldPos("misc/Flag.png", flag.get_x(), flag.get_y());
+        public void drawStartAndGoalPos(Vector2d start, Vector2d flag) {
+            start_and_goal_image.setColor(Color.CLEAR);
+            start_and_goal_image.fill();
+            if (start != null) {
+                drawImageAtWorldPos("misc/"+(ColorProof.COLOR_BLIND_MODE?"cb-":"")+"Start.png", start.get_x(), start.get_y(), start_and_goal_image);
+            }
+            if (flag != null) {
+                drawImageAtWorldPos("misc/"+(ColorProof.COLOR_BLIND_MODE?"cb-":"")+"Flag.png",
+                        flag.get_x(), flag.get_y(), start_and_goal_image);
+            }
         }
 
     }

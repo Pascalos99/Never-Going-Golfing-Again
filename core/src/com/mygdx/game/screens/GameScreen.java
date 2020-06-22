@@ -21,6 +21,7 @@ import com.mygdx.game.courses.GameInfo;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.courses.PuttingCourseGenerator;
 import com.mygdx.game.utils.Variables;
+import com.mygdx.game.utils.Vector2d;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -32,11 +33,6 @@ public class GameScreen implements Screen {
     private Menu parent;
     private GameInfo gameAspects;
     private Stage stage;
-    static PuttingCourseGenerator generator = new PuttingCourseGenerator(System.currentTimeMillis());
-    static int size = 55;
-    static double hole_tolerance = 10;
-    static double max_speed = 20;
-    static double gravity = 9.812;
     static PuttingCourse course = null;
     Label currentPlayerLabel;
     Label currentPlayerShotNum;
@@ -57,7 +53,7 @@ public class GameScreen implements Screen {
         winners= new ArrayList<>();
         stage = new Stage(new ScreenViewport());
         for(Player p:gameAspects.players)
-            playerLabels.add(new Label(p.getName(),MENU_SKIN));
+            playerLabels.add(new Label(p.getName(),ORANGE));
 
         Gdx.input.setInputProcessor(stage);
         //table
@@ -76,7 +72,7 @@ public class GameScreen implements Screen {
             Table p = new Table();
             p.add(player);
             p.getCells().get(0).padRight(10);
-            p.add(new Label("0", MENU_SKIN));
+            p.add(new Label("0", ORANGE));
             playerOverview.add(p);
             playerOverview.row();
         }
@@ -84,14 +80,11 @@ public class GameScreen implements Screen {
         BLANK_BKG.setColor(0, 0, 0, 0); // r, g, b, a
 
 
-        generator.setPathPreference(true);
         if(gameAspects!=null){
             CourseBuilder cb =SettingsScreen.cb;
             course = cb.getModified();
             course.updateGameAspects(gameAspects);
-        }else{
-            course = /*generator.fractalGeneratedCourse(size, 1,0.8,0.7,size/200,3,9.81);*/ null;
-        }
+        } else throw new IllegalArgumentException("gameAspects may not be null");
         game =new CrazyPutting(course, gameAspects, this);
         game.create();
 
@@ -160,10 +153,10 @@ public class GameScreen implements Screen {
             replayButton.addListener(new ChangeListener(){
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    //TODO: wall height doesnt reset, also camera angle does not reset
                     PlayerScreen.playerNumber=1;
                     PlayerScreen.playerTable=null;
                     parent.players=null;
+                    Variables.reset();
                     for (AI_controller bot : AVAILABLE_BOTS) bot.clear();
                     parent.create();
 

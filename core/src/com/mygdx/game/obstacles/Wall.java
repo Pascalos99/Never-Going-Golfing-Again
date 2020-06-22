@@ -122,8 +122,8 @@ public class Wall extends Obstacle {
 //        builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.GREEN)));
 //        builder.sphere((float)this.radius*2f, (float)this.height, (float)this.radius*2f, 20,20);
         Model wall = modelBuilder.end();
-        System.out.println((float)this.getGraphicsPosition().get_y());
-        System.out.println(height+rootHeight);
+//        System.out.println((float)this.getGraphicsPosition().get_y());
+//        System.out.println(height+rootHeight);
         double y=this.getGraphicsPosition().get_y();
         ModelInstance wallInstance = new ModelInstance(wall, (float)this.getGraphicsPosition().get_x(), (float)(y+((height+rootHeight)/2f)), (float)this.getGraphicsPosition().get_z());
         Vector2d dir=end.sub(start);

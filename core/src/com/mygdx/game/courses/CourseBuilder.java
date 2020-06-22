@@ -7,7 +7,7 @@ import com.mygdx.game.parser.*;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
-import java.lang.reflect.Array;
+import static com.mygdx.game.courses.CourseBuilderListener.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,9 +28,12 @@ public class CourseBuilder {
     Vector2d shift;
     List<Obstacle> obstacles;
 
+    List<CourseBuilderListener> listeners;
+
     public CourseBuilder() {
         shift = Vector2d.ZERO;
         obstacles = new ArrayList<>();
+        listeners = new ArrayList<>();
     }
 
     public CourseBuilder(GameInfo aspects) {
@@ -45,11 +48,16 @@ public class CourseBuilder {
         setMaximumVelocity(aspects.getMaxV());
         setGravity(aspects.getGravity());
         setSandFunction(new AtomFunction2d(aspects.getSandFunction()), aspects.friction, aspects.sandFriciton);
+        if (aspects.use_fractals) {
+            FractalInfo f = aspects.fractalInfo;
+            setFractalHeight(f.seed, f.roughness, f.resolution_setting, f.smoothness_setting, f.interpolation_setting, f.minimum, f.maximum);
+        }
     }
 
     public void addHeight(Function2d func) {
         if (height_function==null) height_function = func;
         else height_function = height_function.add(func);
+        notifyListeners(UPDATE_HEIGHT);
         updateSandFunction();
     }
 
@@ -57,6 +65,7 @@ public class CourseBuilder {
         if (friction_function instanceof SandFunction2d) {
             SandFunction2d s = (SandFunction2d)friction_function;
             friction_function = new SandFunction2d(s.default_friction, s.sand_friction, height_function, s.sand);
+            notifyListeners(UPDATE_FRICTION);
         }
     }
 
@@ -64,11 +73,13 @@ public class CourseBuilder {
         Function2d main = height_function;
         if (height_function == null) main = Function2d.getConstant(0);
         friction_function = new SandFunction2d(friction, sand_friction, main, func);
+        notifyListeners(UPDATE_FRICTION);
     }
 
     public void addFriction(Function2d func) {
         if (friction_function==null) friction_function = func;
         else friction_function = friction_function.add(func);
+        notifyListeners(UPDATE_FRICTION);
     }
 
     public boolean isStartInWater() {
@@ -86,9 +97,17 @@ public class CourseBuilder {
 
     public void setStartPos(Vector2d v) {
         start = v;
+        notifyListeners(UPDATE_START);
     }
     public void setGoalPos(Vector2d v) {
         goal = v;
+        notifyListeners(UPDATE_GOAL);
+    }
+    public Vector2d getStart() {
+        return start;
+    }
+    public Vector2d getGoal() {
+        return goal;
     }
     public void setStartAndGoalPos(Vector2d start, Vector2d goal) {
         setStartPos(start);
@@ -96,19 +115,23 @@ public class CourseBuilder {
     }
     public void addShift(Vector2d shift) {
         this.shift = this.shift.add(shift);
+        notifyListeners(UPDATE_SHIFT);
     }
 
     public void addObstacles(Collection<Obstacle> o) {
-        obstacles.addAll(o);
+        for (Obstacle ob : o) addObstacle(ob);
     }
     public void addObstacle(Obstacle obstacle) {
         obstacles.add(obstacle);
+        notifyAddedObstacle(obstacle);
     }
     public void removeObstacle(Obstacle obstacle) {
         obstacles.remove(obstacle);
+        notifyListeners(UPDATE_OBSTACLES);
     }
     public void clearObstacles() {
         obstacles.clear();
+        notifyListeners(UPDATE_OBSTACLES);
     }
 
     public void addTree(Vector2d position, double height, double radius) {
@@ -140,20 +163,24 @@ public class CourseBuilder {
     public void startWall(Vector2d start, double thickness) {
         if (temp_wall != null) endWall();
         temp_wall = new TempWall(start, thickness);
+        notifyListeners(UPDATE_TEMP_WALL);
     }
     public void updateWall(Vector2d temp_end, double thickness) {
         temp_wall.end = temp_end;
         temp_wall.thickness = thickness;
+        notifyListeners(UPDATE_TEMP_WALL);
     }
     public void endWall(Vector2d end, double thickness) {
         updateWall(end, thickness); endWall();
     }
     public void endWall() {
-        obstacles.add(temp_wall.get());
+        addObstacle(temp_wall.get());
         temp_wall = null;
+        notifyListeners(UPDATE_TEMP_WALL);
     }
     public void cancelWall() {
         temp_wall = null;
+        notifyListeners(UPDATE_TEMP_WALL);
     }
     public boolean isBuildingWall() {
         return temp_wall != null;
@@ -237,7 +264,24 @@ public class CourseBuilder {
                 Variables.BOUNDED_WORLD_SIZE + 1, min_value, max_value, Variables.OUT_OF_BOUNDS_HEIGHT);
 
         ((ArrayFunction2d)height_function).setShift(Vector2d.ZERO.sub(Variables.WORLD_SHIFT));
+        notifyListeners(UPDATE_HEIGHT);
         updateSandFunction();
+    }
+
+    public void addListener(CourseBuilderListener cbl) {
+        listeners.add(cbl);
+        cbl.setCourse(this);
+        cbl.reset();
+    }
+
+    private void notifyListeners(int update_code) {
+        for (int i=0; i < listeners.size(); i++)
+            listeners.get(i).notify(update_code);
+    }
+    private void notifyAddedObstacle(Obstacle ob) {
+        notifyListeners(ADD_OBSTACLE);
+        for (int i=0; i < listeners.size(); i++)
+            listeners.get(i).obstacles.add(ob);
     }
 
     // (add functionality of generating start and goal positions based on course)

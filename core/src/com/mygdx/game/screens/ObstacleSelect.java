@@ -17,8 +17,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.courses.CourseBuilder;
+import com.mygdx.game.courses.CourseBuilderListener;
 import com.mygdx.game.courses.IO_course_module;
 import com.mygdx.game.courses.MiniMapDrawer;
+import com.mygdx.game.utils.ColorProof;
 import com.mygdx.game.utils.Vector2d;
 
 
@@ -54,21 +56,28 @@ public class ObstacleSelect implements Screen {
     private Drawable lTreeSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/LargeTreeSelect.png"))));
     private Drawable wallSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/WallSelect.png"))));
     private Drawable wallThickSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/WallSelectThick.png"))));
+    private Drawable startSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/"+(ColorProof.COLOR_BLIND_MODE?"cb-":"")+"StartSelect.png"))));
+    private Drawable flagSelectDraw = new TextureRegionDrawable(sumTextures(selectBoxTxt, new Texture(Gdx.files.internal("misc/"+(ColorProof.COLOR_BLIND_MODE?"cb-":"")+"FlagSelect.png"))));
 
     private Image selectionImage;
 
     private CourseBuilder courseBuilder;
+    private CourseBuilderListener minimapUpdater;
 
     private int selected = -1;
 
     public ObstacleSelect(Menu menu) {
         parent = menu;
         stage = new Stage(new ScreenViewport());
+
         Gdx.input.setInputProcessor(stage);
         Table overall = new Table();
         overall.setFillParent(true);
         courseBuilder = SettingsScreen.cb;
+        minimapUpdater = new CourseBuilderListener();
+        courseBuilder.addListener(minimapUpdater);
         minimapDraw = MiniMapDrawer.defaultDrawer(20, 20, 30, Vector2d.ZERO.sub(WORLD_SHIFT));
+        minimapDraw.setListener(minimapUpdater);
         minimapDraw.draw(courseBuilder);
         minimapTexture = minimapDraw.getTexture();
 
@@ -164,8 +173,7 @@ public class ObstacleSelect implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                selectionImage.setDrawable(wallThickSelectDraw);
-                selectedThickness = thickThickness;
+                selectionImage.setDrawable(startSelectDraw);
                 selected = 5;
             }
         });
@@ -173,8 +181,7 @@ public class ObstacleSelect implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                selectionImage.setDrawable(wallThickSelectDraw);
-                selectedThickness = thickThickness;
+                selectionImage.setDrawable(flagSelectDraw);
                 selected = 6;
             }
         });
@@ -196,9 +203,13 @@ public class ObstacleSelect implements Screen {
         save.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                GAME_ASPECTS.startX = courseBuilder.getStart().get_x();
+                GAME_ASPECTS.startY = courseBuilder.getStart().get_y();
+                GAME_ASPECTS.goalX = courseBuilder.getGoal().get_x();
+                GAME_ASPECTS.goalY = courseBuilder.getGoal().get_y();
                 try{
                     File f = new File(savePath.getText());
-                    if (!f.createNewFile()) {
+                    if (!IO_course_module.isDefaultCourseName(savePath.getText()) && !f.createNewFile()) {
                         f.delete();
                         f.createNewFile();
                     }
@@ -278,10 +289,10 @@ public class ObstacleSelect implements Screen {
                     } else selected=WALL_START;
                     break;
                 case CHANGE_START:
-                    //TODO: fillout
+                    if (is_on_map) courseBuilder.setStartPos(pos_in_world);
                     break;
                 case CHANGE_GOAL:
-                    //TODO: fillout
+                    if (is_on_map) courseBuilder.setGoalPos(pos_in_world);
                     break;
                 default: update_minimap = false;
             }

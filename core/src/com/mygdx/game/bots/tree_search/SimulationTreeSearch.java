@@ -9,6 +9,8 @@ public class SimulationTreeSearch {
     private Node best_node;
     private double total_cost;
     private double maximum_cost;
+    /** the minimum amount in heuristic units that a child should be better than its parent in order to be added to the
+     * list of endorsed nodes (I am considering removing this) */
     private double minimum_improvement;
 
     public final HeuristicFunction heuristic;
@@ -49,6 +51,10 @@ public class SimulationTreeSearch {
     public Node completeTreeSearch(double max_cost, double minimum_improvement) {
         startTreeSearch(max_cost, minimum_improvement);
         return best_node;
+    }
+    public Node completeAggregateTreeSearch(double max_cost, double minimum_improvement, double aggregate_factor) {
+        startTreeSearch(max_cost, minimum_improvement);
+        return getBestAggregateNode(aggregate_factor);
     }
 
     public void rebase(Node new_root) {
@@ -120,6 +126,22 @@ public class SimulationTreeSearch {
     public Node getBestNode() {
         return best_node;
     }
+
+    /**
+     * The aggregate heuristic of a node is determined by the sum of its own heuristic value and the heuristic value of
+     * its best child multiplied by the given aggregate_factor. The aggregate heuristic is used to eventually select the best node.
+     */
+    public Node getBestAggregateNode(double aggregate_factor) {
+        double best_aggregate = Double.NEGATIVE_INFINITY;
+        Node best_node = null;
+        for (Node n : endorsed_nodes) {
+            n.updateAggregateHeuristic(aggregate_factor);
+            if (n.getAggregateHeuristic() > best_aggregate) {
+                best_aggregate = n.getAggregateHeuristic();
+                best_node = n;
+            }}
+        return best_node;
+    }
     public void resetCost() {
         total_cost = 0;
     }
@@ -132,7 +154,7 @@ public class SimulationTreeSearch {
      *          suggested nodes to select from.
      */
     private Node selectSuggestedNode() {
-        if (suggested_nodes.size() <= 0) makeSuite(root_node);
+        while (suggested_nodes.size() <= 0) makeSuite(root_node);
         return suggested_nodes.get(0);
     }
 
@@ -170,7 +192,28 @@ public class SimulationTreeSearch {
         if (makeSuite) makeSuite(node);
     }
 
-    // TODO this is not working
+    /**
+     * this method tries to make sure that the best_node that is returned, also has good future possible outcomes.
+     * //TODO find a way to systematically promote future-progress in search
+     * This can be achieved by having a heuristic that takes exploration into account, but also by letting deeper nodes
+     *  have higher heuristic values (either by improvement or just by default), such that the best node will never be
+     *  in the first depth or so. I might need to come up with something to make the heuristic scale well with depth.
+     *  This is of coarse complexioned by the fact that we want to get to the goal in as few shots as possible, and each
+     *  depth is an extra shot. So our heuristic will have to both promote and punish deep nodes..
+     *  So maybe, a better approach would be to not compare nodes with other nodes in other depths, but only with nodes
+     *  in the same depths. This can of coarse increase the complexity of the algorithm a lot, but it would be beneficial.
+     *  In typical applications of A*, you don't have this problem, because A) the unit of the heuristic you want to improve
+     *  and the unit of the cost you want to minimize are the same, and B) it is very possible to update existing nodes
+     *  with an improved heuristic value (while in our case, it is very unlikely, but could still be implemented).
+     *
+     * A way to eliminate competition between nodes of different depths could be to make the heuristic of a node be the sum
+     *   of its children's heuristics. Of course, we only care about the children with the highest heuristic value, so that's
+     *   the only one that is included in this 'sum'. And we care less about children further down the line, because they are
+     *   less likely to truly be optimal (because we do less simulations in those depths).
+     *   So we can make the heuristic of a node be a sum of its own heuristic value and the heuristic of its best child
+     *   multiplied by some factor. Then all children will have their heuristic calculated in this way, so that all children
+     *   and all grand children are part of the calculation of any one node's heuristic.
+     */
     public void validateBestNode() {
         if (stop_simulation) return; // the 'best_node' satisfies the stop condition, so it does not have to be validated
         Node original_best = best_node;

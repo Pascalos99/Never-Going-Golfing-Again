@@ -21,6 +21,9 @@ public class GameInfo {
     private String sandFunction;
     private String heightFunction;
 
+    public FractalInfo fractalInfo;
+    public boolean use_fractals;
+
 
     public GameInfo(ArrayList<Player> players, double gravity, double ballMass,double friction, double maxVelocity,
                     double tol, double startX, double startY, double goalX,double goalY,String heightFunction, double sandFriction,String sandFunction)
@@ -81,12 +84,12 @@ public class GameInfo {
         return goalY;
     }
 
-    String getSandFunction(){ return sandFunction; }
-    double getSandFriction(){ return sandFriciton; }
+    public String getSandFunction(){ return sandFunction; }
+    public double getSandFriction(){ return sandFriciton; }
 
-
+    @Deprecated
     /** should not be used for any other purpose than initializing the world, and thus is not supposed to be public */
-    String getHeightFunction(){
+    public String getHeightFunction(){
         return heightFunction;
     }
 

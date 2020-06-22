@@ -20,19 +20,19 @@ public class Tree extends Obstacle {
 
     public static final int TEXTURE_NOT_SPECIFIED = 0;
     public static final int TEXTURE_SMALL = 1;
-    public static final double HEIGHT_SMALL = 8;
+    public static final double HEIGHT_SMALL = 15;
     public static final int TEXTURE_MEDIUM = 2;
-    public static final double HEIGHT_MEDIUM = 15;
+    public static final double HEIGHT_MEDIUM = 23;
     public static final int TEXTURE_LARGE = 3;
-    public static final double HEIGHT_LARGE = 22;
+    public static final double HEIGHT_LARGE = 31;
     /** tree height / tree radius = H_R_RATIO (for all default trees) - "the tree is 18* taller than it is wide" */
-    public static final double H_R_RATIO = 18d;
+    public static final double H_R_RATIO = 125d;
     static final double rootHeight=1;
 
     public int texture_used = TEXTURE_NOT_SPECIFIED;
 
-    private Vector2d position = null;
-    private double height = 0d, radius = 0d;
+    private Vector2d position;
+    private double height, radius;
     private AxisAllignedBoundingBox aabb = null;
 
     public Tree(Vector2d position, double height, double radius){
@@ -124,14 +124,13 @@ public class Tree extends Obstacle {
 
     @Override
     public AxisAllignedBoundingBox getBoundingBox() {
-        Vector3d physics_pos = getPhysicsPosition();
-
-        if(aabb == null)
+        if(aabb == null) {
+            Vector3d physics_pos = getPhysicsPosition();
             aabb = new AxisAllignedBoundingBox(
                     new Vector3d(physics_pos.get_x() - radius, height + physics_pos.get_y(), physics_pos.get_z() - radius),
-                    radius*2, height + physics_pos.get_y() + 10, radius*2
+                    radius * 2, height + physics_pos.get_y() + 10, radius * 2
             );
-
+        }
         return aabb;
     }
 

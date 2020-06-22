@@ -84,3 +84,5 @@ core/.classpath
 core/.settings/org.eclipse.buildship.core.prefs
 desktop/.classpath
 desktop/.settings/org.eclipse.buildship.core.prefs
+core/assets/TODO.txt
+desktop/build/resources/main/TODO.txt

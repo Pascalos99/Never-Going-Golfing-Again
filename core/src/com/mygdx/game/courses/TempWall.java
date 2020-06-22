@@ -16,6 +16,6 @@ public class TempWall implements Drawable {
     }
     public void visit(MiniMapDrawer mapDrawer) {
         if (end == null) end = start;
-        mapDrawer.draw(start, end, thickness);
+        mapDrawer.drawTemp(start, end, thickness);
     }
 }

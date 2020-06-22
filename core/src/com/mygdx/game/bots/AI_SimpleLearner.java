@@ -1,6 +1,7 @@
 package com.mygdx.game.bots;
 
 import com.mygdx.game.Player;
+import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
 import java.util.*;
@@ -55,7 +56,7 @@ public class AI_SimpleLearner extends AI_controller {
     }
 
     private static double epi = PI/8;
-    private static double[] velocity_modifiers = {0.7, 0.9, 1.5, 2.5};
+    private static double[] velocity_modifiers = {0.2, 0.4, 0.6, 0.8, 1};
     private static double[] angle_modifiers = {0, epi, -epi, 1.5*epi, -1.5*epi};
     public static double delta_distance_bound = 0.5;
 
@@ -91,7 +92,6 @@ public class AI_SimpleLearner extends AI_controller {
             resetVMODs(player);
         }
         int select = VMODs.get(player).get(VMODs.get(player).size() / 2);
-        System.out.println("selected "+velocity_modifiers[select]);
         return select;
     }
 
@@ -108,6 +108,6 @@ public class AI_SimpleLearner extends AI_controller {
 
     @Override
     public double getShotVelocity() {
-        return velocity_modifiers[velocity_index] * last_distance_to_flag.get(current_player);
+        return velocity_modifiers[velocity_index] * Variables.MAX_SHOT_VELOCITY;
     }
 }
