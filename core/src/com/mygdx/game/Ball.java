@@ -255,15 +255,15 @@ public class Ball extends TopDownPhysicsObject {
         for(CollisionData collision : global_collisions){
 
             if(collision.atop)
-                return collision.obstacle.getFrictionAt(x, y);
+                return collision.obstacle.getFrictionAt(x, y)*4D;
 
         }
 
         if(world != null)
-            return world.friction_function.evaluate(x, y);
+            return world.friction_function.evaluate(x, y)*4D;
 
         if(WORLD != null)
-            return WORLD.friction_function.evaluate(x, y);
+            return WORLD.friction_function.evaluate(x, y)*4D;
 
         throw new AssertionError("No terrain function has been declared yet.");
     }
