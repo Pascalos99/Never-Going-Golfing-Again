@@ -1,7 +1,6 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.obstacles.AxisAllignedBoundingBox;
 import com.mygdx.game.obstacles.CollisionData;
@@ -343,7 +342,7 @@ public class Ball extends TopDownPhysicsObject {
     }
 
     public void hit(Vector2d direction, double speed){
-        addVelocity(correctHitVector(direction, speed));
+        addVelocity(getHitVector(direction, speed));
         hit_count += 1;
         previous_position = position;
         turn_state = TURN_STATE_WAIT;
@@ -361,16 +360,12 @@ public class Ball extends TopDownPhysicsObject {
         /*
             g(t, x, &x) = -n*g*h'(x) - (m*g*&x)/|&x|
         */
-        double hvel = vel.get_y();
-
         vel = new Vector3d(vel.get_x(), 0, vel.get_z());
         double friction_eval = evalFrictionAt(pos.get_x(), pos.get_z());
         Vector2d gradients_eval = evalGradientsAt(pos.get_x(), pos.get_z());
 
-        double total_pull = getGravity() + (hvel > 0? hvel : 0);
-
-        double x_acc = -getMass()* total_pull*gradients_eval.get_x() - (vel.get_length() > 0? getMass()* getGravity()*friction_eval*vel.get_x()/vel.get_length() : 0);
-        double z_acc = -getMass()* total_pull*gradients_eval.get_y() - (vel.get_length() > 0? getMass()* getGravity()*friction_eval*vel.get_z()/vel.get_length() : 0);
+        double x_acc = -getMass()* getGravity()*gradients_eval.get_x() - (vel.get_length() > 0? getMass()* getGravity()*friction_eval*vel.get_x()/vel.get_length() : 0);
+        double z_acc = -getMass()* getGravity()*gradients_eval.get_y() - (vel.get_length() > 0? getMass()* getGravity()*friction_eval*vel.get_z()/vel.get_length() : 0);
 
         return new Vector3d(x_acc, 0, z_acc);
     }
@@ -484,8 +479,8 @@ public class Ball extends TopDownPhysicsObject {
 
     public double getGravity() { return world.gravity; }
 
-    public static Vector2d correctHitVector(Vector2d direction, double speed){
-        return new Vector2d(direction.get_x() * speed * SPEED_CORRECTION, direction.get_y() * speed * SPEED_CORRECTION);
+    public static Vector2d getHitVector(Vector2d direction, double speed){
+        return direction.scale(speed);
     }
 
     public Ball simulateHit(Vector2d direction, double speed, int ticks, double h){

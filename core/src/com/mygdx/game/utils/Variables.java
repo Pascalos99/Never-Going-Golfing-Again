@@ -100,10 +100,6 @@ public final class Variables {
 		WORLD_SHIFT = null;
 	}
 
-	public static final double SPEED_CORRECTION = 50d * 1d / 50d; // in m/s
-	public static final double AIR_FRICTION = 0.5d;
-	public static final double VELOCITY_CUTTOFF = 0.1d * SPEED_CORRECTION; // in m/s
-
 	public static PhysicsSetting CURRENT_PHYSICS_SETTING = Verlet;
 
 	// AI
