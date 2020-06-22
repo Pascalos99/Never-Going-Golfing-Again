@@ -37,7 +37,6 @@ public class Ball extends TopDownPhysicsObject {
     private List<CollisionData> global_collisions;
 
     Ball(double x, double y, ModelInstance model, Player owner) {
-
         this.model = model;
         this.owner = owner;
         hit_count = 0;
@@ -148,6 +147,8 @@ public class Ball extends TopDownPhysicsObject {
             rolling_distance += initial_position.distance(position);
 
             global_collisions.clear();
+
+            System.out.println(velocity.toString() + " | " + velocity.get_length());
         }
 
     }
@@ -255,15 +256,15 @@ public class Ball extends TopDownPhysicsObject {
         for(CollisionData collision : global_collisions){
 
             if(collision.atop)
-                return collision.obstacle.getFrictionAt(x, y)*4D;
+                return collision.obstacle.getFrictionAt(x, y)*FRICTION_SCALE;
 
         }
 
         if(world != null)
-            return world.friction_function.evaluate(x, y)*4D;
+            return world.friction_function.evaluate(x, y)*FRICTION_SCALE;
 
         if(WORLD != null)
-            return WORLD.friction_function.evaluate(x, y)*4D;
+            return WORLD.friction_function.evaluate(x, y)*FRICTION_SCALE;
 
         throw new AssertionError("No terrain function has been declared yet.");
     }

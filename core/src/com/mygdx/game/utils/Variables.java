@@ -123,6 +123,8 @@ public final class Variables {
 
 	public static final double DELTA = 0.01d;
 
+	public static final double FRICTION_SCALE = 1d;
+
 	public static final double WALL_BASE = -10d;
 
 	// The rest is all Deprecated

@@ -64,7 +64,7 @@ public class Tree extends Obstacle {
                 Vector2d scaled_normal = clipping_normal.scale(2*dotp);
 
                 Vector2d horizontal_bounce = entrance_normal.sub(scaled_normal);
-                horizontal_bounce = horizontal_bounce.scale(ball.velocity.get_length()*RESTITUTION);
+                horizontal_bounce = horizontal_bounce.normalize().scale(ball.velocity.get_length()*RESTITUTION);
                 data.bounce = new Vector3d(horizontal_bounce.get_x(), 0, horizontal_bounce.get_y());
 
                 return data;
