@@ -214,11 +214,11 @@ public class Ball extends TopDownPhysicsObject {
         return new Vector2d(position.get_x(), position.get_z());
     }
 
-    @Override
-    public ModelInstance getModel() {
+    public ModelInstance[] getModel() {
         Vector3d real_pos = getGraphicsPosition();
         model.transform.setTranslation((float) real_pos.get_x(), (float) real_pos.get_y(), (float) real_pos.get_z());
-        return model;
+        ModelInstance [] ball = new ModelInstance []{model};
+        return ball;
     }
 
     @Override
