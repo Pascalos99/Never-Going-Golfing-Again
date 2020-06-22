@@ -2,10 +2,12 @@ package com.mygdx.game.bots.tree_search;
 
 import java.util.*;
 
+import static com.mygdx.game.bots.AI_Sherlock.debug;
+
 public class SimulationTreeSearch {
     private Node root_node;
     private List<Node> endorsed_nodes;
-    private List<Node> suggested_nodes;
+    private PriorityQueue<Node> suggested_nodes;
     private Node best_node;
     private double total_cost;
     private double maximum_cost;
@@ -34,7 +36,7 @@ public class SimulationTreeSearch {
         this.suite_maker = suite_maker;
         this.stop_condition = stop_condition;
         endorsed_nodes = new ArrayList<>();
-        suggested_nodes = auto_sorted_node_list();
+        suggested_nodes = new PriorityQueue<>();
         root_node = initial_node;
         total_cost = 0;
         simulateNode(root_node, true);
@@ -54,7 +56,8 @@ public class SimulationTreeSearch {
     }
     public Node completeAggregateTreeSearch(double max_cost, double minimum_improvement, double aggregate_factor) {
         startTreeSearch(max_cost, minimum_improvement);
-        return getBestAggregateNode(aggregate_factor);
+        Node n = getBestAggregateNode(aggregate_factor);
+        return n;
     }
 
     public void rebase(Node new_root) {
@@ -72,7 +75,8 @@ public class SimulationTreeSearch {
 
     private void addAllChildren(Node from) {
         from.updateHeuristic();
-        for (Node child : from.children) {
+        for (Object o : from.children) {
+            Node child = (Node)o;
             if (child.isSimulated() && child.getHeuristic() >= from.getHeuristic() + minimum_improvement) {
                 if (!endorsed_nodes.contains(child)) endorsed_nodes.add(child);
                 addAllChildren(child);
@@ -155,7 +159,7 @@ public class SimulationTreeSearch {
      */
     private Node selectSuggestedNode() {
         while (suggested_nodes.size() <= 0) makeSuite(root_node);
-        return suggested_nodes.get(0);
+        return suggested_nodes.poll();
     }
 
     /**
@@ -178,7 +182,6 @@ public class SimulationTreeSearch {
         }
         total_cost += node.getCost();
         double h_value = node.getHeuristic();
-        suggested_nodes.remove(node);
         if (node == root_node || h_value > getBestHeuristicValue()) best_node = node;
         // pruning step:
         else if (stop_condition.isSolution(node)) {
@@ -187,7 +190,6 @@ public class SimulationTreeSearch {
             return;
         }
         else if (h_value < node.parent.getHeuristic() + minimum_improvement) return;
-
         endorsed_nodes.add(node);
         if (makeSuite) makeSuite(node);
     }
@@ -219,12 +221,12 @@ public class SimulationTreeSearch {
         Node original_best = best_node;
         Node current_best = best_node;
         while (true) {
-            for (Node child : current_best.children)
+            for (Object child : current_best.children)
                 if (endorsed_nodes.contains(child)) return; // there is a child node that is better than best_node
             resetCost();
             while (current_best.suggested_children_count <= 0) makeSuite(current_best);
-            for (Node child : current_best.children) {
-                simulateNode(child, false);
+            for (Object child : current_best.children) {
+                simulateNode((Node)child, false);
                 if (endorsed_nodes.contains(child)) return; // there is a child node that is better than best_node
             }
             endorsed_nodes.remove(current_best);
