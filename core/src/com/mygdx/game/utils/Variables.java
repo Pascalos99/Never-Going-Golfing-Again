@@ -91,7 +91,7 @@ public final class Variables {
 		YAW = Math.PI * 0.75;
 		VIEW_ZOOM = 7;
 		CURRENT_PHYSICS_SETTING = Verlet;
-		ALLOW_FLIGHT = true;
+		ALLOW_FLIGHT = false;
 		CAST_SHADOWS = false;
 		GAME = null;
 		CAMERA = null;
@@ -100,7 +100,7 @@ public final class Variables {
 		WORLD_SHIFT = null;
 	}
 
-	public static final double SPEED_CORRECTION = 1d / 50d; // in m/s
+	public static final double SPEED_CORRECTION = 50d * 1d / 50d; // in m/s
 	public static final double AIR_FRICTION = 0.5d;
 	public static final double VELOCITY_CUTTOFF = 0.1d * SPEED_CORRECTION; // in m/s
 

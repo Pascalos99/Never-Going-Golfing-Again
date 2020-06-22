@@ -26,6 +26,14 @@ public class Vector3d {
         return new Vector3d(x + v.get_x(),y + v.get_y(),z + v.get_z());
     }
 
+    public Vector3d mul(Vector3d v){
+        return new Vector3d(x * v.get_x(),y * v.get_y(),z * v.get_z());
+    }
+
+    public Vector3d div(Vector3d v){
+        return new Vector3d(x / v.get_x(),y / v.get_y(),z / v.get_z());
+    }
+
     public Vector3d normalize() {
         double len = get_length();
         return new Vector3d(x/len, z/len, y/len);
