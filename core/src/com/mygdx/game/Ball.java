@@ -96,7 +96,7 @@ public class Ball extends TopDownPhysicsObject {
                         pair[1].get_z()
                 );
 
-                if(isStuck() || ((fence_check || evalGradientsAt(final_position.get_x(), final_position.get_z()).get_length() < GRADIENT_CUTTOFF) && final_velocity.get_length() < getStoppingVelocity())){
+                if(isStuck() || ((fence_check || evalGradientsAt(final_position.get_x(), final_position.get_z()).get_length() < GRADIENT_CUTTOFF) && final_velocity.get_length() < getStoppingVelocity(final_velocity.get_x(), final_velocity.get_z()))){
                     is_moving = false;
                     final_velocity = new Vector3d(0, 0, 0);
                 }
@@ -361,12 +361,16 @@ public class Ball extends TopDownPhysicsObject {
         /*
             g(t, x, &x) = -n*g*h'(x) - (m*g*&x)/|&x|
         */
+        double hvel = vel.get_y();
+
         vel = new Vector3d(vel.get_x(), 0, vel.get_z());
         double friction_eval = evalFrictionAt(pos.get_x(), pos.get_z());
         Vector2d gradients_eval = evalGradientsAt(pos.get_x(), pos.get_z());
 
-        double x_acc = -getMass()* getGravity()*gradients_eval.get_x() - (vel.get_length() > 0? getMass()* getGravity()*friction_eval*vel.get_x()/vel.get_length() : 0);
-        double z_acc = -getMass()* getGravity()*gradients_eval.get_y() - (vel.get_length() > 0? getMass()* getGravity()*friction_eval*vel.get_z()/vel.get_length() : 0);
+        double total_pull = getGravity() + (hvel > 0? hvel : 0);
+
+        double x_acc = -getMass()* total_pull*gradients_eval.get_x() - (vel.get_length() > 0? getMass()* getGravity()*friction_eval*vel.get_x()/vel.get_length() : 0);
+        double z_acc = -getMass()* total_pull*gradients_eval.get_y() - (vel.get_length() > 0? getMass()* getGravity()*friction_eval*vel.get_z()/vel.get_length() : 0);
 
         return new Vector3d(x_acc, 0, z_acc);
     }
@@ -535,8 +539,8 @@ public class Ball extends TopDownPhysicsObject {
         mapDrawer.draw(this);
     }
 
-    private double getStoppingVelocity(){
-        return getMass()*getGravity();
+    private double getStoppingVelocity(double x, double y){
+        return getMass()*getGravity()*evalFrictionAt(x, y);
     }
 
     private double getMass(){
