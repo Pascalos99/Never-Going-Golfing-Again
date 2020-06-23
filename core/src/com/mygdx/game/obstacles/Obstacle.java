@@ -36,21 +36,4 @@ public abstract class Obstacle extends TopDownPhysicsObject {
     public TopDownPhysicsObject dupe() {
         return (TopDownPhysicsObject)this;
     }
-
-    public abstract double getHeightAt(double x, double y);
-
-    public double getHeightAt(Vector2d pos){
-        return getHeightAt(pos.get_x(), pos.get_y());
-    }
-
-    public abstract  double getFrictionAt(double x, double y);
-
-    public double getFrictionAt(Vector2d pos){
-        return getFrictionAt(pos.get_x(), pos.get_y());
-    }
-
-    public abstract Vector2d getGradientsAt(double x, double y);
-
-    public Vector2d getGradientsAt(Vector2d pos) { return getGradientsAt(pos.get_x(), pos.get_y()); }
-
 }

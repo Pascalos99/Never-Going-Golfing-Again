@@ -82,21 +82,6 @@ public class Tree extends Obstacle {
     }
 
     @Override
-    public double getHeightAt(double x, double y) {
-        return height + WORLD.height_function.evaluate(position);
-    }
-
-    @Override
-    public double getFrictionAt(double x, double y) {
-        return 1d;
-    }
-
-    @Override
-    public Vector2d getGradientsAt(double x, double y){
-        return new Vector2d(0, 0);
-    }
-
-    @Override
     public Vector3d getGraphicsPosition() {
         Vector3d vec = getPhysicsPosition();
         return new Vector3d(toWorldScale(vec.get_x()), toWorldScale(vec.get_y()), toWorldScale(vec.get_z()));

@@ -67,21 +67,6 @@ public class Wall extends Obstacle {
     }
 
     @Override
-    public double getHeightAt(double x, double y) {
-        return 0;
-    }
-
-    @Override
-    public double getFrictionAt(double x, double y) {
-        return 0;
-    }
-
-    @Override
-    public Vector2d getGradientsAt(double x, double y) {
-        return new Vector2d(0, 0);
-    }
-
-    @Override
     public Vector3d getGraphicsPosition() {
         Vector2d vec = start.add(end.sub(start).scale(.5)).add(WORLD_SHIFT);
         double y = WORLD.height_function.evaluate(vec);
