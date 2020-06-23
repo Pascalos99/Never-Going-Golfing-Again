@@ -1,8 +1,10 @@
 package com.mygdx.game.bots;
 
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.Ball;
 import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.parser.Function2d;
+import com.mygdx.game.physics.PuttingCoursePhysics;
 import com.mygdx.game.utils.Vector2d;
 
 import java.util.ArrayList;
@@ -193,4 +195,9 @@ public final class AIUtils {
             x += dir_x; z += dir_z;
         } return true;
     }
+
+    public static double evalHeightAt(double x, double y, Ball example){
+        return 0;
+    }
+
 }

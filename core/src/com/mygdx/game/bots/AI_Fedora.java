@@ -10,6 +10,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.Player;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.Ball;
+import com.mygdx.game.utils.Vector3d;
+
 import java.util.AbstractMap.SimpleEntry;
 
 /**
@@ -23,7 +25,7 @@ public class AI_Fedora extends AI_controller {
     private List<TestDataHolder> tests;
     private Vector2d old_ball_position;
 
-    public static boolean FEDORA_DEBUG = false;
+    public static boolean FEDORA_DEBUG = true;
 
     private static class Fedora {}
     public Fedora the_fedora;
@@ -83,7 +85,12 @@ public class AI_Fedora extends AI_controller {
             tests.remove(tests.size() - 1);
             setShotVelocity(select.speed);
             setShotAngle(select.direction.angle());
-            if (FEDORA_DEBUG) System.out.println("[FEDORA] Select: " + select.weight);
+
+            if (FEDORA_DEBUG) {
+                System.out.println("[FEDORA] Select: " + select.weight);
+                System.out.println("[FEDORA] Position Prediction: " + select.final_position);
+            }
+
         }
 
         else{
@@ -160,7 +167,7 @@ public class AI_Fedora extends AI_controller {
             double total = displacement_test + change_in_distance + tick_test + flag_test + travel_test;
             total = total / 5d;
 
-            TestDataHolder test = new TestDataHolder(direction, speed_i, total);
+            TestDataHolder test = new TestDataHolder(direction, speed_i, total, test_ball.position);
 
             if(output == null || test.weight > output.weight) {
                 output = test;
@@ -179,11 +186,13 @@ public class AI_Fedora extends AI_controller {
         public Vector2d direction;
         public double speed;
         public double weight;
+        public Vector3d final_position;
 
-        TestDataHolder(Vector2d direction, double speed, double weight){
+        TestDataHolder(Vector2d direction, double speed, double weight, Vector3d final_position){
             this.direction = direction;
             this.speed = speed;
             this.weight = weight;
+            this.final_position = final_position;
         }
 
     }

@@ -99,6 +99,7 @@ public class Ball extends TopDownPhysicsObject {
                 if(isStuck() || ((fence_check || evalGradientsAt(final_position.get_x(), final_position.get_z()).get_length() < GRADIENT_CUTTOFF) && (new Vector2d(final_velocity.get_x(), final_velocity.get_z())).get_length() < getStoppingVelocity(final_velocity.get_x(), final_velocity.get_z()))){
                     is_moving = false;
                     final_velocity = new Vector3d(0, 0, 0);
+                    System.out.println("[BALL] Stopped moving at " + final_position.toString());
                 }
 
                 Vector3d displacement = final_position.sub(initial_position);
@@ -421,8 +422,8 @@ public class Ball extends TopDownPhysicsObject {
 
     private Vector3d[] verletStep(double t, double h, Vector3d[] pair, int flight_state){
         Vector3d pos = pair[0].add(pair[1].scale(h)).add(acc(t, pair[0], pair[1]).scale(h*h/2d));
-        Vector3d dummy_vel = eulerStep(t, h, pair, flight_state)[1];
-        Vector3d vel = pair[1].add(acc(t, pair[0], pair[1]).add(dummy_vel).scale(h/2d));
+        Vector3d[] dummy_pair = eulerStep(t, h, pair, flight_state);
+        Vector3d vel = pair[1].add((acc(t, pair[0], pair[1]).add(acc(t, dummy_pair[0], dummy_pair[1]))).scale(h/2d));
         return new Vector3d[]{pos, vel};
     }
 
