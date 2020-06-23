@@ -20,9 +20,9 @@ public class AI_TopHat extends AI_controller {
     private static int ANGLE_PARTITION = 50;
     private static int SPEED_PARTITION = 20;
     private static double EAGERNESS_TO_EXPLORE = 2.5;
-    private static double ERROR_BOUND = 0.1;
+    private static double ERROR_BOUND = 0.6;
 
-    public static boolean DEBUG = false;
+    public static boolean DEBUG = true;
 
     public Heuristic SHOT_COUNT = n -> n.depth;
     public Heuristic DISTANCE = n -> {
@@ -211,6 +211,7 @@ public class AI_TopHat extends AI_controller {
         setShotVelocity(next_shot.speed);
         last_node = next_shot;
         previous_position = current_position;
+        System.out.println(Vector2d.X.rotate(next_shot.angle).scale(next_shot.speed));
     }
 
     private void rebase(Node new_root) {
