@@ -100,7 +100,6 @@ public class Ball extends TopDownPhysicsObject {
                 if(isStuck() || ((fence_check || WORLD.height_function.gradient(final_position.get_x(), final_position.get_z()).get_length() < GRADIENT_CUTTOFF) && (new Vector2d(final_velocity.get_x(), final_velocity.get_z())).get_length() < getStoppingVelocity(final_velocity.get_x(), final_velocity.get_z()))){
                     is_moving = false;
                     final_velocity = new Vector3d(0, 0, 0);
-                    System.out.println("[BALL] Stopped moving at " + final_position.toString());
                 }
 
                 Vector3d displacement = final_position.sub(initial_position);
