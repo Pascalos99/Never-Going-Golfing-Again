@@ -61,14 +61,6 @@ public class Ball extends TopDownPhysicsObject {
 
     public void step(double delta, List<TopDownPhysicsObject> ents) {
 
-        for(Obstacle o : WORLD.getObstacles()){
-
-            if(o instanceof Wall && o.isPositionInsideShape(position.get_x(), position.get_z())){
-                System.out.println("Collision detected motherfucker!!!!");
-            }
-
-        }
-
         if(is_moving) {
             global_collisions = isColliding();
             boolean fence_check = ballVsFenceCollision();

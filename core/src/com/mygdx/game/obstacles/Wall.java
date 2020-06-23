@@ -38,6 +38,20 @@ public class Wall extends Obstacle {
 
     @Override
     protected CollisionData isShapeColliding(Ball ball) {
+        Vector3d physic_pos = getPhysicsPosition();
+        Vector2d midpoint = new Vector2d(physic_pos.get_x(), physic_pos.get_z());
+
+        Vector2d real_point = new Vector2d(ball.position.get_x(), ball.position.get_z());
+        Vector2d relative_point = real_point.sub(midpoint);
+        Vector2d aligned_point = relative_point.rotate(-angle);
+
+        AxisAllignedBoundingBox box = new AxisAllignedBoundingBox(new Vector2d(-length/2d, -thickness/2d), length, thickness);
+        AxisAllignedBoundingBox p = new AxisAllignedBoundingBox(aligned_point.sub(new Vector2d(BALL_RADIUS, BALL_RADIUS)), BALL_RADIUS*2d, BALL_RADIUS*2d);
+
+        double hld = Math.abs(p.origin.get_x() + length/2d);//Horizontal left distance
+        double hrd = Math.abs(p.origin.get_x() - length/2d);//Horizontal right distance
+
+        System.out.println("Horizontal right distance: " + hld + " | " + hrd + " = " + (hld + hrd));
         return null;
     }
 
@@ -48,10 +62,10 @@ public class Wall extends Obstacle {
 
         Vector2d real_point = new Vector2d(x, y);
         Vector2d relative_point = real_point.sub(midpoint);
-        Vector2d aligned_point = relative_point;
+        Vector2d aligned_point = relative_point.rotate(-angle);
 
         AxisAllignedBoundingBox box = new AxisAllignedBoundingBox(new Vector2d(-length/2d, -thickness/2d), length, thickness);
-        AxisAllignedBoundingBox p = new AxisAllignedBoundingBox(aligned_point, 0, 0);
+        AxisAllignedBoundingBox p = new AxisAllignedBoundingBox(aligned_point.sub(new Vector2d(BALL_RADIUS, BALL_RADIUS)), BALL_RADIUS*2d, BALL_RADIUS*2d);
 
         return box.collides(p);
     }
@@ -118,8 +132,18 @@ public class Wall extends Obstacle {
 
     @Override
     public AxisAllignedBoundingBox getBoundingBox() {
-        //TODO Dennis'
-        return null;
+        double side = length;
+
+        if(thickness > length)
+            side = thickness;
+
+        Vector3d physics_pos = getPhysicsPosition();
+        Vector2d topdown = new Vector2d(physics_pos.get_x(), physics_pos.get_z());
+
+        return new AxisAllignedBoundingBox(
+                topdown.add(new Vector2d(-side/2d, -side/2d)),
+                side, side
+        );
     }
 
     @Override
