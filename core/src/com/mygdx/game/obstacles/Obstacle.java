@@ -30,6 +30,8 @@ public abstract class Obstacle extends TopDownPhysicsObject {
 
     protected abstract CollisionData isShapeColliding(Ball ball);
 
+    public abstract boolean isPositionInsideShape(double x, double y);
+
     @Override
     public TopDownPhysicsObject dupe() {
         return (TopDownPhysicsObject)this;

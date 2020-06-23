@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.mygdx.game.courses.MiniMapDrawer;
+import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.obstacles.AxisAllignedBoundingBox;
 import com.mygdx.game.obstacles.CollisionData;
 import com.mygdx.game.obstacles.Obstacle;
@@ -51,7 +52,7 @@ public class Ball extends TopDownPhysicsObject {
 
         global_collisions = new ArrayList<CollisionData>();
 
-        position = new Vector3d(x, evalHeightAt(x, y) + BALL_RADIUS, y);
+        position = new Vector3d(x, WORLD.height_function.evaluate(x, y) + BALL_RADIUS, y);
         velocity = new Vector3d(0, 0, 0);
         start_position = position;
         previous_position = position;
@@ -87,7 +88,7 @@ public class Ball extends TopDownPhysicsObject {
             if(flight_state == ROLL) {
                 final_position = new Vector3d(
                         pair[0].get_x(),
-                        evalHeightAt(pair[0].get_x(), pair[0].get_z()) + BALL_RADIUS,
+                        WORLD.height_function.evaluate(pair[0].get_x(), pair[0].get_z()) + BALL_RADIUS,
                         pair[0].get_z()
                 );
                 final_velocity = new Vector3d(
@@ -96,14 +97,14 @@ public class Ball extends TopDownPhysicsObject {
                         pair[1].get_z()
                 );
 
-                if(isStuck() || ((fence_check || evalGradientsAt(final_position.get_x(), final_position.get_z()).get_length() < GRADIENT_CUTTOFF) && (new Vector2d(final_velocity.get_x(), final_velocity.get_z())).get_length() < getStoppingVelocity(final_velocity.get_x(), final_velocity.get_z()))){
+                if(isStuck() || ((fence_check || WORLD.height_function.gradient(final_position.get_x(), final_position.get_z()).get_length() < GRADIENT_CUTTOFF) && (new Vector2d(final_velocity.get_x(), final_velocity.get_z())).get_length() < getStoppingVelocity(final_velocity.get_x(), final_velocity.get_z()))){
                     is_moving = false;
                     final_velocity = new Vector3d(0, 0, 0);
                     System.out.println("[BALL] Stopped moving at " + final_position.toString());
                 }
 
                 Vector3d displacement = final_position.sub(initial_position);
-                Vector2d gradients = evalGradientsAt(initial_position.get_x(), initial_position.get_z());
+                Vector2d gradients = WORLD.height_function.gradient(initial_position.get_x(), initial_position.get_z());
                 Vector3d projected_position = new Vector3d(
                         final_position.get_x(),
                         initial_position.get_y() + (new Vector2d(displacement.get_x()*gradients.get_x(), displacement.get_z()*gradients.get_y())).get_length(),
@@ -127,10 +128,10 @@ public class Ball extends TopDownPhysicsObject {
                 final_position = pair[0];
                 final_velocity = pair[1];
 
-                if(final_position.get_y() - BALL_RADIUS <= evalHeightAt(final_position.get_x(), final_position.get_z())){
+                if(final_position.get_y() - BALL_RADIUS <= WORLD.height_function.evaluate(final_position.get_x(), final_position.get_z())){
                     position = new Vector3d(
                             final_position.get_x(),
-                            evalHeightAt(final_position.get_x(), final_position.get_z()) + BALL_RADIUS,
+                            WORLD.height_function.evaluate(final_position.get_x(), final_position.get_z()) + BALL_RADIUS,
                             final_position.get_z()
                     );
                     flight_state = ROLL;
@@ -206,7 +207,7 @@ public class Ball extends TopDownPhysicsObject {
     public Vector3d getPhysicsPosition(){
 
         if(flight_state == ROLL)
-            return new Vector3d(position.get_x(), evalHeightAt(position.get_x(), position.get_z()), position.get_z());
+            return new Vector3d(position.get_x(), WORLD.height_function.evaluate(position.get_x(), position.get_z()), position.get_z());
 
         return position;
     }
@@ -229,63 +230,23 @@ public class Ball extends TopDownPhysicsObject {
         out.flight_state = this.flight_state;
         out.velocity = this.velocity;
         out.engine = engine.dupe();
-        out.world = world;
 
         return out;
     }
 
-    public double evalHeightAt(double x, double y){
+    public static boolean isPositionInsideAShape(double x, double y){
 
-        for(CollisionData collision : global_collisions){
+        if(WORLD == null)
+            throw new AssertionError("No world has been created yet.");
 
-            if(collision.atop)
-                return collision.obstacle.getHeightAt(x, y);
+        for(Obstacle obstacle : WORLD.getObstacles()){
 
-        }
-
-        if(world != null)
-            return world.height_function.evaluate(x, y);
-
-        if(WORLD != null)
-            return WORLD.height_function.evaluate(x, y);
-
-        throw new AssertionError("No terrain function has been declared yet.");
-    }
-
-    public double evalFrictionAt(double x, double y){
-
-        for(CollisionData collision : global_collisions){
-
-            if(collision.atop)
-                return collision.obstacle.getFrictionAt(x, y)*FRICTION_SCALE;
+            if(obstacle.isPositionInsideShape(x, y))
+                return true;
 
         }
 
-        if(world != null)
-            return world.friction_function.evaluate(x, y)*FRICTION_SCALE;
-
-        if(WORLD != null)
-            return WORLD.friction_function.evaluate(x, y)*FRICTION_SCALE;
-
-        throw new AssertionError("No terrain function has been declared yet.");
-    }
-
-    public Vector2d evalGradientsAt(double x, double y){
-
-        for(CollisionData collision : global_collisions){
-
-            if(collision.atop)
-                return collision.obstacle.getGradientsAt(x, y);
-
-        }
-
-        if(world != null)
-            return world.height_function.gradient(x, y);
-
-        if(WORLD != null)
-            return WORLD.height_function.gradient(x, y);
-
-        throw new AssertionError("No terrain function has been declared yet.");
+        return false;
     }
 
     @Override
@@ -296,7 +257,7 @@ public class Ball extends TopDownPhysicsObject {
     public List<CollisionData> isColliding(){
         List<CollisionData> collisions = new ArrayList<CollisionData>();
 
-        for(Obstacle obstacle : world.getObstacles()){
+        for(Obstacle obstacle : WORLD.getObstacles()){
             CollisionData data = obstacle.isColliding(this);
 
             if(data != null){
@@ -311,9 +272,9 @@ public class Ball extends TopDownPhysicsObject {
     }
 
     public boolean isTouchingFlag() {
-        Vector2d flag = world.flag_position;
+        Vector2d flag = WORLD.flag_position;
         Vector2d ballPos = new Vector2d(position.get_x(), position.get_z());
-        double _r = world.hole_tolerance;
+        double _r = WORLD.hole_tolerance;
 
         if(flag.distance(ballPos) < _r) {
           return true;
@@ -357,8 +318,8 @@ public class Ball extends TopDownPhysicsObject {
             g(t, x, &x) = -n*g*h'(x) - (m*g*&x)/|&x|
         */
         vel = new Vector3d(vel.get_x(), 0, vel.get_z());
-        double friction_eval = evalFrictionAt(pos.get_x(), pos.get_z());
-        Vector2d gradients_eval = evalGradientsAt(pos.get_x(), pos.get_z());
+        double friction_eval = getFirctionAt(pos.get_x(), pos.get_z());
+        Vector2d gradients_eval = WORLD.height_function.gradient(pos.get_x(), pos.get_z());
 
         double x_acc = -getMass()* getGravity()*gradients_eval.get_x() - (vel.get_length() > 0? getMass()* getGravity()*friction_eval*vel.get_x()/vel.get_length() : 0);
         double z_acc = -getMass()* getGravity()*gradients_eval.get_y() - (vel.get_length() > 0? getMass()* getGravity()*friction_eval*vel.get_z()/vel.get_length() : 0);
@@ -427,11 +388,7 @@ public class Ball extends TopDownPhysicsObject {
         return new Vector3d[]{pos, vel};
     }
 
-    public double flightGravity(){
-        return world.gravity*7d;
-    }
-
-    public double getGravity() { return world.gravity; }
+    public double getGravity() { return WORLD.gravity; }
 
     public static Vector2d getHitVector(Vector2d direction, double speed){
         return direction.scale(speed);
@@ -489,7 +446,11 @@ public class Ball extends TopDownPhysicsObject {
     }
 
     private double getStoppingVelocity(double x, double y){
-        return getMass()*getGravity()*evalFrictionAt(x, y);
+        return getMass()*getGravity()*getFirctionAt(x, y);
+    }
+
+    private double getFirctionAt(double x, double y){
+        return WORLD.friction_function.evaluate(x, y)*FRICTION_SCALE;
     }
 
     private double getMass(){

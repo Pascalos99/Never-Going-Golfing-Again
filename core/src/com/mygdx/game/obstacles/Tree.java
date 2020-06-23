@@ -39,38 +39,46 @@ public class Tree extends Obstacle {
         this.position = position;
         this.height = height;
         this.radius = radius;
+
+        System.out.println(height);
     }
 
     @Override
     protected CollisionData isShapeColliding(Ball ball) {
         Vector3d physics_pos = getPhysicsPosition();
         Vector2d topdown_pos = new Vector2d(physics_pos.get_x(), physics_pos.get_z());
+        Vector2d ball_position = new Vector2d(ball.position.get_x(), ball.position.get_z());
 
-        if (ball.position.get_y() < height + physics_pos.get_y()) {
-            Vector2d ball_position = new Vector2d(ball.position.get_x(), ball.position.get_z());
+        if (isPositionInsideShape(ball_position.get_x(), ball_position.get_y())) {
+            CollisionData data = new CollisionData(this);
 
-            if (ball_position.distance(topdown_pos) < radius + BALL_RADIUS) {
-                CollisionData data = new CollisionData(this);
+            Vector2d clipping_normal = ball_position.sub(topdown_pos).normalize();
+            Vector2d unclipped_position = clipping_normal.scale(radius + BALL_RADIUS).add(topdown_pos);
+            Vector2d clipping_correction = unclipped_position.sub(ball_position);
+            data.clipping_correction = new Vector3d(clipping_correction.get_x(), 0, clipping_correction.get_y());
 
-                Vector2d clipping_normal = ball_position.sub(topdown_pos).normalize();
-                Vector2d unclipped_position = clipping_normal.scale(radius + BALL_RADIUS).add(topdown_pos);
-                Vector2d clipping_correction = unclipped_position.sub(ball_position);
-                data.clipping_correction = new Vector3d(clipping_correction.get_x(), 0, clipping_correction.get_y());
+            Vector2d topdown_vel = new Vector2d(ball.velocity.get_x(), ball.velocity.get_z());
+            Vector2d entrance_normal = topdown_vel.normalize();
 
-                Vector2d topdown_vel = new Vector2d(ball.velocity.get_x(), ball.velocity.get_z());
-                Vector2d entrance_normal = topdown_vel.normalize();
+            double dotp = entrance_normal.dot(clipping_normal);
+            Vector2d scaled_normal = clipping_normal.scale(2*dotp);
 
-                double dotp = entrance_normal.dot(clipping_normal);
-                Vector2d scaled_normal = clipping_normal.scale(2*dotp);
+            Vector2d horizontal_bounce = entrance_normal.sub(scaled_normal);
+            horizontal_bounce = horizontal_bounce.normalize().scale(ball.velocity.get_length()*RESTITUTION);
+            data.bounce = new Vector3d(horizontal_bounce.get_x(), 0, horizontal_bounce.get_y());
 
-                Vector2d horizontal_bounce = entrance_normal.sub(scaled_normal);
-                horizontal_bounce = horizontal_bounce.normalize().scale(ball.velocity.get_length()*RESTITUTION);
-                data.bounce = new Vector3d(horizontal_bounce.get_x(), 0, horizontal_bounce.get_y());
-
-                return data;
-            }
+            return data;
         }
+
         return null;
+    }
+
+    @Override
+    public boolean isPositionInsideShape(double x, double y) {
+        Vector3d physics_pos = getPhysicsPosition();
+        Vector2d topdown_pos = new Vector2d(physics_pos.get_x(), physics_pos.get_z());
+
+        return (new Vector2d(x, y)).distance(topdown_pos) < radius + BALL_RADIUS;
     }
 
     @Override
@@ -80,7 +88,7 @@ public class Tree extends Obstacle {
 
     @Override
     public double getFrictionAt(double x, double y) {
-        return 0;
+        return 1d;
     }
 
     @Override

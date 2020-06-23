@@ -9,7 +9,6 @@ import com.mygdx.game.utils.Vector3d;
 import static com.mygdx.game.utils.Variables.WORLD_SCALING;
 
 public abstract class TopDownPhysicsObject implements Drawable {
-    protected PuttingCourse world;
     protected PhysicsEngine engine;
 
     public abstract Vector3d getGraphicsPosition();
@@ -17,14 +16,10 @@ public abstract class TopDownPhysicsObject implements Drawable {
 
     public abstract double getOrientation();
     public abstract ModelInstance[] getModel();
-    public PuttingCourse getWorld(){
-        return world;
-    }
 
     public abstract TopDownPhysicsObject dupe();
 
-    public void setWorld(PuttingCourse world, PhysicsEngine engine){
-        this.world = world;
+    public void setWorld(PhysicsEngine engine){
         this.engine = (PuttingCoursePhysics) engine;
     }
 

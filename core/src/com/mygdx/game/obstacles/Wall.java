@@ -62,6 +62,11 @@ public class Wall extends Obstacle {
     }
 
     @Override
+    public boolean isPositionInsideShape(double x, double y) {
+        return false;
+    }
+
+    @Override
     public double getHeightAt(double x, double y) {
         return 0;
     }
@@ -133,8 +138,8 @@ public class Wall extends Obstacle {
     }
 
     @Override
-    public void setWorld(PuttingCourse world, PhysicsEngine engine) {
-        throw new AssertionError("Obstacle holds no reference to World.");
+    public void setWorld(PhysicsEngine engine) {
+        throw new AssertionError("Obstacle holds no reference to the engine.");
     }
 
     @Override

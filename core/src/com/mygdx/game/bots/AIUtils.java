@@ -2,16 +2,19 @@ package com.mygdx.game.bots;
 
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.Ball;
+import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.obstacles.Obstacle;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.physics.PuttingCoursePhysics;
 import com.mygdx.game.utils.Vector2d;
+import com.mygdx.game.utils.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class AIUtils {
     public static final int OPTIMAL_RESOLUTION = 2000;
+    public static final double ROOF = Double.POSITIVE_INFINITY;
 
     public static double linearInterpolate(double a, double b, double t){
         return a + (b - a) * t;
@@ -164,6 +167,28 @@ public final class AIUtils {
         return  heights;
     }
 
+    public static double[][] asTiles(PuttingCourse world, int steps){
+        double[][] heights = new double[steps][steps];
+
+        for(double i = 0d; i < 1d; i += 1d/((double) steps)) {
+            double x = linearInterpolate(0, 50, i);
+
+            for (double j = 0d; j < 1d; j += 1d / ((double) steps)) {
+                double y = linearInterpolate(0, 50, j);
+                double height = evalHeightAt(world, x, y);
+
+                heights[(int)(i * steps)][(int)(j * steps)] = 0;
+
+                if (height > 0) {
+                    heights[(int)(i * steps)][(int)(j * steps)] = height;
+                }
+            }
+
+        }
+
+        return  heights;
+    }
+
     public static boolean isClearPath(Vector2d start, Vector2d end, Function2d h, int steps, double tolerance){
 
         for(double i = 1d/((double) steps); i <= 1d; i += 1d/((double) steps)){
@@ -196,8 +221,16 @@ public final class AIUtils {
         } return true;
     }
 
-    public static double evalHeightAt(double x, double y, Ball example){
-        return 0;
+    public static double evalHeightAt(PuttingCourse world, double x, double y){
+
+        for(Obstacle o : world.getObstacles()){
+
+            if(o.isPositionInsideShape(x, y))
+                return ROOF;
+
+        }
+
+        return world.height_function.evaluate(x, y);
     }
 
 }
