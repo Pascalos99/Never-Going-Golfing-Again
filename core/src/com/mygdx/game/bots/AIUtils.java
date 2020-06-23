@@ -4,17 +4,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.Ball;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.obstacles.Obstacle;
-import com.mygdx.game.courses.PuttingCourse;
-import com.mygdx.game.obstacles.Obstacle;
-import com.mygdx.game.parser.AtomFunction2d;
 import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.physics.PuttingCoursePhysics;
-import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public final class AIUtils {
@@ -96,91 +91,29 @@ public final class AIUtils {
         return  distance;
     }
 
-    public static boolean[][] convertPointsToArray(Collection<Vector2d> points, double world_bound, int resolution) {
-        boolean[][] array = new boolean[resolution][resolution];
-        for (Vector2d v : points) {
-            double transmuted_x = (v.get_x() / world_bound) * (array.length - 1);
-            double transmuted_y = (v.get_y() / world_bound) * (array[0].length - 1);
-            int i = (int)Math.round(transmuted_x), j = (int)Math.round(transmuted_y);
-            array[i][j] = true;
-        }
-        return array;
-    }
-
-    public static Vector2d convertIndexToReal(Vector2d index, int width, int height, double world_bound) {
-        return new Vector2d(
-                index.get_x() * world_bound / (width - 1),
-                index.get_y() * world_bound / (height - 1));
-    }
-    public static Vector2d convertIndexToReal(Vector2d index, boolean[][] array, double world_bound) {
-        return convertIndexToReal(index, array.length, array[0].length, world_bound);
-    }
-
-    public static Vector2d getClosestValidArrayIndex(Vector2d point, boolean[][] array, double world_bound) {
-        double transmuted_x = (point.get_x() / world_bound) * (array.length - 1);
-        double transmuted_y = (point.get_y() / world_bound) * (array[0].length - 1);
-        int index_x = (int)Math.round(transmuted_x), index_y = (int)Math.round(transmuted_y);
-        if (array[index_x][index_y]) return new Vector2d(index_x, index_y);
-        int cx = (transmuted_x < index_x)?1:-1;
-        int cy = (transmuted_y < index_y)?1:-1;
-        int depth = 1;
-        while (true) {
-            int end = depth*2 + 1;
-            for (int i=0; i < end; i++) {
-                int x = index_x - depth*cx + cx*i;
-                if (x < 0 || x >= array.length) continue;
-                if (i==0 || i == end-1) {
-                    for (int y=-depth * cy; y <= depth * cy; y += cy) {
-                        int yy = index_y + y;
-                        if (yy < 0 || yy >= array[x].length) continue;
-                        if (array[x][yy]) return new Vector2d(x, yy);
-                    }
-                } else {
-                    int y1 = index_y - depth*cy;
-                    int y2 = index_y + depth*cy;
-                    if (y1 >= 0 && y1 < array[x].length && array[x][y1]) return new Vector2d(x, y1);
-                    if (y2 >= 0 && y2 < array[x].length && array[x][y2]) return new Vector2d(x, y2);
-                }
-            }
-            depth++;
-        }
-    }
-
-    public static List<Vector2d> getStationaryPoints(Function2d h, double gradient_cutoff, double world_bound, int resolution) {
-        double square_gc = gradient_cutoff * gradient_cutoff;
-        double increment = world_bound / ((double)resolution);
-        List<Vector2d> points = new ArrayList<>();
-        for (double x=0; x <= world_bound; x += increment) {
-            for (double y=0; y <= world_bound; y += increment) {
-                if (h.evaluate(x, y) > 0) {
-                    Vector2d point = new Vector2d(x, y);
-                    if (x == 0 || y == 0 || x >= world_bound || y >= world_bound) points.add(point);
-                    else if (h.gradient(x, y).squared_length() < square_gc) points.add(point);
-                }
-            }
-        }
-        return points;
-    }
-
-    public static List<Vector2d> getPointsWithGradient(Function2d h, double squared_gradient_length, double tolerance, int parts){
-        double total_gradient = squared_gradient_length;
-        double increment = 1d / ((double)parts);
+    public static List<Vector2d> getPointsWithGradient(Function2d h, Vector2d gradient, double tolerance, int parts){
+        double total_gradient = gradient.abs().get_x() + gradient.abs().get_y();
+        int steps = parts;
         List<Vector2d> points = new ArrayList<Vector2d>();
 
-        for(double i = 0d; i <= 1d; i += increment) {
-            double x = linearInterpolate(0, Variables.BOUNDED_WORLD_SIZE, i);
+        for(double i = 0d; i < 1d; i += 1d/((double) steps)) {
+            double x = linearInterpolate(0, 50, i);
 
-            for (double j = 0d; j <= 1d; j += increment) {
-                double y = linearInterpolate(0, Variables.BOUNDED_WORLD_SIZE, j);
+            for (double j = 0d; j < 1d; j += 1d / ((double) steps)) {
+                double y = linearInterpolate(0, 50, j);
                 double height = h.evaluate(x, y);
 
                 if (height > 0) {
-                    double total_local_gradient = h.gradient(x, y).squared_length();
+                    Vector2d local_gradient = h.gradient(x, y).abs();
+                    double total_local_gradient = local_gradient.get_x() + local_gradient.get_y();
 
                     if (Math.abs(total_gradient - total_local_gradient) <= tolerance)
                         points.add(new Vector2d(x, y));
+
                 }
+
             }
+
         }
 
         return points;
@@ -270,22 +203,6 @@ public final class AIUtils {
         }
 
         return true;
-    }
-
-    public static boolean isWaterFreePath(Vector2d start, Vector2d normalized_direction, Function2d h, List<Obstacle> obstacles, int steps, double max_distance) {
-        double square_distance_left_to_cover = max_distance * max_distance;
-        int steps_left = steps;
-        double distance_per_step = max_distance / steps;
-        double dir_x = normalized_direction.get_x() * distance_per_step;
-        double dir_z = normalized_direction.get_y() * distance_per_step;
-        double x = start.get_x(), z = start.get_y();
-        for (;steps_left > 0; steps_left--) {
-            double y = h.evaluate(x, z);
-            if (y < 0) return false;
-            for (Obstacle o : obstacles) {
-                if (o.getBoundingBox().contains(x, y, z)) return true; }
-            x += dir_x; z += dir_z;
-        } return true;
     }
 
     public static double evalHeightAt(PuttingCourse world, double x, double y){

@@ -30,7 +30,7 @@ public class AI_SimpleLearner extends AI_controller {
     public void calculate(Player player) {
         current_player = player;
         if (!has_seen_player(player)) setup(player);
-        Vector2d currentPos = new Vector2d(player.getBall().x, player.getBall().y);
+        Vector2d currentPos = new Vector2d(player.getBall().position.get_x(), player.getBall().position.get_z());
         Vector2d toFlag = getWorld().flag_position.sub(currentPos);
         angle = toFlag.angle();
         double distance_to_flag = toFlag.get_length();

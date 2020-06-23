@@ -433,10 +433,8 @@ public class Ball extends TopDownPhysicsObject {
         Vector3d physics_pos = getPhysicsPosition();
 
         return new AxisAllignedBoundingBox(
-                    new Vector3d(physics_pos.get_x() - BALL_RADIUS, physics_pos.get_y() - BALL_RADIUS, physics_pos.get_z() - BALL_RADIUS),
-                    BALL_RADIUS*2,
-                    BALL_RADIUS*2,
-                    BALL_RADIUS*2
+                    new Vector2d(physics_pos.get_x() - BALL_RADIUS, physics_pos.get_z() - BALL_RADIUS),
+                    BALL_RADIUS*2, BALL_RADIUS*2
                     );
     }
 
