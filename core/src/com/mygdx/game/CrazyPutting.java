@@ -219,8 +219,8 @@ public class CrazyPutting implements ApplicationListener {
             }
         }
 
-        /*for (int i = 0; i < TerrainBuilder.bigDepth * TerrainBuilder.bigWidth; i++)
-            modelBatch.render(terrainInstance[i], environment);*/
+        for (int i = 0; i < TerrainBuilder.bigDepth * TerrainBuilder.bigWidth; i++)
+            modelBatch.render(terrainInstance[i], environment);
 
         for (Obstacle obstacle : course.getObstacles()) {
             if (obstacle.getModel() != null) {

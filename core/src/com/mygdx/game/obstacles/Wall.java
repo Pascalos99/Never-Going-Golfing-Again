@@ -15,38 +15,19 @@ import com.mygdx.game.Ball;
 import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.physics.PhysicsEngine;
+import com.mygdx.game.utils.ColorProof;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
 
 import static com.mygdx.game.utils.Variables.*;
 
 public class Wall extends Obstacle {
-    final Vector2d[] points;
     final Vector2d start, end;
     final double thickness, angle, length;
     ModelInstance[] model;
 
     public Wall(Vector2d a, Vector2d b, double thickness) {
-        Vector2d center = a.add(b).div(new Vector2d(2, 2));
         length = a.distance(b);
-
-        Vector2d left_point = (new Vector2d(-length / 2d, 0));
-        Vector2d right_point = (new Vector2d(length / 2d, 0));
-
-        Vector2d upper_left_point = left_point.add(new Vector2d(0, thickness / 2d));
-        Vector2d lower_left_point = left_point.add(new Vector2d(0, -thickness / 2d));
-
-        Vector2d upper_right_point = right_point.add(new Vector2d(0, thickness / 2d));
-        Vector2d lower_right_point = right_point.add(new Vector2d(0, -thickness / 2d));
-
-        Vector2d[] vectors = {upper_left_point, upper_right_point, lower_right_point, lower_left_point};
-
-        for (int i = 0; i < vectors.length; i++) {
-            vectors[i] = vectors[i].rotate(b.sub(a).angle());
-            vectors[i] = vectors[i].add(center);
-        }
-
-        points = vectors;
         this.thickness = thickness;
         start = a;
         end = b;
@@ -62,13 +43,22 @@ public class Wall extends Obstacle {
 
     @Override
     public boolean isPositionInsideShape(double x, double y) {
-        return false;
+        Vector3d physic_pos = getPhysicsPosition();
+        Vector2d midpoint = new Vector2d(physic_pos.get_x(), physic_pos.get_z());
+
+        Vector2d real_p = new Vector2d(x, y);
+        Vector2d p = (real_p.sub(midpoint)).rotate(-angle);
+
+        AxisAllignedBoundingBox box = new AxisAllignedBoundingBox(new Vector2d(-length/2d, -thickness/2d), length, thickness);
+        AxisAllignedBoundingBox dummy = new AxisAllignedBoundingBox(p, 0, 0);
+
+        return box.collides(dummy);
     }
 
     @Override
     public Vector3d getGraphicsPosition() {
         Vector2d vec = start.add(end.sub(start).scale(.5)).add(WORLD_SHIFT);
-        return new Vector3d(toWorldScale(vec.get_x()), WALL_BASE, toWorldScale(vec.get_y()));
+        return new Vector3d(toWorldScale(vec.get_x()), (WALL_HEIGHT + WALL_BASE)/2d, toWorldScale(vec.get_y()));
     }
 
     public Vector2d getStart() {
@@ -85,12 +75,8 @@ public class Wall extends Obstacle {
 
     @Override
     public Vector3d getPhysicsPosition() {
-
-        Vector2d real_position = end.sub(start).add(anchor);
-        double y = 0;
-        if (WORLD != null) y = WORLD.height_function.evaluate(real_position);
-
-        return new Vector3d(real_position.get_x(), y, real_position.get_y());
+        Vector2d real_position = (end.add(start).scale(1d/2d)).add(anchor);
+        return new Vector3d(real_position.get_x(), 0, real_position.get_y());
     }
 
     public String toString() {
@@ -105,11 +91,11 @@ public class Wall extends Obstacle {
     public ModelInstance[] generateModel() {
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
-        MeshPartBuilder builder = modelBuilder.part("tree", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(Color.BROWN)));
-        new BoxShapeBuilder().build(builder, toWorldScale(this.thickness), (float) (WALL_HEIGHT), toWorldScale(this.length));
+        MeshPartBuilder builder = modelBuilder.part("tree", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(ColorProof.WALL())));
+        new BoxShapeBuilder().build(builder, toWorldScale(this.thickness), (float) (WALL_HEIGHT + Math.abs(WALL_BASE)), toWorldScale(this.length));
         Model wall = modelBuilder.end();
         double y = this.getGraphicsPosition().get_y();
-        ModelInstance[] wallInstance = new ModelInstance[]{new ModelInstance(wall, (float) this.getGraphicsPosition().get_x(), (float) (0), (float) this.getGraphicsPosition().get_z())};
+        ModelInstance[] wallInstance = new ModelInstance[]{new ModelInstance(wall, (float) this.getGraphicsPosition().get_x(), (float) (y), (float) this.getGraphicsPosition().get_z())};
         Vector2d dir = end.sub(start);
         wallInstance[0].transform.rotateRad(Vector3.Y, (float) ((Math.PI / 2) - dir.angle()));
         return wallInstance;
@@ -139,4 +125,5 @@ public class Wall extends Obstacle {
     public void visit(MiniMapDrawer mapDrawer) {
         mapDrawer.draw(start, end, thickness);
     }
+
 }

@@ -128,8 +128,8 @@ public final class Variables {
 
 	public static final double FRICTION_SCALE = 5d;
 
-	public static final double WALL_HEIGHT = TopDownPhysicsObject.toWorldScale(5d);//GRAPHICS SCALE
-	public static final double WALL_BASE = TopDownPhysicsObject.toWorldScale(-10d);//GRAPHICS SCALE
+	public static final double WALL_HEIGHT = TopDownPhysicsObject.toWorldScale(5d/WORLD_SCALING);//GRAPHICS SCALE
+	public static final double WALL_BASE = TopDownPhysicsObject.toWorldScale(-50d/WORLD_SCALING);//GRAPHICS SCALE
 
 	// The rest is all Deprecated
 	// can't remove yet, because some of the code using these may be useful later

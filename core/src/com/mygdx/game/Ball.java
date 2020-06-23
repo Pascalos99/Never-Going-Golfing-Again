@@ -6,6 +6,7 @@ import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.obstacles.AxisAllignedBoundingBox;
 import com.mygdx.game.obstacles.CollisionData;
 import com.mygdx.game.obstacles.Obstacle;
+import com.mygdx.game.obstacles.Wall;
 import com.mygdx.game.physics.PuttingCoursePhysics;
 import com.mygdx.game.physics.TopDownPhysicsObject;
 import com.mygdx.game.utils.Vector2d;
@@ -59,6 +60,14 @@ public class Ball extends TopDownPhysicsObject {
     }
 
     public void step(double delta, List<TopDownPhysicsObject> ents) {
+
+        for(Obstacle o : WORLD.getObstacles()){
+
+            if(o instanceof Wall && o.isPositionInsideShape(position.get_x(), position.get_z())){
+                System.out.println("Collision detected motherfucker!!!!");
+            }
+
+        }
 
         if(is_moving) {
             global_collisions = isColliding();
