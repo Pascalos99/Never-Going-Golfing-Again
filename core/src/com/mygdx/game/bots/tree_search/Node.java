@@ -3,7 +3,7 @@ package com.mygdx.game.bots.tree_search;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Node <T> implements Comparable<T> {
+public abstract class Node implements Comparable<Node> {
     /**
      * @param estimate_quality the estimated value of the heuristic that determines the order of simulation execution.<br>
      *                         the actual value of the estimated_heuristic will never be compared with the heuristic_value
@@ -26,9 +26,8 @@ public abstract class Node <T> implements Comparable<T> {
         if (parent==null) depth = 0;
         else {
             setDepth(parent.depth + 1);
-            if (!parent.children.contains(this)) parent.children.add(this);
+            parent.children.add(this);
             if (!simulated) parent.suggested_children_count++;
-            parent.CAH_needs_updating = true;
         }
     }
 
@@ -52,8 +51,6 @@ public abstract class Node <T> implements Comparable<T> {
 
     private boolean simulated;
     private double heuristic_value;
-    private double children_aggregate_heuristic;
-    private boolean CAH_needs_updating = false;
     private double cost;
 
     public final void computeSimulation() {
@@ -68,34 +65,11 @@ public abstract class Node <T> implements Comparable<T> {
         this.depth = depth;
         for (Node child : children) child.setDepth(depth + 1);
     }
-    public final void updateAggregateHeuristic(double child_importance) {
-        if (!CAH_needs_updating || !simulated) return;
-        double sum = heuristic_value;
-        Node best_child = null;
-        double best_heuristic = Double.NEGATIVE_INFINITY;
-        for (Node child : children) {
-            if (child.isSimulated()) {
-                child.updateAggregateHeuristic(child_importance);
-                if (child.children_aggregate_heuristic > best_heuristic) {
-                    best_child = child;
-                    best_heuristic = child.children_aggregate_heuristic;
-                }
-            } }
-        if (best_child != null) sum += child_importance * best_heuristic;
-        children_aggregate_heuristic = sum;
-    }
-    public final void addChild(Node child) {
-        children.add(child);
-        CAH_needs_updating = true;
-    }
     public final boolean isSimulated() {
         return simulated;
     }
     public final double getHeuristic() {
         return heuristic_value;
-    }
-    public final double getAggregateHeuristic() {
-        return children_aggregate_heuristic;
     }
     public final double getCost() {
         return cost;
@@ -111,11 +85,10 @@ public abstract class Node <T> implements Comparable<T> {
     }
 
     @Override
-    public int compareTo(Object o) {
-        if (!(o instanceof Node)) return 0;
-        Node n = (Node)o;
+    public int compareTo(Node n) {
         if (n.estimate_heuristic > estimate_heuristic) return -1;
         if (n.estimate_heuristic == estimate_heuristic) return 0;
         return 1;
     }
+
 }

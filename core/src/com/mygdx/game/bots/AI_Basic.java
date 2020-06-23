@@ -21,7 +21,7 @@ public class AI_Basic extends AI_controller {
     }
 
     public void calculate(Player player) {
-        Vector2d currentPos = new Vector2d(player.getBall().position.get_x(), player.getBall().position.get_z());
+        Vector2d currentPos = new Vector2d(player.getBall().x, player.getBall().y);
         Vector2d toFlag = getWorld().flag_position.sub(currentPos).normalize();
         double angle = toFlag.angle();
         double velocity = 0d;
