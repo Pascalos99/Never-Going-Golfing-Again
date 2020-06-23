@@ -95,7 +95,11 @@ public class ObstacleSelect implements Screen {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(Menu.PLAY);
+                if(SettingsScreen.cb.isStartInWater()||SettingsScreen.cb.isFlagInWater()){
+                    parent.changeScreen(Menu.WARNING_SCREEN);
+                }else {
+                    parent.changeScreen(Menu.PLAY);
+                }
             }
         });
         TextButton smallTree = new TextButton("Small Tree", MENU_SKIN);
