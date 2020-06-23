@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.SphereShapeBuilder;
 import com.mygdx.game.Ball;
 import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.utils.Vector2d;
@@ -17,7 +18,6 @@ import static com.mygdx.game.utils.Variables.*;
 
 public class Tree extends Obstacle {
     public  static  final double RESTITUTION = 0.4;
-
     public static final int TEXTURE_NOT_SPECIFIED = 0;
     public static final int TEXTURE_SMALL = 1;
     public static final double HEIGHT_SMALL = 15;
@@ -39,39 +39,46 @@ public class Tree extends Obstacle {
         this.position = position;
         this.height = height;
         this.radius = radius;
+
+        System.out.println(height);
     }
 
     @Override
     protected CollisionData isShapeColliding(Ball ball) {
         Vector3d physics_pos = getPhysicsPosition();
         Vector2d topdown_pos = new Vector2d(physics_pos.get_x(), physics_pos.get_z());
+        Vector2d ball_position = new Vector2d(ball.position.get_x(), ball.position.get_z());
 
-        if (ball.height - BALL_RADIUS < height + physics_pos.get_y()) {
-            Vector2d ball_position = new Vector2d(ball.x, ball.y);
+        if (isPositionInsideShape(ball_position.get_x(), ball_position.get_y())) {
+            CollisionData data = new CollisionData(this);
 
-            if (ball_position.distance(topdown_pos) < radius + BALL_RADIUS) {
-                CollisionData data = new CollisionData(this);
+            Vector2d clipping_normal = ball_position.sub(topdown_pos).normalize();
+            Vector2d unclipped_position = clipping_normal.scale(radius + BALL_RADIUS).add(topdown_pos);
+            Vector2d clipping_correction = unclipped_position.sub(ball_position);
+            data.clipping_correction = new Vector3d(clipping_correction.get_x(), 0, clipping_correction.get_y());
 
-                Vector2d clipping_normal = ball_position.sub(topdown_pos).normalize();
-                Vector2d unclipped_position = clipping_normal.scale(radius + BALL_RADIUS).add(topdown_pos);
-                Vector2d clipping_correction = unclipped_position.sub(ball_position);
-                data.clipping_correction = new Vector3d(clipping_correction.get_x(), 0, clipping_correction.get_y());
+            Vector2d topdown_vel = new Vector2d(ball.velocity.get_x(), ball.velocity.get_z());
+            Vector2d entrance_normal = topdown_vel.normalize();
 
-                Vector2d entrance_normal = ball.velocity.normalize();
+            double dotp = entrance_normal.dot(clipping_normal);
+            Vector2d scaled_normal = clipping_normal.scale(2*dotp);
 
-                double dotp = entrance_normal.dot(clipping_normal);
-                Vector2d scaled_normal = clipping_normal.scale(2*dotp);
+            Vector2d horizontal_bounce = entrance_normal.sub(scaled_normal);
+            horizontal_bounce = horizontal_bounce.normalize().scale(ball.velocity.get_length()*RESTITUTION);
+            data.bounce = new Vector3d(horizontal_bounce.get_x(), 0, horizontal_bounce.get_y());
 
-                Vector2d horizontal_bounce = entrance_normal.sub(scaled_normal);
-                horizontal_bounce = horizontal_bounce.scale(ball.velocity.get_length()*RESTITUTION);
-                data.bounce = new Vector3d(horizontal_bounce.get_x(), 0, horizontal_bounce.get_y());
-
-                return data;
-            }
-
+            return data;
         }
 
         return null;
+    }
+
+    @Override
+    public boolean isPositionInsideShape(double x, double y) {
+        Vector3d physics_pos = getPhysicsPosition();
+        Vector2d topdown_pos = new Vector2d(physics_pos.get_x(), physics_pos.get_z());
+
+        return (new Vector2d(x, y)).distance(topdown_pos) < radius + BALL_RADIUS;
     }
 
     @Override
@@ -81,7 +88,12 @@ public class Tree extends Obstacle {
 
     @Override
     public double getFrictionAt(double x, double y) {
-        return 0;
+        return 1d;
+    }
+
+    @Override
+    public Vector2d getGradientsAt(double x, double y){
+        return new Vector2d(0, 0);
     }
 
     @Override
@@ -103,17 +115,38 @@ public class Tree extends Obstacle {
         return 0;
     }
 
-    @Override
-    public ModelInstance getModel() {
+    private ModelInstance[] generateModel() {
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part("tree", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.BROWN)));
         new CylinderShapeBuilder().build(builder,(float)toWorldScale(this.radius*2f), (float)(this.height+rootHeight), (float)toWorldScale(this.radius*2f), 20);
-//        builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.GREEN)));
-//        builder.sphere((float)this.radius*2f, (float)this.height, (float)this.radius*2f, 20,20);
-        Model tree = modelBuilder.end();
-        ModelInstance treeInstance = new ModelInstance(tree, (float)this.getGraphicsPosition().get_x(), (float)this.getGraphicsPosition().get_y(), (float)this.getGraphicsPosition().get_z());
+        Model trunk = modelBuilder.end();
+
+        modelBuilder = new ModelBuilder();
+        modelBuilder.begin();
+        builder = modelBuilder.part("leaves", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.GREEN)));
+        new SphereShapeBuilder().build(builder,(float)(this.height/2), (float)(this.height/2),(float)(this.height/2), 40,40);
+        Model leaves = modelBuilder.end();
+
+        ModelInstance trunkInstance = new ModelInstance(trunk, (float)this.getGraphicsPosition().get_x(), (float)this.getGraphicsPosition().get_y(), (float)this.getGraphicsPosition().get_z());
+        ModelInstance leavesInstance = new ModelInstance(leaves, (float)this.getGraphicsPosition().get_x(), (float)(this.getGraphicsPosition().get_y()+this.height-(this.height/3f)), (float)this.getGraphicsPosition().get_z());
+
+        ModelInstance[] treeInstance= new ModelInstance[]{trunkInstance,leavesInstance};
+
         return treeInstance;
+    }
+
+    private ModelInstance trunk;
+    private ModelInstance leaves;
+
+    @Override
+    public ModelInstance[] getModel() {
+        if (trunk == null || leaves == null) {
+            ModelInstance[] models = generateModel();
+            trunk = models[0];
+            leaves = models[1];
+        }
+        return new ModelInstance[]{trunk, leaves};
     }
 
     @Override
@@ -122,7 +155,7 @@ public class Tree extends Obstacle {
             Vector3d physics_pos = getPhysicsPosition();
             aabb = new AxisAllignedBoundingBox(
                     new Vector3d(physics_pos.get_x() - radius, height + physics_pos.get_y(), physics_pos.get_z() - radius),
-                    radius * 2, height + physics_pos.get_y() + 10, radius * 2
+                    radius * 2, (height + physics_pos.get_y() + 10), radius * 2
             );
         }
         return aabb;
@@ -131,6 +164,7 @@ public class Tree extends Obstacle {
     public double getHeight() {
         return height;
     }
+
     public double getRadius() {
         return radius;
     }
