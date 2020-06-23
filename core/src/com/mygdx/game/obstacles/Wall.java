@@ -15,6 +15,7 @@ import com.mygdx.game.Ball;
 import com.mygdx.game.courses.MiniMapDrawer;
 import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.physics.PhysicsEngine;
+import com.mygdx.game.utils.ColorProof;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
 
@@ -104,22 +105,25 @@ public class Wall extends Obstacle {
         return end.sub(start).angle();
     }
 
-    @Override
-    public ModelInstance[] getModel() {
+    private ModelInstance generateModel() {
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
-        MeshPartBuilder builder = modelBuilder.part("tree", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(Color.BROWN)));
+        MeshPartBuilder builder = modelBuilder.part("wall", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(ColorProof.WALL())));
         new BoxShapeBuilder().build(builder, toWorldScale(this.thickness), (float) (height + rootHeight), toWorldScale(this.length));
-//        builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.GREEN)));
-//        builder.sphere((float)this.radius*2f, (float)this.height, (float)this.radius*2f, 20,20);
         Model wall = modelBuilder.end();
-//        System.out.println((float)this.getGraphicsPosition().get_y());
-//        System.out.println(height+rootHeight);
         double y = this.getGraphicsPosition().get_y();
-        ModelInstance[] wallInstance = new ModelInstance[]{new ModelInstance(wall, (float) this.getGraphicsPosition().get_x(), (float) (y + ((height + rootHeight) / 2f)), (float) this.getGraphicsPosition().get_z())};
+        ModelInstance wallInstance = new ModelInstance(wall, (float) this.getGraphicsPosition().get_x(), (float) (y + ((height + rootHeight) / 2f)), (float) this.getGraphicsPosition().get_z());
         Vector2d dir = end.sub(start);
-        wallInstance[0].transform.rotateRad(Vector3.Y, (float) ((Math.PI / 2) - dir.angle()));
+        wallInstance.transform.rotateRad(Vector3.Y, (float) ((Math.PI / 2) - dir.angle()));
         return wallInstance;
+    }
+
+    private ModelInstance model;
+
+    @Override
+    public ModelInstance[] getModel() {
+        if (model == null) model = generateModel();
+        return new ModelInstance[]{model};
     }
 
     @Override
