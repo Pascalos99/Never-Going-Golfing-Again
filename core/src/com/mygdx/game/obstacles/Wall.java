@@ -50,8 +50,8 @@ public class Wall extends Obstacle {
             AxisAllignedBoundingBox box = new AxisAllignedBoundingBox(new Vector2d(-length / 2d, -thickness / 2d), length, thickness);
             AxisAllignedBoundingBox p = new AxisAllignedBoundingBox(aligned_point.sub(new Vector2d(BALL_RADIUS, BALL_RADIUS)), BALL_RADIUS * 2d, BALL_RADIUS * 2d);
 
-            double hld = p.origin.get_x() + length / 2d;//Horizontal left distance
-            double hrd = p.origin.get_x() - length / 2d;//Horizontal right distance
+            double hld = p.origin.get_x() - length / 2d;//Horizontal left distance decreases with x
+            double hrd = p.origin.get_x() + length / 2d;//Horizontal right distance
             double x_clipping_correction = hld < hrd ? -hld : hrd;
 
             double vud = p.origin.get_y() + thickness / 2d;//Vertical upper distance
@@ -64,7 +64,7 @@ public class Wall extends Obstacle {
             clipping_correction = clipping_correction.rotate(angle);
             data.clipping_correction = new Vector3d(clipping_correction.get_x(), 0, clipping_correction.get_y());
 
-            System.out.println("Horizontal distances: " + hld + " | " + hrd + " = " + (hld + hrd));
+            System.out.println("\nHorizontal distances: " + hld + " | " + hrd + " = " + (hld + hrd));
             System.out.println("Vertical distances: " + vud + " | " + vld + " = " + (vud + vld));
 
             return data;
