@@ -13,12 +13,10 @@ public class AI_TopHat extends AI_controller {
 
     private int MAX_TICKS = 8000;
     private double STEP_SIZE = Variables.DELTA;
-    private int GRID_RESOLUTION = 1000;
-    private int ANGLE_PARTITION = 20;
-    private int SPEED_PARTITION = 50;
-    private double EAGERNESS_TO_EXPLORE = 1.5;
-    private double ERROR_BOUND = 0.001;
-    private double WORLD_BOUND = Variables.BOUNDED_WORLD_SIZE;
+    private int ANGLE_PARTITION = 50;
+    private int SPEED_PARTITION = 20;
+    private double EAGERNESS_TO_EXPLORE = 2.5;
+    private double ERROR_BOUND = 0.1;
 
     public static boolean DEBUG = true;
 
@@ -31,11 +29,13 @@ public class AI_TopHat extends AI_controller {
         @Override
         public Node[] exploreNode(Node parent) {
             Node[] result = new Node[ANGLE_PARTITION * SPEED_PARTITION];
-            double speed_increase = getWorld().maximum_velocity / SPEED_PARTITION;
+            double vmax = getWorld().maximum_velocity;
+            double start_v = vmax / SPEED_PARTITION;
             double[] angles = createAnglePartitions(parent.ball.topDownPosition());
             for (int i=0; i < ANGLE_PARTITION; i++) {
                 int k = 0;
-                for (double v = 0; v <= getWorld().maximum_velocity; v += speed_increase) {
+                for (int j=0; j < SPEED_PARTITION; j++) {
+                    double v = AIUtils.linearInterpolate(start_v, vmax, j/((double)SPEED_PARTITION));
                     if (v == 0) result[i * SPEED_PARTITION + k++] = parent.shoot(v, getWorld().maximum_velocity);
                     else result[i * SPEED_PARTITION + k++] = parent.shoot(v, angles[i]);
                 }
@@ -61,20 +61,41 @@ public class AI_TopHat extends AI_controller {
             return EAGERNESS_TO_EXPLORE * current_distance / max_distance;
         }
     };
+    public Explorer ALL_ROUND = n -> {
+            Node[] result = new Node[ANGLE_PARTITION * SPEED_PARTITION];
+            double vmax = getWorld().maximum_velocity;
+            double start_v = vmax / SPEED_PARTITION;
+            double[] angles = equal_partition_of_angles(ANGLE_PARTITION);
+            for (int i=0; i < ANGLE_PARTITION; i++) {
+                int k = 0;
+                for (int j=0; j < SPEED_PARTITION; j++) {
+                    double v = AIUtils.linearInterpolate(start_v, vmax, j/((double)SPEED_PARTITION));
+                    if (v == 0) result[i * SPEED_PARTITION + k++] = n.shoot(v, getWorld().maximum_velocity);
+                    else result[i * SPEED_PARTITION + k++] = n.shoot(v, angles[i]);
+                }
+            }
+            return result;
+    };
+
+    private double[] equal_partition_of_angles(int count) {
+        double[] result = new double[count];
+        result[0] = 0;
+        for (int i=1; i < result.length; i++)
+            result[i] = AIUtils.linearInterpolate(-Math.PI, Math.PI, i / ((double)(result.length - 1)));
+        return result;
+    }
 
     private Node root;
     private Node last_node;
     private Node result;
     private PriorityQueue<Node> expandable_nodes;
+    private List<Node> all_nodes;
     private Heuristic h_value = DISTANCE;
     private Heuristic g_cost = SHOT_COUNT;
-    private Explorer explorer = GAUSSIAN;
+    private Explorer explorer = ALL_ROUND;
     private boolean first_shot;
     private int current_depth;
     private boolean found_solution;
-
-    private Node[][] total_node_grid;
-    private boolean[][] stationary_grid;
 
     public AI_TopHat() {
         clear();
@@ -82,14 +103,22 @@ public class AI_TopHat extends AI_controller {
 
     @Override
     public void clear() {
-        expandable_nodes = new PriorityQueue<>();
-        total_node_grid = new Node[GRID_RESOLUTION][GRID_RESOLUTION];
-        stationary_grid = null;
+        clearTree();
         first_shot = true;
+    }
+
+    private void clearTree() {
+        expandable_nodes = new PriorityQueue<>();
+        all_nodes = new ArrayList<>();
         current_depth = 1;
         found_solution = false;
         result = null;
         root = null;
+    }
+
+    private void restart(Player player) {
+        root = new Node(player.getBall());
+        expandable_nodes.add(root);
     }
 
     @Override
@@ -102,44 +131,44 @@ public class AI_TopHat extends AI_controller {
         return "An implementation of the Dijkstra inspired A* algorithm";
     }
 
+    private Vector2d previous_position;
+
     @Override
     protected void calculate(Player player) {
-        double error = 0;
+        Vector2d current_position = player.getBall().topDownPosition();
+        double error;
+        boolean error_exceeded = false;
         if (!first_shot) {
             error = last_node.ball.topDownPosition().sub(player.getBall().topDownPosition()).get_length();
             if (error > ERROR_BOUND) {
                 debug.debug("Error of %.3f exceeds error bound of %.3f\n", error, ERROR_BOUND);
-                found_solution = false;
+                error_exceeded = true;
+            } else if (current_position.distance(previous_position) < 0.001) {
+                debug.debug("Ball ended up in water unexpectedly");
+                error_exceeded = true;
             }
         }
         if (first_shot) {
-            stationary_grid = AIUtils.convertPointsToArray(AIUtils.getStationaryPoints(getWorld().height_function,
-                    Variables.GRADIENT_CUTTOFF, WORLD_BOUND, GRID_RESOLUTION), WORLD_BOUND, GRID_RESOLUTION);
-            root = new Node(player.getBall());
-            expandable_nodes.add(root);
+            restart(player);
             result = search();
             first_shot = false;
         }
-        else if (!found_solution) {
+        else if (!found_solution || error_exceeded) {
             debug.debug("didn't find a solution, re-starting search");
-            rebase(last_node);
-            // TODO not yet tested
+            clearTree();
+            restart(player);
             result = search();
         }
         Node next_shot = getNodeAtDepth(result, current_depth++);
         setShotAngle(next_shot.angle);
         setShotVelocity(next_shot.speed);
         last_node = next_shot;
+        previous_position = current_position;
     }
 
     private Node getNodeAtDepth(Node node, int depth) {
         if (node.depth <= depth) return node;
         return getNodeAtDepth(node.parent, depth);
-    }
-
-    private void rebase(Node base) {
-        root = base;
-        // TODO more
     }
 
     private Node search() {
@@ -152,16 +181,15 @@ public class AI_TopHat extends AI_controller {
         if (result == null || !found_solution) {
             Node best = null;
             double best_h = Double.POSITIVE_INFINITY;
-            for (int i=0; i < total_node_grid.length; i++)
-                for (int j=0; j < total_node_grid[i].length; j++) {
-                    Node n = total_node_grid[i][j];
+            for (Node n : all_nodes)
                     if (n != null && n.getHeuristic() < best_h) {
                         best_h = n.getHeuristic();
                         best = n;
                     }
-                }
             return best;
-        } return result;
+        }
+        if (found_solution) debug.debug("Found a solution in %d shot%s",result.depth,result.depth==1?"":"s");
+        return result;
     }
 
     private void exploreNode(Node n) {
@@ -169,18 +197,8 @@ public class AI_TopHat extends AI_controller {
         for (int k=0; k < nodes.length; k++) {
             Node node = nodes[k];
             if (node == null) continue;
-            Vector2d index = AIUtils.getClosestValidArrayIndex(node.ball.topDownPosition(), stationary_grid, WORLD_BOUND);
-            int i = (int)index.get_x(), j = (int)index.get_y();
-            Node previous = total_node_grid[i][j];
-            if (previous == null) {
-                expandable_nodes.add(node);
-                total_node_grid[i][j] = node;
-            }
-            else if (node.g_cost_value < previous.g_cost_value) {
-                    expandable_nodes.remove(previous);
-                    expandable_nodes.add(node);
-                    total_node_grid[i][j] = node;
-                }
+            expandable_nodes.add(node);
+            all_nodes.add(node);
             if (node.reached_goal && (result == null || node.getHeuristic() < result.getHeuristic())) {
                 result = node;
                 found_solution = true;
@@ -226,7 +244,7 @@ public class AI_TopHat extends AI_controller {
             this.speed = speed;
             this.angle = angle;
             reached_goal = ball.topDownPosition().distance(getWorld().flag_position) < getWorld().hole_tolerance;
-            if (ball.isStuck() && !reached_goal) throw new ExceptionInInitializerError("simulated ball hit water ("+speed+", "+angle+")");
+            if (ball.isStuck() && !reached_goal) throw new ExceptionInInitializerError("simulated ball hit water");
             depth = parent.depth + 1;
             heuristic_value = h_value.evaluate(this);
             g_cost_value = g_cost.evaluate(this);
@@ -236,7 +254,6 @@ public class AI_TopHat extends AI_controller {
             try {
                 child = new Node(this, speed, angle);
             } catch (ExceptionInInitializerError e) {
-                debug.debug("erroneous ball found: "+e.getMessage());
                 return null;
             }
             return child;

@@ -91,7 +91,7 @@ public final class AIUtils {
     }
 
     public static boolean[][] convertPointsToArray(Collection<Vector2d> points, double world_bound, int resolution) {
-        boolean[][] array = new boolean[resolution+1][resolution+1];
+        boolean[][] array = new boolean[resolution][resolution];
         for (Vector2d v : points) {
             double transmuted_x = (v.get_x() / world_bound) * (array.length - 1);
             double transmuted_y = (v.get_y() / world_bound) * (array[0].length - 1);
