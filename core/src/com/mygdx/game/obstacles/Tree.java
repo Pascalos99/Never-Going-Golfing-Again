@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.CylinderShapeBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.SphereShapeBuilder;
 import com.mygdx.game.Ball;
 import com.mygdx.game.courses.MiniMapDrawer;
+import com.mygdx.game.utils.ColorProof;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
 import static com.mygdx.game.utils.Variables.*;
@@ -103,13 +104,13 @@ public class Tree extends Obstacle {
     private ModelInstance[] generateModel() {
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
-        MeshPartBuilder builder = modelBuilder.part("tree", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.BROWN)));
+        MeshPartBuilder builder = modelBuilder.part("tree", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(ColorProof.TRUNK())));
         new CylinderShapeBuilder().build(builder,(float)toWorldScale(this.radius*2f), (float)(this.height+rootHeight), (float)toWorldScale(this.radius*2f), 20);
         Model trunk = modelBuilder.end();
 
         modelBuilder = new ModelBuilder();
         modelBuilder.begin();
-        builder = modelBuilder.part("leaves", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.GREEN)));
+        builder = modelBuilder.part("leaves", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(ColorProof.LEAVES())));
         new SphereShapeBuilder().build(builder,(float)(this.height/2), (float)(this.height/2),(float)(this.height/2), 40,40);
         Model leaves = modelBuilder.end();
 
