@@ -19,6 +19,8 @@ public class ColorProof {
     public static ColorProof SAND       = of(new Color(0.7f, 0.7f, 0f, 1f), Color.YELLOW);
     public static ColorProof WATER      = of(new Color(0.2f, 0.2f, 1f, 1f), new Color(0.2f, 0.2f, 1f, 1f));
     public static ColorProof WALL       = of(new Color(0.92156863f, 0.90588235f, 0.34901961f, 1f), Color.DARK_GRAY);
+    public static ColorProof LEAVES     = of(Color.GREEN, Color.YELLOW);
+    public static ColorProof TRUNK      = of(Color.BROWN, Color.BLACK);
 
     public static boolean COLOR_BLIND_MODE = false;
 
@@ -37,6 +39,8 @@ public class ColorProof {
     public static Color WATER() { return WATER.get(); }
     public static Color FLAG() { return FLAG.get(); }
     public static Color WALL() { return WALL.get(); }
+    public static Color LEAVES() { return LEAVES.get(); }
+    public static Color TRUNK() { return TRUNK.get(); }
 
     public static ColorProof of(Color norm, Color adjust) {
         return new ColorProof(norm, adjust);
