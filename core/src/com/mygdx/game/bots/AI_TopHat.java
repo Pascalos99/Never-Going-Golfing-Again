@@ -8,17 +8,19 @@ import com.mygdx.game.utils.Vector2d;
 
 import java.util.*;
 
+import static com.mygdx.game.utils.Variables.WORLD;
+
 public class AI_TopHat extends AI_controller {
 
     private static class TopHat {}
     public TopHat the_hat_that_makes_the_bot;
 
-    private int MAX_TICKS = 8000;
-    private double STEP_SIZE = Variables.DELTA;
-    private int ANGLE_PARTITION = 50;
-    private int SPEED_PARTITION = 20;
-    private double EAGERNESS_TO_EXPLORE = 2.5;
-    private double ERROR_BOUND = 0.1;
+    private static int MAX_TICKS = 8000;
+    private static double STEP_SIZE = Variables.DELTA;
+    private static int ANGLE_PARTITION = 50;
+    private static int SPEED_PARTITION = 20;
+    private static double EAGERNESS_TO_EXPLORE = 2.5;
+    private static double ERROR_BOUND = 0.1;
 
     public static boolean DEBUG = false;
 
@@ -27,18 +29,18 @@ public class AI_TopHat extends AI_controller {
         double distance = n.ball.topDownPosition().distance(getWorld().flag_position);
         return distance / getWorld().maximum_velocity;
     };
-    public Explorer GAUSSIAN = new Explorer() {
+    public static Explorer GAUSSIAN = new Explorer() {
         @Override
         public Node[] exploreNode(Node parent) {
             Node[] result = new Node[ANGLE_PARTITION * SPEED_PARTITION];
-            double vmax = getWorld().maximum_velocity;
+            double vmax = WORLD.maximum_velocity;
             double start_v = vmax / SPEED_PARTITION;
             double[] angles = createAnglePartitions(parent.ball.topDownPosition());
             for (int i=0; i < ANGLE_PARTITION; i++) {
                 int k = 0;
                 for (int j=0; j < SPEED_PARTITION; j++) {
                     double v = AIUtils.linearInterpolate(start_v, vmax, j/((double)SPEED_PARTITION));
-                    if (v == 0) result[i * SPEED_PARTITION + k++] = parent.shoot(v, getWorld().maximum_velocity);
+                    if (v == 0) result[i * SPEED_PARTITION + k++] = parent.shoot(v, WORLD.maximum_velocity);
                     else result[i * SPEED_PARTITION + k++] = parent.shoot(v, angles[i]);
                 }
             }
@@ -48,7 +50,7 @@ public class AI_TopHat extends AI_controller {
         private double[] createAnglePartitions(Vector2d currentPos) {
             double[] angle_partition = new double[ANGLE_PARTITION];
             angle_partition[0] = 0;
-            double sigma = g(currentPos, getWorld().flag_position);
+            double sigma = g(currentPos, WORLD.flag_position);
             for (int i=1; i < angle_partition.length; i++) {
                 double val = 2*Math.PI;
                 int n = 0;
@@ -58,28 +60,54 @@ public class AI_TopHat extends AI_controller {
             return angle_partition;
         }
         private double g(Vector2d c, Vector2d d) {
-            double max_distance = getWorld().start_position.distance(d);
+            double max_distance = WORLD.start_position.distance(d);
             double current_distance = c.distance(d);
             return EAGERNESS_TO_EXPLORE * current_distance / max_distance;
         }
     };
-    public Explorer ALL_ROUND = n -> {
+    public static Explorer ALL_ROUND = n -> {
         Node[] result = new Node[ANGLE_PARTITION * SPEED_PARTITION];
-        double vmax = getWorld().maximum_velocity;
+        double vmax = WORLD.maximum_velocity;
         double start_v = vmax / SPEED_PARTITION;
         double[] angles = equal_partition_of_angles(ANGLE_PARTITION);
         for (int i=0; i < ANGLE_PARTITION; i++) {
             int k = 0;
             for (int j=0; j < SPEED_PARTITION; j++) {
                 double v = AIUtils.linearInterpolate(start_v, vmax, j/((double)SPEED_PARTITION));
-                if (v == 0) result[i * SPEED_PARTITION + k++] = n.shoot(v, getWorld().maximum_velocity);
+                if (v == 0) result[i * SPEED_PARTITION + k++] = n.shoot(v, WORLD.maximum_velocity);
+                else result[i * SPEED_PARTITION + k++] = n.shoot(v, angles[i]);
+            }
+        }
+        return result;
+    };
+    public static Explorer STOCHASTIC_ROUND = n -> {
+        Node[] result = new Node[ANGLE_PARTITION * SPEED_PARTITION];
+        double vmax = WORLD.maximum_velocity;
+        double start_v = vmax / SPEED_PARTITION;
+        double[] angles = stochastic_partition_of_angles(ANGLE_PARTITION);
+        for (int i=0; i < ANGLE_PARTITION; i++) {
+            int k = 0;
+            for (int j=0; j < SPEED_PARTITION; j++) {
+                double v = AIUtils.linearInterpolate(start_v, vmax, j/((double)SPEED_PARTITION));
+                if (v == 0) result[i * SPEED_PARTITION + k++] = n.shoot(v, WORLD.maximum_velocity);
                 else result[i * SPEED_PARTITION + k++] = n.shoot(v, angles[i]);
             }
         }
         return result;
     };
 
-    private double[] equal_partition_of_angles(int count) {
+    private static Random r = new Random(0); // to keep it deterministic
+
+    private static double[] stochastic_partition_of_angles(int count) {
+        double[] result = new double[count];
+        result[0] = 0;
+        double part = 2 * Math.PI / ((double)result.length);
+        for (int i=1; i < result.length; i++)
+            result[i] = AIUtils.linearInterpolate(-Math.PI, Math.PI, i / ((double)(result.length - 1))) + part * r.nextDouble();
+        return result;
+    }
+
+    private static double[] equal_partition_of_angles(int count) {
         double[] result = new double[count];
         result[0] = 0;
         for (int i=1; i < result.length; i++)
@@ -91,7 +119,7 @@ public class AI_TopHat extends AI_controller {
     private Node last_node;
     private Node result;
     private PriorityQueue<Node> expandable_nodes;
-    private List<Node> all_nodes;
+    private PriorityQueue<Node> all_nodes;
     private Heuristic h_value = DISTANCE;
     private Heuristic g_cost = SHOT_COUNT;
     private Explorer explorer = ALL_ROUND;
@@ -99,8 +127,12 @@ public class AI_TopHat extends AI_controller {
     private int current_depth;
     private boolean found_solution;
 
-    public AI_TopHat() {
+    public AI_TopHat(Explorer exp) {
+        this.explorer = exp;
         clear();
+    }
+    public AI_TopHat() {
+        this(ALL_ROUND);
     }
 
     @Override
@@ -111,7 +143,7 @@ public class AI_TopHat extends AI_controller {
 
     private void clearTree() {
         expandable_nodes = new PriorityQueue<>();
-        all_nodes = new ArrayList<>();
+        all_nodes = new PriorityQueue<>();
         current_depth = 1;
         found_solution = false;
         result = null;
@@ -123,14 +155,27 @@ public class AI_TopHat extends AI_controller {
         expandable_nodes.add(root);
     }
 
+    private String getExplorerString() {
+        if (explorer == GAUSSIAN) return "[GP]";
+        if (explorer == ALL_ROUND) return "[EP]";
+        if (explorer == STOCHASTIC_ROUND) return "[SP]";
+        return "";
+    }
+    private String getExplorerDescr() {
+        if (explorer == GAUSSIAN) return "with gaussian partitioning";
+        if (explorer == ALL_ROUND) return "with equal partitioning";
+        if (explorer == STOCHASTIC_ROUND) return "with stochastic partitioning";
+        return "";
+    }
+
     @Override
     public String getName() {
-        return "Heuristic Dijkstra Search";
+        return String.format("Heuristic Dijkstra Search %s",getExplorerString());
     }
 
     @Override
     public String getDescription() {
-        return "An implementation of the Dijkstra inspired A* algorithm";
+        return "An implementation of the Dijkstra inspired A* algorithm "+getExplorerDescr();
     }
 
     private Vector2d previous_position;
@@ -195,8 +240,24 @@ public class AI_TopHat extends AI_controller {
     private Node search() {
         long start = System.currentTimeMillis();
         long time_spent = 0;
-        while (time_spent < 5000) {
-            exploreNode(expandable_nodes.poll());
+        search: while (time_spent < 5000) {
+            Node node = expandable_nodes.poll();
+            if (node == null) {
+                // this basically only happens if no single node has possible outcomes
+                // we can only do anything about this with a stochastic partitioning
+                if (explorer == STOCHASTIC_ROUND || explorer == GAUSSIAN) {
+                    Iterator<Node> iter = all_nodes.iterator();
+                    while (expandable_nodes.size() <= 0 && iter.hasNext())
+                        exploreNode(iter.next());
+                    // will try re-exploring previously explored nodes
+                    node = expandable_nodes.poll();
+                } if (node == null) {
+                    debug.debug("Search yields no result");
+                    break search;
+                }
+                // if none yield results, that's it, we stop
+            }
+            exploreNode(node);
             time_spent = System.currentTimeMillis() - start;
         }
         if (result == null || !found_solution) {
