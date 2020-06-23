@@ -205,22 +205,6 @@ public final class AIUtils {
         return true;
     }
 
-    public static boolean isWaterFreePath(Vector2d start, Vector2d normalized_direction, Function2d h, List<Obstacle> obstacles, int steps, double max_distance) {
-        double square_distance_left_to_cover = max_distance * max_distance;
-        int steps_left = steps;
-        double distance_per_step = max_distance / steps;
-        double dir_x = normalized_direction.get_x() * distance_per_step;
-        double dir_z = normalized_direction.get_y() * distance_per_step;
-        double x = start.get_x(), z = start.get_y();
-        for (;steps_left > 0; steps_left--) {
-            double y = h.evaluate(x, z);
-            if (y < 0) return false;
-            for (Obstacle o : obstacles) {
-                if (o.getBoundingBox().contains(x, y, z)) return true; }
-            x += dir_x; z += dir_z;
-        } return true;
-    }
-
     public static double evalHeightAt(PuttingCourse world, double x, double y){
 
         for(Obstacle o : world.getObstacles()){
