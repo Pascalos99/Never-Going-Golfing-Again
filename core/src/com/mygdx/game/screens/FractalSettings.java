@@ -74,7 +74,11 @@ public class FractalSettings implements Screen {
             public void changed(ChangeEvent event, Actor actor) {
                 updateFractalInfo();
                 cb.setFractalHeight(getSeed(),getRoughness(),getResSetting(),getSmoothingSetting(), getInterpolation(),getMin(),getMax());
-                parent.changeScreen(Menu.PLAY);
+                if(cb.isStartInWater()||cb.isFlagInWater()){
+                    parent.changeScreen(Menu.WARNING_SCREEN);
+                }else {
+                    parent.changeScreen(Menu.PLAY);
+                }
             }
         });
         TextButton customizeObstacles = new TextButton("Customize Obstacles", MENU_SKIN);

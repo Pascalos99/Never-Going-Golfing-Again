@@ -176,7 +176,11 @@ public class SettingsScreen implements Screen {
                 MAX_SHOT_VELOCITY = getMaxV();
                 GameInfo g = getGameInfo();
                 cb.loadInfo(g);
-                parent.changeScreen(Menu.PLAY);
+                if(cb.isStartInWater()||cb.isFlagInWater()){
+                    parent.changeScreen(Menu.WARNING_SCREEN);
+                }else {
+                    parent.changeScreen(Menu.PLAY);
+                }
             }
         });
 
