@@ -36,7 +36,7 @@ public class Vector3d {
 
     public Vector3d normalize() {
         double len = get_length();
-        return new Vector3d(x/len, z/len, y/len);
+        return new Vector3d(x/len, y/len, z/len);
     }
 
     public Vector3d sub(Vector3d v){

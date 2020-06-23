@@ -67,6 +67,9 @@ public class Ball extends TopDownPhysicsObject {
             Vector3d initial_position = position, final_position = null;
             Vector3d initial_velocity = velocity, final_velocity = null;
 
+            System.out.println("\nInitial velocity: " + initial_velocity.toString() + " | " + initial_velocity.get_length());
+            System.out.println("Initial position: " + initial_position.toString());
+
             Vector3d[] pair = new Vector3d[]{
                     initial_position,
                     initial_velocity
@@ -94,7 +97,7 @@ public class Ball extends TopDownPhysicsObject {
                         pair[1].get_z()
                 );
 
-                if(isStuck() || ((fence_check || evalGradientsAt(final_position.get_x(), final_position.get_z()).get_length() < GRADIENT_CUTTOFF) && final_velocity.get_length() < getStoppingVelocity(final_velocity.get_x(), final_velocity.get_z()))){
+                if(isStuck() || ((fence_check || evalGradientsAt(final_position.get_x(), final_position.get_z()).get_length() < GRADIENT_CUTTOFF) && (new Vector2d(final_velocity.get_x(), final_velocity.get_z())).get_length() < getStoppingVelocity(final_velocity.get_x(), final_velocity.get_z()))){
                     is_moving = false;
                     final_velocity = new Vector3d(0, 0, 0);
                 }
@@ -148,7 +151,9 @@ public class Ball extends TopDownPhysicsObject {
 
             global_collisions.clear();
 
-            System.out.println(velocity.toString() + " | " + velocity.get_length());
+            System.out.println("\nFinal velocity: " + velocity.toString() + " | " + velocity.get_length());
+            System.out.println("Final position: " + position.toString());
+            System.out.println("#--------------------------------------------#");
         }
 
     }
@@ -295,19 +300,17 @@ public class Ball extends TopDownPhysicsObject {
     public List<CollisionData> isColliding(){
         List<CollisionData> collisions = new ArrayList<CollisionData>();
 
-        for(TopDownPhysicsObject body : world.getObstacles()){
+        for(Obstacle obstacle : world.getObstacles()){
+            CollisionData data = obstacle.isColliding(this);
 
-            if(body instanceof Obstacle){
-                Obstacle obstacle = (Obstacle) body;
+            if(data != null){
 
-                CollisionData data = obstacle.isColliding(this);
+                System.out.println("Clipping correction: " + data.clipping_correction.toString());
+                System.out.println("Bounce velocity: " + data.bounce.toString() + " | " + data.bounce.get_length());
 
-                if(data != null){
-                    this.position = position.add(data.clipping_correction);
-                    this.velocity = data.bounce;
-                    collisions.add(data);
-                }
-
+                this.position = position.add(data.clipping_correction);
+                this.velocity = data.bounce;
+                collisions.add(data);
             }
 
         }

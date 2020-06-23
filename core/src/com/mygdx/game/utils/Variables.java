@@ -80,8 +80,8 @@ public final class Variables {
 	public static double SHOT_VELOCITY = MAX_SHOT_VELOCITY/2d;
 	public static double SHOT_VELOCITY_INCREASE() { return 0.01 * MAX_SHOT_VELOCITY; }
 
-	public static double PITCH = Math.PI * 2/9d;
-	public static double YAW = Math.PI * 0.75;
+	public static double PITCH = Math.PI*2/9d;
+	public static double YAW = Math.PI*0.75;
 	public static double VIEW_ZOOM = 7;
 
 	public static void reset() {
@@ -123,7 +123,7 @@ public final class Variables {
 
 	public static final double DELTA = 0.01d;
 
-	public static final double FRICTION_SCALE = 1d;
+	public static final double FRICTION_SCALE = 5d;
 
 	public static final double WALL_BASE = -10d;
 

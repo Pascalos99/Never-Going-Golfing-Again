@@ -18,8 +18,6 @@ public abstract class Obstacle extends TopDownPhysicsObject {
     }
 
     public CollisionData isColliding(Ball ball) {
-//        System.out.println(toString());
-
         AxisAllignedBoundingBox box = getBoundingBox();
         AxisAllignedBoundingBox ball_box = ball.getBoundingBox();
 

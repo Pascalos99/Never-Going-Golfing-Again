@@ -57,7 +57,7 @@ public class Tree extends Obstacle {
                 Vector2d clipping_correction = unclipped_position.sub(ball_position);
                 data.clipping_correction = new Vector3d(clipping_correction.get_x(), 0, clipping_correction.get_y());
 
-                Vector2d topdown_vel = new Vector2d(ball.velocity.get_x(), ball.position.get_z());
+                Vector2d topdown_vel = new Vector2d(ball.velocity.get_x(), ball.velocity.get_z());
                 Vector2d entrance_normal = topdown_vel.normalize();
 
                 double dotp = entrance_normal.dot(clipping_normal);
