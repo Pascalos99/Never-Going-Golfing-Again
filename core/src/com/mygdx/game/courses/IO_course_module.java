@@ -270,9 +270,10 @@ public class IO_course_module {
     }
 
     public static void outputFile(File file, GameInfo aspects, List<Obstacle> obstacles) {
-        String[] str = new String[obstacles.size()];
-        for (int i=0; i < str.length; i++) str[i] = obstacle_to_string(obstacles.get(i));
-        outputToFile(file, toOutputString(aspects));
+        String[] str = new String[obstacles.size()+1];
+        str[0]=toOutputString(aspects);
+        for (int i=1; i < str.length; i++) str[i] = obstacle_to_string(obstacles.get(i-1));
+        outputToFile(file, str);
     }
 
     public static void outputFile(File file, GameInfo info) {

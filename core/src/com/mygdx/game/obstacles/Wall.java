@@ -17,9 +17,8 @@ import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.physics.PhysicsEngine;
 import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
-import static com.mygdx.game.utils.Variables.*;
 
-import java.awt.*;
+import static com.mygdx.game.utils.Variables.*;
 
 public class Wall extends Obstacle {
     final Vector2d[] points;
@@ -27,25 +26,25 @@ public class Wall extends Obstacle {
     final double thickness, angle, length, height, rootHeight;
 
 
-    public Wall(Vector2d a, Vector2d b, double thickness){
+    public Wall(Vector2d a, Vector2d b, double thickness) {
         Vector2d center = a.add(b).div(new Vector2d(2, 2));
         length = a.distance(b);
         height = 3.0;
         rootHeight = 1.0;
 
 
-        Vector2d left_point = (new Vector2d(-length/2d, 0));
-        Vector2d right_point = (new Vector2d(length/2d, 0));
+        Vector2d left_point = (new Vector2d(-length / 2d, 0));
+        Vector2d right_point = (new Vector2d(length / 2d, 0));
 
-        Vector2d upper_left_point = left_point.add(new Vector2d(0, thickness/2d));
-        Vector2d lower_left_point = left_point.add(new Vector2d(0, -thickness/2d));
+        Vector2d upper_left_point = left_point.add(new Vector2d(0, thickness / 2d));
+        Vector2d lower_left_point = left_point.add(new Vector2d(0, -thickness / 2d));
 
-        Vector2d upper_right_point = left_point.add(new Vector2d(0, thickness/2d));
-        Vector2d lower_right_point = left_point.add(new Vector2d(0, -thickness/2d));
+        Vector2d upper_right_point = left_point.add(new Vector2d(0, thickness / 2d));
+        Vector2d lower_right_point = left_point.add(new Vector2d(0, -thickness / 2d));
 
         Vector2d[] vectors = {upper_left_point, upper_right_point, lower_left_point, lower_right_point};
 
-        for(int i = 0; i < vectors.length; i++) {
+        for (int i = 0; i < vectors.length; i++) {
             vectors[i] = vectors[i].rotate(b.sub(a).angle());
             vectors[i] = vectors[i].add(center);
         }
@@ -63,6 +62,11 @@ public class Wall extends Obstacle {
     }
 
     @Override
+    public boolean isPositionInsideShape(double x, double y) {
+        return false;
+    }
+
+    @Override
     public double getHeightAt(double x, double y) {
         return 0;
     }
@@ -73,24 +77,31 @@ public class Wall extends Obstacle {
     }
 
     @Override
+    public Vector2d getGradientsAt(double x, double y) {
+        return new Vector2d(0, 0);
+    }
+
+    @Override
     public Vector3d getGraphicsPosition() {
         Vector2d vec = start.add(end.sub(start).scale(.5)).add(WORLD_SHIFT);
-        double y=WORLD.height_function.evaluate(vec);
-        return new Vector3d(toWorldScale(vec.get_x()), toWorldScale(y)-rootHeight, toWorldScale(vec.get_y()));
+        double y = WORLD.height_function.evaluate(vec);
+        return new Vector3d(toWorldScale(vec.get_x()), toWorldScale(y) - rootHeight, toWorldScale(vec.get_y()));
     }
 
     public Vector2d getStart() {
         return start;
     }
+
     public Vector2d getEnd() {
         return end;
     }
+
     public double getThickness() {
         return thickness;
     }
 
     @Override
-    public Vector3d getPhysicsPosition(){
+    public Vector3d getPhysicsPosition() {
 
         Vector2d real_position = end.sub(start).add(anchor);
         double y = 0;
@@ -100,7 +111,7 @@ public class Wall extends Obstacle {
     }
 
     public String toString() {
-        return "Wall from "+start+" to "+end+", with a thickness of "+thickness;
+        return "Wall from " + start + " to " + end + ", with a thickness of " + thickness;
     }
 
     @Override
@@ -109,26 +120,26 @@ public class Wall extends Obstacle {
     }
 
     @Override
-    public ModelInstance getModel() {
+    public ModelInstance[] getModel() {
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part("tree", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(Color.BROWN)));
-        new BoxShapeBuilder().build(builder,toWorldScale(this.thickness), (float)(height+rootHeight), toWorldScale(this.length));
+        new BoxShapeBuilder().build(builder, toWorldScale(this.thickness), (float) (height + rootHeight), toWorldScale(this.length));
 //        builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.GREEN)));
 //        builder.sphere((float)this.radius*2f, (float)this.height, (float)this.radius*2f, 20,20);
         Model wall = modelBuilder.end();
 //        System.out.println((float)this.getGraphicsPosition().get_y());
 //        System.out.println(height+rootHeight);
-        double y=this.getGraphicsPosition().get_y();
-        ModelInstance wallInstance = new ModelInstance(wall, (float)this.getGraphicsPosition().get_x(), (float)(y+((height+rootHeight)/2f)), (float)this.getGraphicsPosition().get_z());
-        Vector2d dir=end.sub(start);
-        wallInstance.transform.rotateRad(Vector3.Y, (float)((Math.PI/2)-dir.angle()));
+        double y = this.getGraphicsPosition().get_y();
+        ModelInstance[] wallInstance = new ModelInstance[]{new ModelInstance(wall, (float) this.getGraphicsPosition().get_x(), (float) (y + ((height + rootHeight) / 2f)), (float) this.getGraphicsPosition().get_z())};
+        Vector2d dir = end.sub(start);
+        wallInstance[0].transform.rotateRad(Vector3.Y, (float) ((Math.PI / 2) - dir.angle()));
         return wallInstance;
     }
 
     @Override
-    public void setWorld(PuttingCourse world, PhysicsEngine engine) {
-        throw new AssertionError("Obstacle holds no reference to World.");
+    public void setWorld(PhysicsEngine engine) {
+        throw new AssertionError("Obstacle holds no reference to the engine.");
     }
 
     @Override

@@ -1,12 +1,11 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.courses.MiniMapDrawer;
+import com.mygdx.game.courses.PuttingCourse;
 import com.mygdx.game.obstacles.AxisAllignedBoundingBox;
 import com.mygdx.game.obstacles.CollisionData;
 import com.mygdx.game.obstacles.Obstacle;
-import com.mygdx.game.parser.Function2d;
 import com.mygdx.game.physics.PuttingCoursePhysics;
 import com.mygdx.game.physics.TopDownPhysicsObject;
 import com.mygdx.game.utils.Vector2d;
@@ -18,169 +17,140 @@ import java.util.List;
 import static com.mygdx.game.utils.Variables.*;
 
 public class Ball extends TopDownPhysicsObject {
-    public Vector2d velocity;
-    public double x, y, old_x, old_y, init_x, init_y;
-    public double mass = 0.05;
-    private ModelInstance model;
-    public boolean is_moving = false;
+    private static int LAUNCH = 0;
+    private static int ROLL = 2;
+
+    public Vector3d velocity;
+    public Vector3d position, previous_position, start_position;
+
+    public boolean is_moving;
+    private int flight_state;
+
+    public ModelInstance model;
     public Player owner;
     public int hit_count;
     public int turn_state;
 
-    private double height_velocity;
-    private int flight_state;
-    public double height;
-
-    private static int LAUNCH = 0;
-    private static int ROLL = 2;
-
     public double travel_distance;
     public double rolling_distance;
     public int ticks;
-    public Vector3 frozen_direction;
 
     private List<CollisionData> global_collisions;
 
-    Ball(double x_pos, double y_pos, ModelInstance model, Player owner) {
-        this.mass = GAME_ASPECTS.getMassofBall() * 0.001;
-
-        x = x_pos;
-        y = y_pos;
-        velocity = new Vector2d(0, 0);
-        hit_count = 0;
+    Ball(double x, double y, ModelInstance model, Player owner) {
         this.model = model;
         this.owner = owner;
-        init_x = x;
-        init_y = y;
-        old_x = x;
-        old_y = y;
+        hit_count = 0;
         turn_state = 0;
 
+        is_moving = false;
         flight_state = ROLL;
-        height_velocity = 0;
 
         travel_distance = 0d;
         rolling_distance = 0d;
         ticks = 0;
 
         global_collisions = new ArrayList<CollisionData>();
+
+        position = new Vector3d(x, WORLD.height_function.evaluate(x, y) + BALL_RADIUS, y);
+        velocity = new Vector3d(0, 0, 0);
+        start_position = position;
+        previous_position = position;
     }
 
     public void step(double delta, List<TopDownPhysicsObject> ents) {
 
         if(is_moving) {
             global_collisions = isColliding();
-
-            Function2d h = world.height_function;
-            Vector2d gradient = h.gradient(new Vector2d(x, y));
-            double initial_x = x;
-            double initial_y = y;
-            double initial_height = h.evaluate(initial_x, initial_y) + BALL_RADIUS;
+            boolean fence_check = ballVsFenceCollision();
             ticks += 1;
 
+            Vector3d initial_position = position, final_position = null;
+            Vector3d initial_velocity = velocity, final_velocity = null;
+
+            Vector3d[] pair = new Vector3d[]{
+                    initial_position,
+                    initial_velocity
+            };
+
+            switch (CURRENT_PHYSICS_SETTING) {
+                case Euler:
+                    pair = eulerStep(ticks*delta, delta, pair, flight_state);
+                    break;
+                case Runge_Kutta:
+                    pair = rungeKuttaStep(ticks*delta, delta, pair, flight_state);
+                    break;
+                case Verlet:
+                    pair = verletStep(ticks*delta, delta, pair, flight_state);
+                    break;
+            }
+
             if(flight_state == ROLL) {
-                switch (CURRENT_PHYSICS_SETTING) {
-                    case Euler:
-                        velocity = euler(new Vector2d(x, y), velocity, delta);
-                        break;
-                    case Verlet:
-                        velocity = verlet(new Vector2d(x, y), velocity, delta);
-                        break;
-                    case Runge_Kutta:
-                        velocity = runge_kutta(new Vector2d(x, y), velocity, delta);
-                        break;
-                }
+                final_position = new Vector3d(
+                        pair[0].get_x(),
+                        WORLD.height_function.evaluate(pair[0].get_x(), pair[0].get_z()) + BALL_RADIUS,
+                        pair[0].get_z()
+                );
+                final_velocity = new Vector3d(
+                        pair[1].get_x(),
+                        (final_position.get_y() - initial_position.get_y())/delta,
+                        pair[1].get_z()
+                );
 
-                x += velocity.get_x();
-                y += velocity.get_y();
-                boolean fence_check = ballVsFenceCollision();
-                height = h.evaluate(x, y) + BALL_RADIUS;
-
-                double x_diff = x - initial_x;
-                double y_diff = y - initial_y;
-
-                Vector2d gradients = h.gradient(initial_x, initial_y);
-                double predicted_height = initial_height + gradients.get_x()*x_diff + gradients.get_y()*y_diff;
-
-                double final_height = height;
-
-                height_velocity = predicted_height - final_height;
-                /*System.out.println("|------------------|");
-                System.out.println("landGRavity = " + landGravity());
-                System.out.println("landGRavity x delta = " + delta*landGravity());
-                System.out.println("predicted_height = " + predicted_height);
-                System.out.println("final_height = " + final_height);
-                System.out.println("height_velocity = " + height_velocity);
-                System.out.println("|------------------|");*/
-
-                frozen_direction = new Vector3((float)velocity.get_x(), (float)height_velocity, (float)velocity.get_y());
-
-                travel_distance += (new Vector3((float)velocity.get_x(), 0f, (float)velocity.get_y())).len();
-                rolling_distance += (new Vector3((float)velocity.get_x(), (float)height_velocity, (float)velocity.get_y())).len();
-
-                if(fence_check && velocity.get_length() < VELOCITY_CUTTOFF){
+                if(isStuck() || ((fence_check || WORLD.height_function.gradient(final_position.get_x(), final_position.get_z()).get_length() < GRADIENT_CUTTOFF) && (new Vector2d(final_velocity.get_x(), final_velocity.get_z())).get_length() < getStoppingVelocity(final_velocity.get_x(), final_velocity.get_z()))){
                     is_moving = false;
-                    velocity = new Vector2d(0,0);
+                    final_velocity = new Vector3d(0, 0, 0);
+                    System.out.println("[BALL] Stopped moving at " + final_position.toString());
                 }
 
-                else if(velocity.get_length() < VELOCITY_CUTTOFF && gradient.get_length() < GRADIENT_CUTTOFF){
-                    is_moving = false;
-                    velocity = new Vector2d(0, 0);
-                }
+                Vector3d displacement = final_position.sub(initial_position);
+                Vector2d gradients = WORLD.height_function.gradient(initial_position.get_x(), initial_position.get_z());
+                Vector3d projected_position = new Vector3d(
+                        final_position.get_x(),
+                        initial_position.get_y() + (new Vector2d(displacement.get_x()*gradients.get_x(), displacement.get_z()*gradients.get_y())).get_length(),
+                        final_position.get_z()
+                );
+                Vector3d projected_velocity = new Vector3d(
+                        initial_velocity.get_x(),
+                        (projected_position.get_y() - initial_position.get_y())/delta,
+                        initial_velocity.get_z()
+                );
 
-                if (ALLOW_FLIGHT && height_velocity > 0) {
+                if (ALLOW_FLIGHT && (projected_velocity.get_y() > getGravity()) && projected_position.get_y() > final_position.get_y()) {
                     flight_state = LAUNCH;
+                    final_position = projected_position;
+                    final_velocity = projected_velocity;
                 }
 
             }
 
             else if(flight_state == LAUNCH){
-                double vel_x = velocity.get_x();
-                double vel_y = velocity.get_y();
+                final_position = pair[0];
+                final_velocity = pair[1];
 
-                vel_x = vel_x + delta * (-vel_x * AIR_FRICTION);
-                vel_y = vel_y + delta * (-vel_y * AIR_FRICTION);
-                velocity = new Vector2d(vel_x, vel_y);
-
-                x += velocity.get_x();
-                y += velocity.get_y();
-                ballVsFenceCollision();
-
-                height_velocity = height_velocity + delta * (-mass * flightGravity());
-                height += height_velocity;
-
-                if(height - BALL_RADIUS <= h.evaluate(x, y)){
-                    height = h.evaluate(x, y);
+                if(final_position.get_y() - BALL_RADIUS <= WORLD.height_function.evaluate(final_position.get_x(), final_position.get_z())){
+                    position = new Vector3d(
+                            final_position.get_x(),
+                            WORLD.height_function.evaluate(final_position.get_x(), final_position.get_z()) + BALL_RADIUS,
+                            final_position.get_z()
+                    );
                     flight_state = ROLL;
-                    height_velocity = 0;
+                    final_velocity = new Vector3d(
+                            final_velocity.get_x(),
+                            0,
+                            final_velocity.get_z()
+                    );
                 }
 
-                frozen_direction = new Vector3((float)velocity.get_x(), (float)height_velocity, (float)velocity.get_y());
-
-                travel_distance += (new Vector3((float)velocity.get_x(), 0f, (float)velocity.get_y())).len();
-                rolling_distance += (new Vector3((float)velocity.get_x(), (float)height_velocity, (float)velocity.get_y())).len();
-
             }
+
+            position = final_position;
+            velocity = final_velocity;
+
+            travel_distance += (new Vector2d(initial_position.get_x(), initial_position.get_z())).distance(new Vector2d(position.get_x(), position.get_z()));
+            rolling_distance += initial_position.distance(position);
 
             global_collisions.clear();
-
-            Vector2d start = new Vector2d(initial_x, initial_y);
-            Vector2d end = new Vector2d(x, y);
-            int steps = 3;
-
-            for (int i = 0; i <= steps; i++) {
-                    Vector2d xy = interpolate(start, end, steps, i);
-                    x = xy.get_x();
-                    y = xy.get_y();
-
-                    if (isStuck()) {
-                        is_moving = false;
-                        velocity = new Vector2d(0, 0);
-                        break;
-                    }
-
-            }
-
         }
 
     }
@@ -188,32 +158,32 @@ public class Ball extends TopDownPhysicsObject {
     private boolean ballVsFenceCollision(){
         boolean r = false;
 
-        if (x < BALL_RADIUS) {
+        if (position.get_x() < BALL_RADIUS) {
             r = true;
 
-            x = (BALL_RADIUS + 0.001 / WORLD_SCALING);
-            velocity = (new Vector2d(-velocity.get_x()/2d, velocity.get_y()));
+            position = new Vector3d((BALL_RADIUS + 0.001 / WORLD_SCALING), position.get_y(), position.get_z());
+            velocity = new Vector3d(-velocity.get_x()/2d, velocity.get_y(), velocity.get_z());
         }
 
-        if (x > (50*GRAPHICS_SCALING / WORLD_SCALING - BALL_RADIUS)) {
+        if (position.get_x() > (50*GRAPHICS_SCALING / WORLD_SCALING - BALL_RADIUS)) {
             r = true;
 
-            x = (49.99*GRAPHICS_SCALING / WORLD_SCALING - BALL_RADIUS);
-            velocity = (new Vector2d(-velocity.get_x()/2d, velocity.get_y()));
+            position = new Vector3d((49.99*GRAPHICS_SCALING / WORLD_SCALING - BALL_RADIUS), position.get_y(), position.get_z());
+            velocity = new Vector3d(-velocity.get_x()/2d, velocity.get_y(), velocity.get_z());
         }
 
-        if (y < BALL_RADIUS) {
+        if (position.get_z() < BALL_RADIUS) {
             r = true;
 
-            y = (BALL_RADIUS + 0.001 / WORLD_SCALING);
-            velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
+            position = new Vector3d(position.get_x(), position.get_y(), (BALL_RADIUS + 0.001 / WORLD_SCALING));
+            velocity = new Vector3d(velocity.get_x(), velocity.get_y(), -velocity.get_z()/2d);
         }
 
-        if (y > (50*GRAPHICS_SCALING / WORLD_SCALING - BALL_RADIUS)) {
+        if (position.get_z() > (50*GRAPHICS_SCALING / WORLD_SCALING - BALL_RADIUS)) {
             r = true;
 
-            y = (49.99*GRAPHICS_SCALING / WORLD_SCALING - BALL_RADIUS);
-            velocity = (new Vector2d(velocity.get_x(), -velocity.get_y()/2d));
+            position = new Vector3d(position.get_x(), position.get_y(), 49.99*GRAPHICS_SCALING / WORLD_SCALING - BALL_RADIUS);
+            velocity = new Vector3d(velocity.get_x(), velocity.get_y(), -velocity.get_z()/2d);
         }
 
         return r;
@@ -221,84 +191,62 @@ public class Ball extends TopDownPhysicsObject {
 
     public void addVelocity(Vector2d v) {
         is_moving = true;
-        velocity = velocity.add(v);
+        velocity = velocity.add(new Vector3d(v.get_x(), 0, v.get_y()));
     }
 
     @Override
     public Vector3d getGraphicsPosition() {
-        Vector3d vec = new Vector3d(
-                toWorldScale(x),
-                toWorldScale(world.height_function.evaluate(x, y) + BALL_RADIUS),
-                toWorldScale(y)
+        return new Vector3d(
+                toWorldScale(position.get_x()),
+                toWorldScale(position.get_y()),
+                toWorldScale(position.get_z())
         );
-
-        if(flight_state == LAUNCH)
-            vec = new Vector3d(vec.get_x(), toWorldScale(height + BALL_RADIUS), vec.get_z());
-
-        return vec;
     }
 
     @Override
     public Vector3d getPhysicsPosition(){
-        return new Vector3d(x, height, y);
+
+        if(flight_state == ROLL)
+            return new Vector3d(position.get_x(), WORLD.height_function.evaluate(position.get_x(), position.get_z()), position.get_z());
+
+        return position;
     }
 
     public Vector2d topDownPosition() {
-        return new Vector2d(x, y);
+        return new Vector2d(position.get_x(), position.get_z());
     }
 
-    @Override
-    public ModelInstance getModel() {
+    public ModelInstance[] getModel() {
         Vector3d real_pos = getGraphicsPosition();
         model.transform.setTranslation((float) real_pos.get_x(), (float) real_pos.get_y(), (float) real_pos.get_z());
-        return model;
+        ModelInstance [] ball = new ModelInstance []{model};
+        return ball;
     }
 
     @Override
     public TopDownPhysicsObject dupe() {
-        Ball out = new Ball(x, y, null, null);
+        Ball out = new Ball(position.get_x(), position.get_z(), null, null);
 
         out.flight_state = this.flight_state;
         out.velocity = this.velocity;
-        out.height_velocity = this.height_velocity;
-        out.height = this.height;
-        out.frozen_direction = this.frozen_direction;
-        out.engine = (PuttingCoursePhysics) engine.dupe();
-        out.world = world;
+        out.engine = engine.dupe();
 
         return out;
     }
 
-    public double evalHeightAt(double x, double y){
+    public static boolean isPositionInsideAShape(double x, double y){
 
-        for(CollisionData collision : global_collisions){
+        if(WORLD == null)
+            throw new AssertionError("No world has been created yet.");
 
-            if(collision.atop)
-                return collision.obstacle.getHeightAt(x, y);
+        for(Obstacle obstacle : WORLD.getObstacles()){
 
-        }
-
-        return world.height_function.evaluate(x, y);
-    }
-
-    public double evalFrictionAt(double x, double y){
-
-        for(CollisionData collision : global_collisions){
-
-            if(collision.atop)
-                return collision.obstacle.getFrictionAt(x, y);
+            if(obstacle.isPositionInsideShape(x, y))
+                return true;
 
         }
 
-        return world.friction_function.evaluate(x, y);
-    }
-
-    public double evalHeightAt(Vector2d pos, List<CollisionData> collisions){
-        return evalHeightAt(pos.get_x(), pos.get_y());
-    }
-
-    public double evalFrictionAt(Vector2d pos, List<CollisionData> collisions){
-        return evalFrictionAt(pos.get_x(), pos.get_y());
+        return false;
     }
 
     @Override
@@ -309,26 +257,13 @@ public class Ball extends TopDownPhysicsObject {
     public List<CollisionData> isColliding(){
         List<CollisionData> collisions = new ArrayList<CollisionData>();
 
-        for(TopDownPhysicsObject body : world.getObstacles()){
+        for(Obstacle obstacle : WORLD.getObstacles()){
+            CollisionData data = obstacle.isColliding(this);
 
-            if(body instanceof Obstacle){
-                Obstacle obstacle = (Obstacle) body;
-
-                CollisionData data = obstacle.isColliding(this);
-
-                if(data != null){
-                    this.x += data.clipping_correction.get_x();
-                    this.y += data.clipping_correction.get_z();
-                    this.height += data.clipping_correction.get_y();
-
-                    this.velocity = new Vector2d(data.bounce.get_x(), data.bounce.get_z());
-                    this.height_velocity = data.bounce.get_y();
-
-                    collisions.add(data);
-
-                    System.out.println("Hey! Collision here!");
-                }
-
+            if(data != null){
+                this.position = position.add(data.clipping_correction);
+                this.velocity = data.bounce;
+                collisions.add(data);
             }
 
         }
@@ -337,9 +272,10 @@ public class Ball extends TopDownPhysicsObject {
     }
 
     public boolean isTouchingFlag() {
-        Vector2d flag = world.flag_position;
-        Vector2d ballPos = new Vector2d(x,y);
-        double _r = world.hole_tolerance;
+        Vector2d flag = WORLD.flag_position;
+        Vector2d ballPos = new Vector2d(position.get_x(), position.get_z());
+        double _r = WORLD.hole_tolerance;
+
         if(flag.distance(ballPos) < _r) {
           return true;
         }
@@ -349,7 +285,7 @@ public class Ball extends TopDownPhysicsObject {
 
     public boolean isOnWater() {
 
-        if (world.getHeightAt(x, y) <= 0 && flight_state == ROLL)
+        if (position.get_y() - BALL_RADIUS <= 0 && flight_state == ROLL)
             return true;
 
         return false;
@@ -363,10 +299,9 @@ public class Ball extends TopDownPhysicsObject {
     }
 
     public void hit(Vector2d direction, double speed){
-        addVelocity(correctHitVector(direction, speed));
+        addVelocity(getHitVector(direction, speed));
         hit_count += 1;
-        old_x = x;
-        old_y = y;
+        previous_position = position;
         turn_state = TURN_STATE_WAIT;
         travel_distance = 0d;
         rolling_distance = 0d;
@@ -374,85 +309,89 @@ public class Ball extends TopDownPhysicsObject {
     }
 
     public void rewind(){
-        x = old_x;
-        y = old_y;
+        position = previous_position;
+        velocity = new Vector3d(0, 0, 0);
     }
 
-    private Vector2d f(Vector2d pos, Vector2d vel){
-        Function2d h = world.height_function;
-        double gravity = landGravity();
-        double friction = world.friction_function.evaluate(x, y);
+    private Vector3d roll_acc(double t, Vector3d pos, Vector3d vel){
+        /*
+            g(t, x, &x) = -n*g*h'(x) - (m*g*&x)/|&x|
+        */
+        vel = new Vector3d(vel.get_x(), 0, vel.get_z());
+        double friction_eval = getFirctionAt(pos.get_x(), pos.get_z());
+        Vector2d gradients_eval = WORLD.height_function.gradient(pos.get_x(), pos.get_z());
 
-        if(isOnWater()){
-            friction = 1d;
-        }
+        double x_acc = -getMass()* getGravity()*gradients_eval.get_x() - (vel.get_length() > 0? getMass()* getGravity()*friction_eval*vel.get_x()/vel.get_length() : 0);
+        double z_acc = -getMass()* getGravity()*gradients_eval.get_y() - (vel.get_length() > 0? getMass()* getGravity()*friction_eval*vel.get_z()/vel.get_length() : 0);
 
-        Vector2d gradient = h.gradient(pos);
-        double half_x = -mass * gravity * gradient.get_x();
-        double half_y = -mass * gravity * gradient.get_y();
-
-        if (vel.get_length() > 0) {
-            half_x -= mass * gravity * friction * vel.get_x() / vel.get_length();
-            half_y -= mass * gravity * friction * vel.get_y() / vel.get_length();
-        }
-
-        Vector2d acceleration = new Vector2d(half_x, half_y);
-        return acceleration;
+        return new Vector3d(x_acc, 0, z_acc);
     }
 
-    private Vector2d euler(Vector2d pos, Vector2d vel, double h){
-        Vector2d acc = f(pos, vel);
-
-        double vel_x = vel.get_x() + h * acc.get_x();
-        double vel_y = vel.get_y() + h * acc.get_y();
-
-        return new Vector2d(vel_x, vel_y);
-    }
-
-    private Vector2d verlet(Vector2d pos, Vector2d vel, double h){
-        Vector2d k1 = f(pos, vel);
-        Vector2d k2 = f(
-                new Vector2d(pos.get_x() + h, pos.get_y() + h),
-                vel
-        );
-        Vector2d acc = new Vector2d((k1.get_x() + k2.get_x())*h/2d, (k1.get_y() + k2.get_y())*h/2d);
-        return new Vector2d(vel.get_x() + acc.get_x(), vel.get_y() + acc.get_y());
-    }
-
-    private Vector2d runge_kutta(Vector2d pos, Vector2d vel, double h){
-        Vector2d k1 = f(pos, vel);
-        Vector2d k2 = f(
-                new Vector2d(pos.get_x() + h/2d, pos.get_y() + h/2d),
-                new Vector2d(vel.get_x() + (h/2d) * k1.get_x(), vel.get_y() + (h/2d) * k1.get_y())
-        );
-        Vector2d k3 = f(
-                new Vector2d(pos.get_x() + h/2d, pos.get_y() + h/2d),
-                new Vector2d(vel.get_x() + (h/2d) * k2.get_x(), vel.get_y() + (h/2d) * k2.get_y())
-        );
-        Vector2d k4 = f(
-                new Vector2d(pos.get_x() + h, pos.get_y() + h),
-                new Vector2d(vel.get_x() + h * k3.get_x(), vel.get_y() + h * k3.get_y())
-        );
-
-        Vector2d G = new Vector2d(
-                (k1.get_x() + 2*k2.get_x() + 2*k3.get_x() + k4.get_x()) / 6d,
-                (k1.get_y() + 2*k2.get_y() + 2*k3.get_y() + k4.get_y()) / 6d
-        );
-
-        return new Vector2d(
-               vel.get_x() + h*G.get_x(),
-               vel.get_y() + h*G.get_y()
+    private Vector3d flight_acc(double t, Vector3d pos, Vector3d vel){
+        /*
+            g(t, x, &x) = (&x - &x_old)/h
+         */
+        return new Vector3d(
+                0,
+                -getGravity(),
+                0
         );
     }
 
-    public double flightGravity(){
-        return world.gravity*7d;
+    private Vector3d acc(double t, Vector3d pos, Vector3d vel){
+
+        if(flight_state == ROLL)
+            return roll_acc(t, pos, vel);
+
+        else if(flight_state == LAUNCH)
+            return flight_acc(t, pos, vel);
+
+        throw new AssertionError("Unknown flight state.");
     }
 
-    public double landGravity() { return world.gravity; }
+    private Vector3d[] f(double t, Vector3d[] pair, int flight_state){
+        Vector3d [] out = new Vector3d[2];
+        out[0] = pair[1];
+        out[1] = acc(t, pair[0], pair[1]);
+        return out;
+    }
 
-    public static Vector2d correctHitVector(Vector2d direction, double speed){
-        return new Vector2d(direction.get_x() * speed * SPEED_CORRECTION, direction.get_y() * speed * SPEED_CORRECTION);
+    private Vector3d[] eulerStep(double t, double h, Vector3d[] pair, int flight_state){
+        Vector3d[] eval = f(t, pair, flight_state);
+        eval = new Vector3d[]{eval[0].scale(h), eval[1].scale(h)};
+        return new Vector3d[]{eval[0].add(pair[0]), eval[1].add(pair[1])};
+    }
+
+    private Vector3d[] rungeKuttaStep(double t, double h, Vector3d[] pair, int flight_state){
+        Vector3d[] k1 = f(t, pair, flight_state);
+        k1 = new Vector3d[]{k1[0].scale(h), k1[1].scale(h)};
+
+        Vector3d[] k2 = f(t + h/2d, new Vector3d[]{pair[0].add(k1[0].scale(1d/2d)), pair[1].add(k1[1].scale(1d/2d))}, flight_state);
+        k2 = new Vector3d[]{k2[0].scale(h), k2[1].scale(h)};
+
+        Vector3d[] k3 = f(t + h/2d, new Vector3d[]{pair[0].add(k2[0].scale(1d/2d)), pair[1].add(k2[1].scale(1d/2d))}, flight_state);
+        k3 = new Vector3d[]{k3[0].scale(h), k3[1].scale(h)};
+
+        Vector3d[] k4 = f(t + h/2d, new Vector3d[]{pair[0].add(k3[0]), pair[1].add(k3[1])}, flight_state);
+        k4 = new Vector3d[]{k4[0].scale(h), k4[1].scale(h)};
+
+        return new Vector3d[]{
+                k1[0].add(k2[0].scale(2).add(k3[0].scale(2).add(k4[0]))).scale(1d/6d).add(pair[0]),
+                k1[1].add(k2[1].scale(2).add(k3[1].scale(2).add(k4[1]))).scale(1d/6d).add(pair[1])
+        };
+    }
+
+    private Vector3d[] verletStep(double t, double h, Vector3d[] pair, int flight_state){
+        Vector3d pos = pair[0].add(pair[1].scale(h)).add(acc(t, pair[0], pair[1]).scale(h*h/2d));
+        Vector3d[] dummy_pair = eulerStep(t, h, pair, flight_state);
+        Vector3d vel = pair[1].add((acc(t, pair[0], pair[1]).add(acc(t, dummy_pair[0], dummy_pair[1]))).scale(h/2d));
+        return new Vector3d[]{pos, vel};
+    }
+
+    public double getGravity() { return WORLD.gravity; }
+
+    public static Vector2d getHitVector(Vector2d direction, double speed){
+        return direction.scale(speed);
     }
 
     public Ball simulateHit(Vector2d direction, double speed, int ticks, double h){
@@ -475,20 +414,19 @@ public class Ball extends TopDownPhysicsObject {
     }
 
     public Ball resumeSimulatedHit(int ticks, double h){
-        Vector2d direction = new Vector2d(frozen_direction.x, frozen_direction.z);
+        Vector2d direction = new Vector2d(velocity.get_x(), velocity.get_z());
         double speed = direction.get_length();
         return this.simulateHit(direction.normalize(), speed, ticks, h);
     }
 
-    private static Vector2d interpolate(Vector2d start, Vector2d end, int steps, int step){
+    private static Vector3d interpolate(Vector3d start, Vector3d end, int steps, int step){
         double t = (1d / (double)steps) * ((double)step);
 
-        Vector2d xy = new Vector2d(
-                start.get_x() + (end.get_x() - start.get_x()) * t,
-                start.get_y() + (end.get_y() - start.get_y()) * t
+        return new Vector3d(
+                start.get_x() + (end.get_x() - start.get_x())*t,
+                start.get_y() + (end.get_y() - start.get_y()) * t,
+                start.get_z() + (end.get_z() - start.get_z())*t
         );
-
-        return xy;
     }
 
     public AxisAllignedBoundingBox getBoundingBox() {
@@ -505,6 +443,18 @@ public class Ball extends TopDownPhysicsObject {
     @Override
     public void visit(MiniMapDrawer mapDrawer) {
         mapDrawer.draw(this);
+    }
+
+    private double getStoppingVelocity(double x, double y){
+        return getMass()*getGravity()*getFirctionAt(x, y);
+    }
+
+    private double getFirctionAt(double x, double y){
+        return WORLD.friction_function.evaluate(x, y)*FRICTION_SCALE;
+    }
+
+    private double getMass(){
+        return GAME_ASPECTS.getMassofBall() * 0.001;
     }
 
 }

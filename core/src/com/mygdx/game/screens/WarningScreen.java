@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.game.courses.CourseBuilder;
 import com.mygdx.game.courses.GameInfo;
 
 import static com.mygdx.game.utils.Variables.*;
@@ -31,19 +32,19 @@ public class WarningScreen implements Screen {
         stage.addActor(table);
 
         Table overall = new Table();
+        overall.pad(10,10,10,10);
         table.add(overall);
-
+        overall.setBackground(EXTRA_BKG);
 
         msg= new Label("EITHER THE GOAL OR THE FLAG ARE IN WATER",MENU_SKIN);
         overall.add(msg);
 
         TextButton playAnyway=new TextButton("Play Anyway",MENU_SKIN);
-        TextButton obstacleSelect=new TextButton("Fix Via Obstacle", MENU_SKIN);
+        TextButton obstacleSelect=new TextButton("Fix Via Obstacle Select", MENU_SKIN);
         playAnyway.addListener(new ChangeListener() {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
                 parent.changeScreen(Menu.PLAY);
             }
         });

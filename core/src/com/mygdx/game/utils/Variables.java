@@ -80,8 +80,8 @@ public final class Variables {
 	public static double SHOT_VELOCITY = MAX_SHOT_VELOCITY/2d;
 	public static double SHOT_VELOCITY_INCREASE() { return 0.01 * MAX_SHOT_VELOCITY; }
 
-	public static double PITCH = Math.PI * 2/9d;
-	public static double YAW = Math.PI * 0.75;
+	public static double PITCH = Math.PI*2/9d;
+	public static double YAW = Math.PI*0.75;
 	public static double VIEW_ZOOM = 7;
 
 	public static void reset() {
@@ -91,7 +91,7 @@ public final class Variables {
 		YAW = Math.PI * 0.75;
 		VIEW_ZOOM = 7;
 		CURRENT_PHYSICS_SETTING = Verlet;
-		ALLOW_FLIGHT = true;
+		ALLOW_FLIGHT = false;
 		CAST_SHADOWS = false;
 		GAME = null;
 		CAMERA = null;
@@ -99,10 +99,6 @@ public final class Variables {
 		WORLD = null;
 		WORLD_SHIFT = null;
 	}
-
-	public static final double SPEED_CORRECTION = 1d / 50d; // in m/s
-	public static final double AIR_FRICTION = 0.5d;
-	public static final double VELOCITY_CUTTOFF = 0.1d * SPEED_CORRECTION; // in m/s
 
 	public static PhysicsSetting CURRENT_PHYSICS_SETTING = Verlet;
 
@@ -126,6 +122,8 @@ public final class Variables {
 	public static boolean CAST_SHADOWS = false;
 
 	public static final double DELTA = 0.01d;
+
+	public static final double FRICTION_SCALE = 5d;
 
 	public static final double WALL_BASE = -10d;
 

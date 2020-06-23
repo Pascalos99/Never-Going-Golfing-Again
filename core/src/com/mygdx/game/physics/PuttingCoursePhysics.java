@@ -16,18 +16,15 @@ public class PuttingCoursePhysics implements PhysicsEngine {
     protected double fixed_delta;
 
     private static int DELTA_ARRAY_SIZE_LIMIT = 5;
-    private PuttingCourse world;
 
     public PuttingCoursePhysics(){
         ents = new ArrayList<TopDownPhysicsObject>();
         deltas = new ArrayList<Double>(DELTA_ARRAY_SIZE_LIMIT);
-        world = WORLD;
     }
 
     public PuttingCoursePhysics(PuttingCourse world){
         ents = new ArrayList<TopDownPhysicsObject>();
         deltas = new ArrayList<Double>(DELTA_ARRAY_SIZE_LIMIT);
-        this.world = world;
     }
 
     @Override
@@ -58,7 +55,7 @@ public class PuttingCoursePhysics implements PhysicsEngine {
 
     @Override
     public void addBody(TopDownPhysicsObject obj) {
-        obj.setWorld(world, this);
+        obj.setWorld(this);
         ents.add(obj);
     }
 

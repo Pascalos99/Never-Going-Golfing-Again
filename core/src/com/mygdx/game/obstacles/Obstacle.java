@@ -18,8 +18,6 @@ public abstract class Obstacle extends TopDownPhysicsObject {
     }
 
     public CollisionData isColliding(Ball ball) {
-//        System.out.println(toString());
-
         AxisAllignedBoundingBox box = getBoundingBox();
         AxisAllignedBoundingBox ball_box = ball.getBoundingBox();
 
@@ -31,6 +29,8 @@ public abstract class Obstacle extends TopDownPhysicsObject {
     }
 
     protected abstract CollisionData isShapeColliding(Ball ball);
+
+    public abstract boolean isPositionInsideShape(double x, double y);
 
     @Override
     public TopDownPhysicsObject dupe() {
