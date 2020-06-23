@@ -76,10 +76,12 @@ public class Ball extends TopDownPhysicsObject {
                 case Euler:
                     pair = eulerStep(ticks*delta, delta, pair, flight_state);
                     break;
-                case Verlet:
-                    throw new AssertionError("Verlet solver is still not implemented.");
                 case Runge_Kutta:
-                    throw new AssertionError("Runge-Kutta solver is still not implemented.");
+                    pair = rungeKuttaStep(ticks*delta, delta, pair, flight_state);
+                    break;
+                case Verlet:
+                    pair = verletStep(ticks*delta, delta, pair, flight_state);
+                    break;
             }
 
             if(flight_state == ROLL) {
@@ -349,7 +351,7 @@ public class Ball extends TopDownPhysicsObject {
         velocity = new Vector3d(0, 0, 0);
     }
 
-    private Vector3d roll_g(double t, Vector3d pos, Vector3d vel){
+    private Vector3d roll_acc(double t, Vector3d pos, Vector3d vel){
         /*
             g(t, x, &x) = -n*g*h'(x) - (m*g*&x)/|&x|
         */
@@ -363,7 +365,7 @@ public class Ball extends TopDownPhysicsObject {
         return new Vector3d(x_acc, 0, z_acc);
     }
 
-    private Vector3d flight_g(double t, Vector3d pos, Vector3d vel){
+    private Vector3d flight_acc(double t, Vector3d pos, Vector3d vel){
         /*
             g(t, x, &x) = (&x - &x_old)/h
          */
@@ -374,97 +376,55 @@ public class Ball extends TopDownPhysicsObject {
         );
     }
 
+    private Vector3d acc(double t, Vector3d pos, Vector3d vel){
+
+        if(flight_state == ROLL)
+            return roll_acc(t, pos, vel);
+
+        else if(flight_state == LAUNCH)
+            return flight_acc(t, pos, vel);
+
+        throw new AssertionError("Unknown flight state.");
+    }
+
     private Vector3d[] f(double t, Vector3d[] pair, int flight_state){
         Vector3d [] out = new Vector3d[2];
         out[0] = pair[1];
-
-        if(flight_state == ROLL)
-            out[1] = roll_g(t, pair[0], pair[1]);
-
-        else if(flight_state == LAUNCH)
-            out[1] = flight_g(t, pair[0], pair[1]);
-
-        else
-            throw new AssertionError("Unknown flight state " + flight_state);
-
+        out[1] = acc(t, pair[0], pair[1]);
         return out;
     }
 
     private Vector3d[] eulerStep(double t, double h, Vector3d[] pair, int flight_state){
-        /*
-            Euler --> y1 = y0 + h*f(t, y0)
-        */
         Vector3d[] eval = f(t, pair, flight_state);
         eval = new Vector3d[]{eval[0].scale(h), eval[1].scale(h)};
         return new Vector3d[]{eval[0].add(pair[0]), eval[1].add(pair[1])};
     }
 
-    /*private Vector2d f(Vector2d pos, Vector2d vel){
-        Function2d h = world.height_function;
-        double gravity = landGravity();
-        double friction = world.friction_function.evaluate(x, y);
+    private Vector3d[] rungeKuttaStep(double t, double h, Vector3d[] pair, int flight_state){
+        Vector3d[] k1 = f(t, pair, flight_state);
+        k1 = new Vector3d[]{k1[0].scale(h), k1[1].scale(h)};
 
-        if(isOnWater()){
-            friction = 1d;
-        }
+        Vector3d[] k2 = f(t + h/2d, new Vector3d[]{pair[0].add(k1[0].scale(1d/2d)), pair[1].add(k1[1].scale(1d/2d))}, flight_state);
+        k2 = new Vector3d[]{k2[0].scale(h), k2[1].scale(h)};
 
-        Vector2d gradient = h.gradient(pos);
-        double half_x = -mass * gravity * gradient.get_x();
-        double half_y = -mass * gravity * gradient.get_y();
+        Vector3d[] k3 = f(t + h/2d, new Vector3d[]{pair[0].add(k2[0].scale(1d/2d)), pair[1].add(k2[1].scale(1d/2d))}, flight_state);
+        k3 = new Vector3d[]{k3[0].scale(h), k3[1].scale(h)};
 
-        if (vel.get_length() > 0) {
-            half_x -= mass * gravity * friction * vel.get_x() / vel.get_length();
-            half_y -= mass * gravity * friction * vel.get_y() / vel.get_length();
-        }
+        Vector3d[] k4 = f(t + h/2d, new Vector3d[]{pair[0].add(k3[0]), pair[1].add(k3[1])}, flight_state);
+        k4 = new Vector3d[]{k4[0].scale(h), k4[1].scale(h)};
 
-        Vector2d acceleration = new Vector2d(half_x, half_y);
-        return acceleration;
+        return new Vector3d[]{
+                k1[0].add(k2[0].scale(2).add(k3[0].scale(2).add(k4[0]))).scale(1d/6d).add(pair[0]),
+                k1[1].add(k2[1].scale(2).add(k3[1].scale(2).add(k4[1]))).scale(1d/6d).add(pair[1])
+        };
     }
 
-    private Vector2d euler(Vector2d pos, Vector2d vel, double h){
-        Vector2d acc = f(pos, vel);
-
-        double vel_x = vel.get_x() + h * acc.get_x();
-        double vel_y = vel.get_y() + h * acc.get_y();
-
-        return new Vector2d(vel_x, vel_y);
+    private Vector3d[] verletStep(double t, double h, Vector3d[] pair, int flight_state){
+        Vector3d pos = pair[0].add(pair[1].scale(h)).add(acc(t, pair[0], pair[1]).scale(h*h/2d));
+        Vector3d dummy_vel = eulerStep(t, h, pair, flight_state)[1];
+        Vector3d vel = pair[1].add(acc(t, pair[0], pair[1]).add(dummy_vel).scale(h/2d));
+        return new Vector3d[]{pos, vel};
     }
-
-    private Vector2d verlet(Vector2d pos, Vector2d vel, double h){
-        Vector2d k1 = f(pos, vel);
-        Vector2d k2 = f(
-                new Vector2d(pos.get_x() + h, pos.get_y() + h),
-                vel
-        );
-        Vector2d acc = new Vector2d((k1.get_x() + k2.get_x())*h/2d, (k1.get_y() + k2.get_y())*h/2d);
-        return new Vector2d(vel.get_x() + acc.get_x(), vel.get_y() + acc.get_y());
-    }
-
-    private Vector2d runge_kutta(Vector2d pos, Vector2d vel, double h){
-        Vector2d k1 = f(pos, vel);
-        Vector2d k2 = f(
-                new Vector2d(pos.get_x() + h/2d, pos.get_y() + h/2d),
-                new Vector2d(vel.get_x() + (h/2d) * k1.get_x(), vel.get_y() + (h/2d) * k1.get_y())
-        );
-        Vector2d k3 = f(
-                new Vector2d(pos.get_x() + h/2d, pos.get_y() + h/2d),
-                new Vector2d(vel.get_x() + (h/2d) * k2.get_x(), vel.get_y() + (h/2d) * k2.get_y())
-        );
-        Vector2d k4 = f(
-                new Vector2d(pos.get_x() + h, pos.get_y() + h),
-                new Vector2d(vel.get_x() + h * k3.get_x(), vel.get_y() + h * k3.get_y())
-        );
-
-        Vector2d G = new Vector2d(
-                (k1.get_x() + 2*k2.get_x() + 2*k3.get_x() + k4.get_x()) / 6d,
-                (k1.get_y() + 2*k2.get_y() + 2*k3.get_y() + k4.get_y()) / 6d
-        );
-
-        return new Vector2d(
-               vel.get_x() + h*G.get_x(),
-               vel.get_y() + h*G.get_y()
-        );
-    }*/
 
     public double flightGravity(){
         return world.gravity*7d;
