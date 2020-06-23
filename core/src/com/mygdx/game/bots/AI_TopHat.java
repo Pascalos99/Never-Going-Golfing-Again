@@ -17,7 +17,7 @@ public class AI_TopHat extends AI_controller {
     private double EAGERNESS_TO_EXPLORE = 2.5;
     private double ERROR_BOUND = 0.1;
 
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
 
     public Heuristic SHOT_COUNT = n -> n.depth;
     public Heuristic DISTANCE = n -> {
@@ -115,8 +115,8 @@ public class AI_TopHat extends AI_controller {
         root = null;
     }
 
-    private void restart(Player player) {
-        root = new Node(player.getBall());
+    private void restart(Ball ball) {
+        root = new Node(ball);
         expandable_nodes.add(root);
     }
 
@@ -148,13 +148,14 @@ public class AI_TopHat extends AI_controller {
             }
         }
         if (first_shot) {
-            restart(player);
+            restart(player.getBall());
             result = search();
             first_shot = false;
         }
         else if (!found_solution || error_exceeded) {
             debug.debug("didn't find a solution, re-starting search");
-            rebase(player);
+            if (error_exceeded) rebase(new Node(player.getBall()));
+            else rebase(last_node);
             result = search();
         }
         Node next_shot = getNodeAtDepth(result, current_depth++);
@@ -164,9 +165,23 @@ public class AI_TopHat extends AI_controller {
         previous_position = current_position;
     }
 
-    private void rebase(Player player) {
+    private void rebase(Node new_root) {
+        boolean keep_children = all_nodes.contains(new_root);
         clearTree();
-        restart(player);
+        root = new_root;
+        if (keep_children) {
+            addAllChildren(root);
+        } else {
+            expandable_nodes.add(root);
+        }
+    }
+
+    private void addAllChildren(Node parent) {
+        if (parent.children.size() > 0)
+            all_nodes.add(parent);
+        else expandable_nodes.add(parent);
+        for (Node child : parent.children)
+            if (child.children.size() > 0) addAllChildren(child);
     }
 
     private Node getNodeAtDepth(Node node, int depth) {
