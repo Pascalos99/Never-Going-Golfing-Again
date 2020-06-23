@@ -1,7 +1,9 @@
 package com.mygdx.game.bots;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.game.Ball;
 import com.mygdx.game.Player;
+import com.mygdx.game.utils.DebugModule;
 import com.mygdx.game.utils.Variables;
 import com.mygdx.game.utils.Vector2d;
 
@@ -15,7 +17,10 @@ public class AI_TopHat extends AI_controller {
     private int ANGLE_PARTITION = 20;
     private int SPEED_PARTITION = 50;
     private double EAGERNESS_TO_EXPLORE = 1.5;
+    private double ERROR_BOUND = 0.001;
     private double WORLD_BOUND = Variables.BOUNDED_WORLD_SIZE;
+
+    public static boolean DEBUG = true;
 
     public Heuristic SHOT_COUNT = n -> n.depth;
     public Heuristic DISTANCE = n -> {
@@ -25,13 +30,14 @@ public class AI_TopHat extends AI_controller {
     public Explorer GAUSSIAN = new Explorer() {
         @Override
         public Node[] exploreNode(Node parent) {
-            Node[] result = new Node[ANGLE_PARTITION * SPEED_PARTITION - 1];
+            Node[] result = new Node[ANGLE_PARTITION * SPEED_PARTITION];
             double speed_increase = getWorld().maximum_velocity / SPEED_PARTITION;
             double[] angles = createAnglePartitions(parent.ball.topDownPosition());
             for (int i=0; i < ANGLE_PARTITION; i++) {
                 int k = 0;
-                for (double v = speed_increase; v <= getWorld().maximum_velocity; v += speed_increase) {
-                    result[i * SPEED_PARTITION + k++] = parent.shoot(v, angles[i]);
+                for (double v = 0; v <= getWorld().maximum_velocity; v += speed_increase) {
+                    if (v == 0) result[i * SPEED_PARTITION + k++] = parent.shoot(v, getWorld().maximum_velocity);
+                    else result[i * SPEED_PARTITION + k++] = parent.shoot(v, angles[i]);
                 }
             }
             return result;
@@ -98,6 +104,14 @@ public class AI_TopHat extends AI_controller {
 
     @Override
     protected void calculate(Player player) {
+        double error = 0;
+        if (!first_shot) {
+            error = last_node.ball.topDownPosition().sub(player.getBall().topDownPosition()).get_length();
+            if (error > ERROR_BOUND) {
+                debug.debug("Error of %.3f exceeds error bound of %.3f\n", error, ERROR_BOUND);
+                found_solution = false;
+            }
+        }
         if (first_shot) {
             stationary_grid = AIUtils.convertPointsToArray(AIUtils.getStationaryPoints(getWorld().height_function,
                     Variables.GRADIENT_CUTTOFF, WORLD_BOUND, GRID_RESOLUTION), WORLD_BOUND, GRID_RESOLUTION);
@@ -107,8 +121,9 @@ public class AI_TopHat extends AI_controller {
             first_shot = false;
         }
         else if (!found_solution) {
-            System.out.println("didn't find a solution, re-starting search");
+            debug.debug("didn't find a solution, re-starting search");
             rebase(last_node);
+            // TODO not yet tested
             result = search();
         }
         Node next_shot = getNodeAtDepth(result, current_depth++);
@@ -151,8 +166,9 @@ public class AI_TopHat extends AI_controller {
 
     private void exploreNode(Node n) {
         Node[] nodes = explorer.exploreNode(n);
-        List<Node> simulated_nodes = List.of(nodes); // TODO fix nullpointer exception
-        for (Node node : simulated_nodes) {
+        for (int k=0; k < nodes.length; k++) {
+            Node node = nodes[k];
+            if (node == null) continue;
             Vector2d index = AIUtils.getClosestValidArrayIndex(node.ball.topDownPosition(), stationary_grid, WORLD_BOUND);
             int i = (int)index.get_x(), j = (int)index.get_y();
             Node previous = total_node_grid[i][j];
@@ -201,7 +217,7 @@ public class AI_TopHat extends AI_controller {
             heuristic_value = Double.POSITIVE_INFINITY;
             g_cost_value = Double.POSITIVE_INFINITY;
         }
-        public Node(Node parent, double speed, double angle) throws ExceptionInInitializerError {
+        private Node(Node parent, double speed, double angle) throws ExceptionInInitializerError {
             children = new ArrayList<>();
             this.parent = parent;
             parent.children.add(this);
@@ -210,6 +226,7 @@ public class AI_TopHat extends AI_controller {
             this.speed = speed;
             this.angle = angle;
             reached_goal = ball.topDownPosition().distance(getWorld().flag_position) < getWorld().hole_tolerance;
+            if (ball.isStuck() && !reached_goal) throw new ExceptionInInitializerError("simulated ball hit water ("+speed+", "+angle+")");
             depth = parent.depth + 1;
             heuristic_value = h_value.evaluate(this);
             g_cost_value = g_cost.evaluate(this);
@@ -219,6 +236,7 @@ public class AI_TopHat extends AI_controller {
             try {
                 child = new Node(this, speed, angle);
             } catch (ExceptionInInitializerError e) {
+                debug.debug("erroneous ball found: "+e.getMessage());
                 return null;
             }
             return child;
@@ -235,4 +253,6 @@ public class AI_TopHat extends AI_controller {
             return 1;
         }
     }
+
+    public static DebugModule debug = DebugModule.get("tophat", DEBUG);
 }
