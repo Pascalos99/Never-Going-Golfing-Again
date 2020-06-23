@@ -2,8 +2,6 @@ package com.mygdx.game.bots.tree_search;
 
 import java.util.*;
 
-import static com.mygdx.game.bots.AI_Sherlock.debug;
-
 public class SimulationTreeSearch {
     private Node root_node;
     private List<Node> endorsed_nodes;
@@ -11,8 +9,6 @@ public class SimulationTreeSearch {
     private Node best_node;
     private double total_cost;
     private double maximum_cost;
-    /** the minimum amount in heuristic units that a child should be better than its parent in order to be added to the
-     * list of endorsed nodes (I am considering removing this) */
     private double minimum_improvement;
 
     public final HeuristicFunction heuristic;
@@ -44,7 +40,7 @@ public class SimulationTreeSearch {
 
     /**
      * creates a Tree Search without stop condition
-     * @see #SimulationTreeSearch(Node, HeuristicFunction, SuiteMaker, StopCondition) 
+     * @see #SimulationTreeSearch(Node, HeuristicFunction, SuiteMaker, StopCondition)
      */
     public SimulationTreeSearch(Node initial_node, HeuristicFunction heuristic, SuiteMaker suite_maker) {
         this(initial_node, heuristic, suite_maker, n -> false);
@@ -53,11 +49,6 @@ public class SimulationTreeSearch {
     public Node completeTreeSearch(double max_cost, double minimum_improvement) {
         startTreeSearch(max_cost, minimum_improvement);
         return best_node;
-    }
-    public Node completeAggregateTreeSearch(double max_cost, double minimum_improvement, double aggregate_factor) {
-        startTreeSearch(max_cost, minimum_improvement);
-        Node n = getBestAggregateNode(aggregate_factor);
-        return n;
     }
 
     public void rebase(Node new_root) {
@@ -75,8 +66,7 @@ public class SimulationTreeSearch {
 
     private void addAllChildren(Node from) {
         from.updateHeuristic();
-        for (Object o : from.children) {
-            Node child = (Node)o;
+        for (Node child : from.children) {
             if (child.isSimulated() && child.getHeuristic() >= from.getHeuristic() + minimum_improvement) {
                 if (!endorsed_nodes.contains(child)) endorsed_nodes.add(child);
                 addAllChildren(child);
@@ -111,10 +101,16 @@ public class SimulationTreeSearch {
         this.minimum_improvement = minimum_improvement;
         this.maximum_cost = max_cost;
         stop_simulation = false;
+        for (Node n : endorsed_nodes) if (stop_condition.isSolution(n)) {
+            best_node = n;
+            System.out.println("SIMULATION CANCELED\nfound a solution");
+            return;
+        }
         while (total_cost <= max_cost && !stop_simulation) {
             Node next_simulation = selectSuggestedNode();
             simulateNode(next_simulation, true);
         }
+        System.out.println("SIMULATION STOPPED\ntotal cost = "+total_cost+"\nsimulation stopped = "+stop_simulation);
         //validateBestNode();
     }
 
@@ -130,22 +126,6 @@ public class SimulationTreeSearch {
     public Node getBestNode() {
         return best_node;
     }
-
-    /**
-     * The aggregate heuristic of a node is determined by the sum of its own heuristic value and the heuristic value of
-     * its best child multiplied by the given aggregate_factor. The aggregate heuristic is used to eventually select the best node.
-     */
-    public Node getBestAggregateNode(double aggregate_factor) {
-        double best_aggregate = Double.NEGATIVE_INFINITY;
-        Node best_node = null;
-        for (Node n : endorsed_nodes) {
-            n.updateAggregateHeuristic(aggregate_factor);
-            if (n.getAggregateHeuristic() > best_aggregate) {
-                best_aggregate = n.getAggregateHeuristic();
-                best_node = n;
-            }}
-        return best_node;
-    }
     public void resetCost() {
         total_cost = 0;
     }
@@ -158,7 +138,7 @@ public class SimulationTreeSearch {
      *          suggested nodes to select from.
      */
     private Node selectSuggestedNode() {
-        while (suggested_nodes.size() <= 0) makeSuite(root_node);
+        if (suggested_nodes.size() <= 0) makeSuite(root_node);
         return suggested_nodes.poll();
     }
 
@@ -182,51 +162,32 @@ public class SimulationTreeSearch {
         }
         total_cost += node.getCost();
         double h_value = node.getHeuristic();
+        suggested_nodes.remove(node);
         if (node == root_node || h_value > getBestHeuristicValue()) best_node = node;
-        // pruning step:
+            // pruning step:
         else if (stop_condition.isSolution(node)) {
             best_node = node;
             stop_simulation = true;
             return;
         }
         else if (h_value < node.parent.getHeuristic() + minimum_improvement) return;
+
         endorsed_nodes.add(node);
         if (makeSuite) makeSuite(node);
     }
 
-    /**
-     * this method tries to make sure that the best_node that is returned, also has good future possible outcomes.
-     * //TODO find a way to systematically promote future-progress in search
-     * This can be achieved by having a heuristic that takes exploration into account, but also by letting deeper nodes
-     *  have higher heuristic values (either by improvement or just by default), such that the best node will never be
-     *  in the first depth or so. I might need to come up with something to make the heuristic scale well with depth.
-     *  This is of coarse complexioned by the fact that we want to get to the goal in as few shots as possible, and each
-     *  depth is an extra shot. So our heuristic will have to both promote and punish deep nodes..
-     *  So maybe, a better approach would be to not compare nodes with other nodes in other depths, but only with nodes
-     *  in the same depths. This can of coarse increase the complexity of the algorithm a lot, but it would be beneficial.
-     *  In typical applications of A*, you don't have this problem, because A) the unit of the heuristic you want to improve
-     *  and the unit of the cost you want to minimize are the same, and B) it is very possible to update existing nodes
-     *  with an improved heuristic value (while in our case, it is very unlikely, but could still be implemented).
-     *
-     * A way to eliminate competition between nodes of different depths could be to make the heuristic of a node be the sum
-     *   of its children's heuristics. Of course, we only care about the children with the highest heuristic value, so that's
-     *   the only one that is included in this 'sum'. And we care less about children further down the line, because they are
-     *   less likely to truly be optimal (because we do less simulations in those depths).
-     *   So we can make the heuristic of a node be a sum of its own heuristic value and the heuristic of its best child
-     *   multiplied by some factor. Then all children will have their heuristic calculated in this way, so that all children
-     *   and all grand children are part of the calculation of any one node's heuristic.
-     */
+    // TODO this is not working
     public void validateBestNode() {
         if (stop_simulation) return; // the 'best_node' satisfies the stop condition, so it does not have to be validated
         Node original_best = best_node;
         Node current_best = best_node;
         while (true) {
-            for (Object child : current_best.children)
+            for (Node child : current_best.children)
                 if (endorsed_nodes.contains(child)) return; // there is a child node that is better than best_node
             resetCost();
             while (current_best.suggested_children_count <= 0) makeSuite(current_best);
-            for (Object child : current_best.children) {
-                simulateNode((Node)child, false);
+            for (Node child : current_best.children) {
+                simulateNode(child, false);
                 if (endorsed_nodes.contains(child)) return; // there is a child node that is better than best_node
             }
             endorsed_nodes.remove(current_best);
@@ -245,45 +206,7 @@ public class SimulationTreeSearch {
         List<Node> suite = suite_maker.makeSuite(from, this, from.current_suite_count++);
         for (Node node : suite) suggested_nodes.add(node);
     }
-
-    /**
-     * implements a simple version of an auto-sorted linked-list
-     * @return a LinkedList that automatically sorts incoming elements
-     */
-    private LinkedList<Node> auto_sorted_node_list() {
-        return new LinkedList<Node>() {
-            @Override
-            public boolean add(Node node) {
-                ListIterator<Node> iter = this.listIterator();
-                boolean is_inserted = false;
-                while (iter.hasNext()) {
-                    Node current = iter.next();
-                    if (node.estimate_heuristic > current.estimate_heuristic) {
-                        iter.previous();
-                        iter.add(node);
-                        is_inserted = true;
-                        break;
-                    }
-                }
-                if (!is_inserted) iter.add(node);
-                return true;
-            }
-
-            @Override
-            public boolean addAll(Collection<? extends Node> elements) {
-                for (Node node : elements) add(node);
-                return true;
-            }
-
-            @Override
-            public boolean addAll(int index, Collection<? extends Node> elements) {
-                // there is no use in changing the starting index, because the list needs to remain sorted
-                return addAll(elements);
-            }
-        };
-    }
 }
-
 
 
 
