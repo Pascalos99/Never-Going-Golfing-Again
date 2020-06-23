@@ -25,11 +25,11 @@ public abstract class TopDownPhysicsObject implements Drawable {
 
     public abstract AxisAllignedBoundingBox getBoundingBox();
 
-    public float toWorldScale(double n){
+    public static float toWorldScale(double n){
         return (float)(n * WORLD_SCALING);
     }
 
-    public double fromWorldScale(float n){
+    public static double fromWorldScale(float n){
         return  n / WORLD_SCALING;
     }
 

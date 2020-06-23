@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.mygdx.game.physics.TopDownPhysicsObject;
 import com.mygdx.game.screens.BackgroundColor;
 import com.mygdx.game.CrazyPutting;
 import com.mygdx.game.physics.PhysicsSetting;
@@ -125,7 +126,8 @@ public final class Variables {
 
 	public static final double FRICTION_SCALE = 5d;
 
-	public static final double WALL_BASE = -10d;
+	public static final double WALL_HEIGHT = TopDownPhysicsObject.toWorldScale(5d);//GRAPHICS SCALE
+	public static final double WALL_BASE = TopDownPhysicsObject.toWorldScale(-10d);//GRAPHICS SCALE
 
 	// The rest is all Deprecated
 	// can't remove yet, because some of the code using these may be useful later

@@ -23,15 +23,12 @@ import static com.mygdx.game.utils.Variables.*;
 public class Wall extends Obstacle {
     final Vector2d[] points;
     final Vector2d start, end;
-    final double thickness, angle, length, height, rootHeight;
-
+    final double thickness, angle, length;
+    ModelInstance[] model;
 
     public Wall(Vector2d a, Vector2d b, double thickness) {
         Vector2d center = a.add(b).div(new Vector2d(2, 2));
         length = a.distance(b);
-        height = 3.0;
-        rootHeight = 1.0;
-
 
         Vector2d left_point = (new Vector2d(-length / 2d, 0));
         Vector2d right_point = (new Vector2d(length / 2d, 0));
@@ -39,10 +36,10 @@ public class Wall extends Obstacle {
         Vector2d upper_left_point = left_point.add(new Vector2d(0, thickness / 2d));
         Vector2d lower_left_point = left_point.add(new Vector2d(0, -thickness / 2d));
 
-        Vector2d upper_right_point = left_point.add(new Vector2d(0, thickness / 2d));
-        Vector2d lower_right_point = left_point.add(new Vector2d(0, -thickness / 2d));
+        Vector2d upper_right_point = right_point.add(new Vector2d(0, thickness / 2d));
+        Vector2d lower_right_point = right_point.add(new Vector2d(0, -thickness / 2d));
 
-        Vector2d[] vectors = {upper_left_point, upper_right_point, lower_left_point, lower_right_point};
+        Vector2d[] vectors = {upper_left_point, upper_right_point, lower_right_point, lower_left_point};
 
         for (int i = 0; i < vectors.length; i++) {
             vectors[i] = vectors[i].rotate(b.sub(a).angle());
@@ -54,6 +51,8 @@ public class Wall extends Obstacle {
         start = a;
         end = b;
         angle = b.sub(a).angle();
+
+        model = null;
     }
 
     @Override
@@ -69,8 +68,7 @@ public class Wall extends Obstacle {
     @Override
     public Vector3d getGraphicsPosition() {
         Vector2d vec = start.add(end.sub(start).scale(.5)).add(WORLD_SHIFT);
-        double y = WORLD.height_function.evaluate(vec);
-        return new Vector3d(toWorldScale(vec.get_x()), toWorldScale(y) - rootHeight, toWorldScale(vec.get_y()));
+        return new Vector3d(toWorldScale(vec.get_x()), WALL_BASE, toWorldScale(vec.get_y()));
     }
 
     public Vector2d getStart() {
@@ -104,22 +102,26 @@ public class Wall extends Obstacle {
         return end.sub(start).angle();
     }
 
-    @Override
-    public ModelInstance[] getModel() {
+    public ModelInstance[] generateModel() {
         ModelBuilder modelBuilder = new ModelBuilder();
         modelBuilder.begin();
         MeshPartBuilder builder = modelBuilder.part("tree", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new Material(ColorAttribute.createDiffuse(Color.BROWN)));
-        new BoxShapeBuilder().build(builder, toWorldScale(this.thickness), (float) (height + rootHeight), toWorldScale(this.length));
-//        builder = modelBuilder.part("grid", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.GREEN)));
-//        builder.sphere((float)this.radius*2f, (float)this.height, (float)this.radius*2f, 20,20);
+        new BoxShapeBuilder().build(builder, toWorldScale(this.thickness), (float) (WALL_HEIGHT), toWorldScale(this.length));
         Model wall = modelBuilder.end();
-//        System.out.println((float)this.getGraphicsPosition().get_y());
-//        System.out.println(height+rootHeight);
         double y = this.getGraphicsPosition().get_y();
-        ModelInstance[] wallInstance = new ModelInstance[]{new ModelInstance(wall, (float) this.getGraphicsPosition().get_x(), (float) (y + ((height + rootHeight) / 2f)), (float) this.getGraphicsPosition().get_z())};
+        ModelInstance[] wallInstance = new ModelInstance[]{new ModelInstance(wall, (float) this.getGraphicsPosition().get_x(), (float) (0), (float) this.getGraphicsPosition().get_z())};
         Vector2d dir = end.sub(start);
         wallInstance[0].transform.rotateRad(Vector3.Y, (float) ((Math.PI / 2) - dir.angle()));
         return wallInstance;
+    }
+
+    @Override
+    public ModelInstance[] getModel(){
+
+        if(model == null)
+            model = generateModel();
+
+        return model;
     }
 
     @Override
