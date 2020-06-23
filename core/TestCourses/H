@@ -1,5 +1,8 @@
-g = 9.81; m = 45.93; mu = 0.131; mu-sand = 0.578; vmax = 6.0; tol = 0.5;
-start = ( 1.0000,  2.0000); goal = ( 10.0000,  12.0000); world-shift = ( 4.5000,  3.0000);
-height = sin(5x)*cos(5y)/5 +.1; sand = cos(10x)+sin(y)
-using_fractals = false;
-
+g = 9.81; m = 45.93; mu = 0.131; mu-sand = 0.578; vmax = 6.0; tol = 0.1;
+start = (-29.9667, -40.1833); goal = (-30.1000, -25.0500); world-shift = ( 42.3000,  43.7500);
+height = -0.01x+0.003x^2+0.04y; sand = sin(x)+cos(y)
+using_fractals = true;
+seed = -6163199898274800472; roughness = 0.500000;
+minimum = -9.500000; maximum = 15.000000
+resolution = Low; smoothness = None;
+interpolation = bi-cubic;
