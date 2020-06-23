@@ -49,8 +49,4 @@ public abstract class Obstacle extends TopDownPhysicsObject {
         return getFrictionAt(pos.get_x(), pos.get_y());
     }
 
-    public abstract Vector2d getGradientsAt(double x, double y);
-
-    public Vector2d getGradientsAt(Vector2d pos) { return getGradientsAt(pos.get_x(), pos.get_y()); }
-
 }

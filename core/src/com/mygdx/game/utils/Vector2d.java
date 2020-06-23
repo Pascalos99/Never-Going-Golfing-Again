@@ -25,6 +25,7 @@ public class Vector2d {
 	public double get_length(){
 		return Math.sqrt(x * x + y * y);
 	}
+	public double squared_length() { return x*x + y*y; }
 
 	public Vector2d add(Vector2d v){
 		return add(v.get_x(), v.get_y());

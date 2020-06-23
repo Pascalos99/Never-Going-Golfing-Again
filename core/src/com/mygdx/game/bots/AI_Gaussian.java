@@ -28,7 +28,7 @@ public class AI_Gaussian extends AI_controller {
 
     @Override
     protected void calculate(Player player) {
-        Vector2d currentPos = new Vector2d(player.getBall().position.get_x(), player.getBall().position.get_z());
+        Vector2d currentPos = new Vector2d(player.getBall().x, player.getBall().y);
         Vector2d toFlag = getWorld().flag_position.sub(currentPos).normalize();
         double direct_angle = toFlag.angle();
         Ball best = null;
