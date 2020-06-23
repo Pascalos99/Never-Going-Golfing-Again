@@ -155,8 +155,7 @@ public class AI_TopHat extends AI_controller {
         }
         else if (!found_solution || error_exceeded) {
             debug.debug("didn't find a solution, re-starting search");
-            clearTree();
-            restart(player);
+            rebase(player);
             result = search();
         }
         Node next_shot = getNodeAtDepth(result, current_depth++);
@@ -164,6 +163,11 @@ public class AI_TopHat extends AI_controller {
         setShotVelocity(next_shot.speed);
         last_node = next_shot;
         previous_position = current_position;
+    }
+
+    private void rebase(Player player) {
+        clearTree();
+        restart(player);
     }
 
     private Node getNodeAtDepth(Node node, int depth) {
