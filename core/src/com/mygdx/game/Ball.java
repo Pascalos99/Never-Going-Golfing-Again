@@ -67,9 +67,6 @@ public class Ball extends TopDownPhysicsObject {
             Vector3d initial_position = position, final_position = null;
             Vector3d initial_velocity = velocity, final_velocity = null;
 
-            System.out.println("\nInitial velocity: " + initial_velocity.toString() + " | " + initial_velocity.get_length());
-            System.out.println("Initial position: " + initial_position.toString());
-
             Vector3d[] pair = new Vector3d[]{
                     initial_position,
                     initial_velocity
@@ -150,10 +147,6 @@ public class Ball extends TopDownPhysicsObject {
             rolling_distance += initial_position.distance(position);
 
             global_collisions.clear();
-
-            System.out.println("\nFinal velocity: " + velocity.toString() + " | " + velocity.get_length());
-            System.out.println("Final position: " + position.toString());
-            System.out.println("#--------------------------------------------#");
         }
 
     }
@@ -304,10 +297,6 @@ public class Ball extends TopDownPhysicsObject {
             CollisionData data = obstacle.isColliding(this);
 
             if(data != null){
-
-                System.out.println("Clipping correction: " + data.clipping_correction.toString());
-                System.out.println("Bounce velocity: " + data.bounce.toString() + " | " + data.bounce.get_length());
-
                 this.position = position.add(data.clipping_correction);
                 this.velocity = data.bounce;
                 collisions.add(data);
