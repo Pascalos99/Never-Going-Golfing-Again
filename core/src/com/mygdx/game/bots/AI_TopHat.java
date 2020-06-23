@@ -10,6 +10,9 @@ import java.util.*;
 
 public class AI_TopHat extends AI_controller {
 
+    private static class TopHat {}
+    public TopHat the_hat_that_makes_the_bot;
+
     private int MAX_TICKS = 8000;
     private double STEP_SIZE = Variables.DELTA;
     private int ANGLE_PARTITION = 50;
