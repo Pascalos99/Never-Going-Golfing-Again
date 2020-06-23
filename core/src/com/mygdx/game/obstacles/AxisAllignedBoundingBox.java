@@ -1,23 +1,21 @@
 package com.mygdx.game.obstacles;
 
+import com.mygdx.game.utils.Vector2d;
 import com.mygdx.game.utils.Vector3d;
 
 public class AxisAllignedBoundingBox {
 
     /** The point at the lowest x, y and z coordinates of this box */
-    public Vector3d origin;
+    public Vector2d origin;
     /** The physics-scale length of this box in the x-direction */
     public double width;
     /** The physics-scale length of this box in the y-direction */
     public double depth;
-    /** The physics-scale length of this box in the z-direction */
-    public double height;
 
-    public AxisAllignedBoundingBox(Vector3d origin, double width, double height, double depth) {
+    public AxisAllignedBoundingBox(Vector2d origin, double width, double depth) {
         this.origin = origin;
         this.width = width;
         this.depth = depth;
-        this.height = height;
     }
 
     public boolean collides(AxisAllignedBoundingBox box) {
@@ -25,27 +23,21 @@ public class AxisAllignedBoundingBox {
         if(origin.get_x() + width < box.origin.get_x())
             return false;
 
-        if(origin.get_z() + depth < box.origin.get_z())
+        if(origin.get_y() + depth < box.origin.get_y())
             return false;
 
         if(box.origin.get_x() + width < origin.get_x())
             return false;
 
-        if(box.origin.get_z() + depth < origin.get_z())
+        if(box.origin.get_y() + depth < origin.get_y())
             return false;
 
         return true;
     }
 
-    public boolean contains(double x, double y, double z) {
-        if (origin.get_x() > x || origin.get_y() > y || origin.get_z() > z) return false;
-        if (origin.get_x() + width < x || origin.get_y() + depth < y || origin.get_z() + height < z) return false;
-        return true;
-    }
-
     @Override
     public String toString(){
-        return "AABB from " + origin.toString() + " to " + origin.add(new Vector3d(width, height, depth)).toString();
+        return "AABB from " + origin.toString() + " to " + origin.add(new Vector2d(width, depth)).toString();
     }
 
 }
