@@ -111,7 +111,9 @@ public final class Variables {
 		return dir.angle();
 	}
 	public static final double AI_SHOT_ANGLE_BOUND = 0.03;
-	public static final AI_controller[] AVAILABLE_BOTS = {new AI_Basic(), new AI_SimpleLearner(), new AI_Gaussian(), new AI_Fedora(), new AI_Sherlock()};
+	public static final AI_controller[] AVAILABLE_BOTS = {
+			new AI_TopHat(), new AI_Fedora(), new AI_Gaussian(), new AI_Sherlock(), new AI_Basic()
+	};
 
 	public static final int TURN_STATE_START = 0;
 	public static final int TURN_STATE_WAIT = 1;
