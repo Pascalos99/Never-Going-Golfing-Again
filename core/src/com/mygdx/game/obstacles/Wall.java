@@ -22,6 +22,8 @@ import com.mygdx.game.utils.Vector3d;
 import static com.mygdx.game.utils.Variables.*;
 
 public class Wall extends Obstacle {
+    final double RESTITUTION = 0.4;
+
     final Vector2d start, end;
     final double thickness, angle, length;
     ModelInstance[] model;
@@ -46,26 +48,35 @@ public class Wall extends Obstacle {
             Vector2d real_point = new Vector2d(ball.position.get_x(), ball.position.get_z());
             Vector2d relative_point = real_point.sub(midpoint);
             Vector2d aligned_point = relative_point.rotate(-angle);
+            Vector2d aligned_velocity = new Vector2d(ball.velocity.get_x(), ball.velocity.get_z()).rotate(-angle);
 
             AxisAllignedBoundingBox box = new AxisAllignedBoundingBox(new Vector2d(-length / 2d, -thickness / 2d), length, thickness);
             AxisAllignedBoundingBox p = new AxisAllignedBoundingBox(aligned_point.sub(new Vector2d(BALL_RADIUS, BALL_RADIUS)), BALL_RADIUS * 2d, BALL_RADIUS * 2d);
 
-            double hld = p.origin.get_x() - length / 2d;//Horizontal left distance decreases with x
-            double hrd = p.origin.get_x() + length / 2d;//Horizontal right distance
-            double x_clipping_correction = hld < hrd ? -hld : hrd;
+            double hld = Math.abs(p.origin.get_x() + length / 2d);//Horizontal left distance
+            double hrd = Math.abs(p.origin.get_x() - length / 2d);//Horizontal right distance
+            double x_clipping_correction = hld < hrd ? -(hld + BALL_RADIUS) : (hrd + BALL_RADIUS);
 
-            double vud = p.origin.get_y() + thickness / 2d;//Vertical upper distance
-            double vld = p.origin.get_y() - thickness / 2d;//Vertical lower distance
-            double z_clipping_correction = vud < vld ? -vud : vld;
+            double vud = Math.abs(p.origin.get_y() + thickness / 2d);//Vertical upper distance
+            double vld = Math.abs(p.origin.get_y() - thickness / 2d);//Vertical lower distance
+            double z_clipping_correction = vud < vld ? -(vud + BALL_RADIUS) : (vld + BALL_RADIUS);
 
             CollisionData data = new CollisionData(this);
 
             Vector2d clipping_correction = Math.abs(x_clipping_correction) > Math.abs(z_clipping_correction) ? new Vector2d(0, z_clipping_correction) : new Vector2d(x_clipping_correction, 0);
+
             clipping_correction = clipping_correction.rotate(angle);
             data.clipping_correction = new Vector3d(clipping_correction.get_x(), 0, clipping_correction.get_y());
 
-            System.out.println("\nHorizontal distances: " + hld + " | " + hrd + " = " + (hld + hrd));
-            System.out.println("Vertical distances: " + vud + " | " + vld + " = " + (vud + vld));
+            Vector2d entrance_normal = (new Vector2d(ball.velocity.get_x(), ball.velocity.get_z())).normalize();
+            Vector2d clipping_normal = clipping_correction.normalize();
+
+            double dotp = entrance_normal.dot(clipping_normal);
+            Vector2d scaled_normal = clipping_normal.scale(2*dotp);
+
+            Vector2d horizontal_bounce = entrance_normal.sub(scaled_normal);
+            horizontal_bounce = horizontal_bounce.normalize().scale(ball.velocity.get_length()*RESTITUTION);
+            data.bounce = new Vector3d(horizontal_bounce.get_x(), 0, horizontal_bounce.get_y());
 
             return data;
         }

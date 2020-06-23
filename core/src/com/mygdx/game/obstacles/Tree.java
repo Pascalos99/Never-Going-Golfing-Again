@@ -40,8 +40,6 @@ public class Tree extends Obstacle {
         this.position = position;
         this.height = height;
         this.radius = radius;
-
-        System.out.println(height);
     }
 
     @Override
