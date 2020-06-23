@@ -1,5 +1,5 @@
 g = 9.81; m = 45.93; mu = 0.131; mu-sand = 0.578; vmax = 6.0; tol = 0.5;
 start = ( 1.0000,  2.0000); goal = ( 10.0000,  12.0000); world-shift = ( 4.5000,  3.0000);
-height = sin(5x)*cos(5y)/5 +.1; sand = sin(x)+cos(y)
+height = sin(5x)*cos(5y)/5 +.1; sand = -1
 using_fractals = false;
 
