@@ -286,9 +286,17 @@ public class ObstacleSelect implements Screen {
                     selected=WALL_END;
                     break;
                 case WALL_END:
-                    if (is_on_map) courseBuilder.endWall(pos_in_world, selectedThickness);
+                    Vector2d sub = null;
                     if (is_on_map) {
-                        courseBuilder.startWall(pos_in_world, selectedThickness);
+                        Vector2d start = courseBuilder.temp_wall.start;
+                        Vector2d end = courseBuilder.temp_wall.end;
+                        sub = end.sub(start).normalize().scale(selectedThickness).rotate(Math.PI);
+                        courseBuilder.endWall(pos_in_world, selectedThickness);
+                    }
+                    if (is_on_map) {
+                        Vector2d mod_pos = pos_in_world;
+                        if (sub != null) mod_pos = pos_in_world.add(sub);
+                        courseBuilder.startWall(mod_pos, selectedThickness);
                         selected=WALL_END;
                     } else selected=WALL_START;
                     break;
