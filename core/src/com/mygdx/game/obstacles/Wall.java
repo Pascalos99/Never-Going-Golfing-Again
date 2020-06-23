@@ -38,20 +38,38 @@ public class Wall extends Obstacle {
 
     @Override
     protected CollisionData isShapeColliding(Ball ball) {
-        Vector3d physic_pos = getPhysicsPosition();
-        Vector2d midpoint = new Vector2d(physic_pos.get_x(), physic_pos.get_z());
 
-        Vector2d real_point = new Vector2d(ball.position.get_x(), ball.position.get_z());
-        Vector2d relative_point = real_point.sub(midpoint);
-        Vector2d aligned_point = relative_point.rotate(-angle);
+        if(isPositionInsideShape(ball.position.get_x(), ball.position.get_z())) {
+            Vector3d physic_pos = getPhysicsPosition();
+            Vector2d midpoint = new Vector2d(physic_pos.get_x(), physic_pos.get_z());
 
-        AxisAllignedBoundingBox box = new AxisAllignedBoundingBox(new Vector2d(-length/2d, -thickness/2d), length, thickness);
-        AxisAllignedBoundingBox p = new AxisAllignedBoundingBox(aligned_point.sub(new Vector2d(BALL_RADIUS, BALL_RADIUS)), BALL_RADIUS*2d, BALL_RADIUS*2d);
+            Vector2d real_point = new Vector2d(ball.position.get_x(), ball.position.get_z());
+            Vector2d relative_point = real_point.sub(midpoint);
+            Vector2d aligned_point = relative_point.rotate(-angle);
 
-        double hld = Math.abs(p.origin.get_x() + length/2d);//Horizontal left distance
-        double hrd = Math.abs(p.origin.get_x() - length/2d);//Horizontal right distance
+            AxisAllignedBoundingBox box = new AxisAllignedBoundingBox(new Vector2d(-length / 2d, -thickness / 2d), length, thickness);
+            AxisAllignedBoundingBox p = new AxisAllignedBoundingBox(aligned_point.sub(new Vector2d(BALL_RADIUS, BALL_RADIUS)), BALL_RADIUS * 2d, BALL_RADIUS * 2d);
 
-        System.out.println("Horizontal right distance: " + hld + " | " + hrd + " = " + (hld + hrd));
+            double hld = p.origin.get_x() - length / 2d;//Horizontal left distance decreases with x
+            double hrd = p.origin.get_x() + length / 2d;//Horizontal right distance
+            double x_clipping_correction = hld < hrd ? -hld : hrd;
+
+            double vud = p.origin.get_y() + thickness / 2d;//Vertical upper distance
+            double vld = p.origin.get_y() - thickness / 2d;//Vertical lower distance
+            double z_clipping_correction = vud < vld ? -vud : vld;
+
+            CollisionData data = new CollisionData(this);
+
+            Vector2d clipping_correction = Math.abs(x_clipping_correction) > Math.abs(z_clipping_correction) ? new Vector2d(0, z_clipping_correction) : new Vector2d(x_clipping_correction, 0);
+            clipping_correction = clipping_correction.rotate(angle);
+            data.clipping_correction = new Vector3d(clipping_correction.get_x(), 0, clipping_correction.get_y());
+
+            System.out.println("\nHorizontal distances: " + hld + " | " + hrd + " = " + (hld + hrd));
+            System.out.println("Vertical distances: " + vud + " | " + vld + " = " + (vud + vld));
+
+            return data;
+        }
+
         return null;
     }
 

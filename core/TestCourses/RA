@@ -1,5 +1,0 @@
-g = 9.81; m = 45.93; mu = 0.131; mu-sand = 0.578; vmax = 20.0; tol = 0.5;
-start = ( 0.0100,  0.0100); goal = ( 0.0000,  10.0000); world-shift = ( 9.9950,  4.9950);
-height = 1; sand = -1
-using_fractals = false;
-
