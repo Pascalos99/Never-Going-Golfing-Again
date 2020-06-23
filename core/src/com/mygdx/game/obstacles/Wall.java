@@ -46,13 +46,14 @@ public class Wall extends Obstacle {
         Vector3d physic_pos = getPhysicsPosition();
         Vector2d midpoint = new Vector2d(physic_pos.get_x(), physic_pos.get_z());
 
-        Vector2d real_p = new Vector2d(x, y);
-        Vector2d p = (real_p.sub(midpoint)).rotate(-angle);
+        Vector2d real_point = new Vector2d(x, y);
+        Vector2d relative_point = real_point.sub(midpoint);
+        Vector2d aligned_point = relative_point;
 
         AxisAllignedBoundingBox box = new AxisAllignedBoundingBox(new Vector2d(-length/2d, -thickness/2d), length, thickness);
-        AxisAllignedBoundingBox dummy = new AxisAllignedBoundingBox(p, 0, 0);
+        AxisAllignedBoundingBox p = new AxisAllignedBoundingBox(aligned_point, 0, 0);
 
-        return box.collides(dummy);
+        return box.collides(p);
     }
 
     @Override
@@ -75,7 +76,7 @@ public class Wall extends Obstacle {
 
     @Override
     public Vector3d getPhysicsPosition() {
-        Vector2d real_position = (end.add(start).scale(1d/2d)).add(anchor);
+        Vector2d real_position = start.add(end.sub(start).scale(.5)).add(WORLD_SHIFT);
         return new Vector3d(real_position.get_x(), 0, real_position.get_y());
     }
 

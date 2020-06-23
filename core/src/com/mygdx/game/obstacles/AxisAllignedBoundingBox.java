@@ -26,10 +26,10 @@ public class AxisAllignedBoundingBox {
         if(origin.get_y() + depth < box.origin.get_y())
             return false;
 
-        if(box.origin.get_x() + width < origin.get_x())
+        if(box.origin.get_x() + box.width < origin.get_x())
             return false;
 
-        if(box.origin.get_y() + depth < origin.get_y())
+        if(box.origin.get_y() + box.depth < origin.get_y())
             return false;
 
         return true;
