@@ -21,8 +21,9 @@ public class AI_TopHat extends AI_controller {
     private static int SPEED_PARTITION = 20;
     private static double EAGERNESS_TO_EXPLORE = 2.5;
     private static double ERROR_BOUND = 0.1;
+    private static long TIME_PER_SHOT_MS = 5000;
 
-    public static boolean DEBUG = false;
+    public static boolean DEBUG = true;
 
     public Heuristic SHOT_COUNT = n -> n.depth;
     public Heuristic DISTANCE = n -> {
@@ -211,6 +212,7 @@ public class AI_TopHat extends AI_controller {
         setShotVelocity(next_shot.speed);
         last_node = next_shot;
         previous_position = current_position;
+        System.out.println(Vector2d.X.rotate(next_shot.angle).scale(next_shot.speed));
     }
 
     private void rebase(Node new_root) {
@@ -240,7 +242,7 @@ public class AI_TopHat extends AI_controller {
     private Node search() {
         long start = System.currentTimeMillis();
         long time_spent = 0;
-        search: while (time_spent < 5000) {
+        search: while (time_spent < TIME_PER_SHOT_MS && !found_solution) {
             Node node = expandable_nodes.poll();
             if (node == null) {
                 // this basically only happens if no single node has possible outcomes

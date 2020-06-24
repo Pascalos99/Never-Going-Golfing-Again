@@ -126,7 +126,7 @@ public final class Variables {
 
 	public static final double DELTA = 0.01d;
 
-	public static final double FRICTION_SCALE = 5d;
+	public static final double FRICTION_SCALE = 10d;
 
 	public static final double WALL_HEIGHT = TopDownPhysicsObject.toWorldScale(5d/WORLD_SCALING);//GRAPHICS SCALE
 	public static final double WALL_BASE = TopDownPhysicsObject.toWorldScale(-50d/WORLD_SCALING);//GRAPHICS SCALE
