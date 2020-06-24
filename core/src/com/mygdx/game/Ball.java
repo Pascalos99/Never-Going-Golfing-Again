@@ -98,7 +98,7 @@ public class Ball extends TopDownPhysicsObject {
                         pair[1].get_z()
                 );
 
-                if(isStuck() || ((fence_check || WORLD.height_function.gradient(final_position.get_x(), final_position.get_z()).get_length() < GRADIENT_CUTTOFF) && (new Vector2d(final_velocity.get_x(), final_velocity.get_z())).get_length() < getStoppingVelocity(final_velocity.get_x(), final_velocity.get_z()))){
+                if(isStuck() || ((fence_check || WORLD.height_function.gradient(final_position.get_x(), final_position.get_z()).get_length() < GRADIENT_CUTTOFF) && (new Vector2d(final_velocity.get_x(), final_velocity.get_z())).get_length() < getStoppingVelocity(final_velocity.get_x(), final_velocity.get_z(), delta))){
                     is_moving = false;
                     final_velocity = new Vector3d(0, 0, 0);
                 }
@@ -443,8 +443,8 @@ public class Ball extends TopDownPhysicsObject {
         mapDrawer.draw(this);
     }
 
-    private double getStoppingVelocity(double x, double y){
-        return getMass()*getGravity()*getFirctionAt(x, y);
+    private double getStoppingVelocity(double x, double y, double delta){
+        return getMass()*getGravity()*getFirctionAt(x, y)*delta;
     }
 
     private double getFirctionAt(double x, double y){
