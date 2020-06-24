@@ -68,10 +68,10 @@ public class SimulationTreeSearch {
         from.updateHeuristic();
         for (Node child : from.children) {
             if (child.isSimulated() && child.getHeuristic() >= from.getHeuristic() + minimum_improvement) {
-                if (!endorsed_nodes.contains(child)) endorsed_nodes.add(child);
+                endorsed_nodes.add(child);
                 addAllChildren(child);
             } else if (!child.isSimulated()) {
-                if (!suggested_nodes.contains(child)) suggested_nodes.add(child);
+                suggested_nodes.add(child);
             }
         }
     }
@@ -101,16 +101,10 @@ public class SimulationTreeSearch {
         this.minimum_improvement = minimum_improvement;
         this.maximum_cost = max_cost;
         stop_simulation = false;
-        for (Node n : endorsed_nodes) if (stop_condition.isSolution(n)) {
-            best_node = n;
-            System.out.println("SIMULATION CANCELED\nfound a solution");
-            return;
-        }
         while (total_cost <= max_cost && !stop_simulation) {
             Node next_simulation = selectSuggestedNode();
             simulateNode(next_simulation, true);
         }
-        System.out.println("SIMULATION STOPPED\ntotal cost = "+total_cost+"\nsimulation stopped = "+stop_simulation);
         //validateBestNode();
     }
 
@@ -162,7 +156,6 @@ public class SimulationTreeSearch {
         }
         total_cost += node.getCost();
         double h_value = node.getHeuristic();
-        suggested_nodes.remove(node);
         if (node == root_node || h_value > getBestHeuristicValue()) best_node = node;
             // pruning step:
         else if (stop_condition.isSolution(node)) {
@@ -171,7 +164,6 @@ public class SimulationTreeSearch {
             return;
         }
         else if (h_value < node.parent.getHeuristic() + minimum_improvement) return;
-
         endorsed_nodes.add(node);
         if (makeSuite) makeSuite(node);
     }
