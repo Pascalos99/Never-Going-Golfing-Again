@@ -1,4 +1,4 @@
-g = 9.81; m = 45.93; mu = 0.131; mu-sand = 0.578; vmax = 6.0; tol = 0.1;
+g = 9.81; m = 45.93; mu = 0.131; mu-sand = 0.578; vmax = 10.0; tol = 0.1;
 start = (-29.9667, -40.1833); goal = (-30.1000, -25.0500); world-shift = ( 42.3000,  43.7500);
 height = -0.01x+0.003x^2+0.04y; sand = sin(x)+cos(y)
 using_fractals = true;
