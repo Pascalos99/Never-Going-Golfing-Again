@@ -20,7 +20,8 @@ public class AI_TopHat extends AI_controller {
     private static int ANGLE_PARTITION = 50;
     private static int SPEED_PARTITION = 20;
     private static double EAGERNESS_TO_EXPLORE = 2.5;
-    private static double ERROR_BOUND = 0.6;
+    private static double ERROR_BOUND = 0.1;
+    private static long TIME_PER_SHOT_MS = 5000;
 
     public static boolean DEBUG = true;
 
@@ -241,7 +242,7 @@ public class AI_TopHat extends AI_controller {
     private Node search() {
         long start = System.currentTimeMillis();
         long time_spent = 0;
-        search: while (time_spent < 5000) {
+        search: while (time_spent < TIME_PER_SHOT_MS && !found_solution) {
             Node node = expandable_nodes.poll();
             if (node == null) {
                 // this basically only happens if no single node has possible outcomes
