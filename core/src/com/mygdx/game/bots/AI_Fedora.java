@@ -51,10 +51,11 @@ public class AI_Fedora extends AI_controller {
 
             old_ball_position = new Vector2d(player.getBall().position.get_x(), player.getBall().position.get_z());
             List<Vector2d> vectors = cast_vectors(player.getBall());
-            if (FEDORA_DEBUG) System.out.println("Using " + vectors.size() + " of " + VECTOR_COUNT + " vectors.");
+            if (FEDORA_DEBUG) System.out.println("[FEDORA] Using " + vectors.size() + " of " + VECTOR_COUNT + " vectors.");
             tests = new ArrayList<TestDataHolder>(vectors.size());
 
             for(Vector2d v : vectors) {
+                System.out.println("[FEDORA] Testing vector " + v.toString());
                 TestDataHolder test = get_test_data(player.getBall(), v);
 
                 if(test != null)
@@ -112,7 +113,7 @@ public class AI_Fedora extends AI_controller {
         for(int i = 0; i < VECTOR_COUNT; i++) {
             Vector2d ray = anchor.rotate(((double) (i)) * 2d * Math.PI / ((double) VECTOR_COUNT));
 
-            if(
+            /*if(
                     isClearPath(
                             real_ball_position,
                             real_ball_position.add(ray),
@@ -121,8 +122,8 @@ public class AI_Fedora extends AI_controller {
                             getWorld().hole_tolerance
                     ) && (ray.normalize().dot(to_flag) > 0)
             )
-                points.add(ray.normalize());
-
+                points.add(ray.normalize());*/
+            points.add(ray.normalize());
         }
 
         Collections.sort(points, new Comparator<Vector2d>() {

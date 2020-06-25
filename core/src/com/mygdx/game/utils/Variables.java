@@ -92,7 +92,7 @@ public final class Variables {
 		YAW = Math.PI * 0.75;
 		VIEW_ZOOM = 7;
 		CURRENT_PHYSICS_SETTING = Verlet;
-		ALLOW_FLIGHT = false;
+		ALLOW_FLIGHT = true;
 		CAST_SHADOWS = false;
 		GAME = null;
 		CAMERA = null;
